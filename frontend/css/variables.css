@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Sarabun:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+:root {
+  /* Core Canvas & Elevated Surfaces */
+  --bg-canvas: #F4F7F9;
+  --bg-canvas-gradient: radial-gradient(1200px circle at 92% -8%, rgba(67, 97, 238, 0.08), transparent 55%),
+    radial-gradient(900px circle at -5% 105%, rgba(16, 185, 129, 0.06), transparent 50%),
+    #F4F7F9;
+  --bg-surface: #FFFFFF;
+  --bg-surface-hover: #F8FAFC;
+  --bg-surface-Active: #F1F5F9;
+  --bg-subtle: #EEF2F6;
+
+  /* Glassmorphism Surfaces */
+  --glass-bg: rgba(255, 255, 255, 0.78);
+  --glass-bg-strong: rgba(255, 255, 255, 0.90);
+  --glass-dark-bg: rgba(15, 23, 42, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-blur: blur(16px);
+
+  /* FinTech Electric Blue & Emerald Accent Palette */
+  --accent-primary: #4361EE;
+  --accent-primary-hover: #3651D4;
+  --accent-primary-active: #2A41B8;
+  --accent-primary-soft: rgba(67, 97, 238, 0.10);
+  --accent-primary-glow: rgba(67, 97, 238, 0.24);
+
+  --accent-emerald: #10B981;
+  --accent-emerald-hover: #059669;
+  --accent-emerald-soft: rgba(16, 185, 129, 0.12);
+  --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+
+  /* PROTEX Brand Heritage Accent */
+  --brand-crimson: #C8102E;
+  --brand-crimson-soft: rgba(200, 16, 46, 0.10);
+
+  /* Sidebar & Dark Chrome */
+  --sidebar-bg: #0F172A;
+  --sidebar-surface: #1E293B;
+  --sidebar-border: rgba(255, 255, 255, 0.07);
+  --sidebar-text: #94A3B8;
+  --sidebar-text-active: #FFFFFF;
+
+  /* Typography Colors */
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --text-inverse: #FFFFFF;
+
+  /* Semantic Status Colors */
+  --status-success: #10B981;
+  --status-success-bg: #ECFDF5;
+  --status-warning: #F59E0B;
+  --status-warning-bg: #FFFBEB;
+  --status-danger: #EF4444;
+  --status-danger-bg: #FEF2F2;
+  --status-info: #4361EE;
+  --status-info-bg: #EEF2FF;
+
+  /* Borders & Dividers */
+  --border-hairline: #E2E8F0;
+  --border-subtle: #EDF2F7;
+  --border-strong: #CBD5E1;
+  --border-focus: #4361EE;
+
+  /* Typography Stacks (Formal Commercial & Financial Trading Standard) */
+  --font-sans: 'Sarabun', 'IBM Plex Sans Thai', 'TH Sarabun New', 'Tahoma', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-thai: 'Sarabun', 'IBM Plex Sans Thai', 'TH Sarabun New', 'Tahoma', sans-serif;
+  --font-mono: 'IBM Plex Sans', 'Sarabun', 'SFMono-Regular', Consolas, monospace;
+
+  /* Font Sizes */
+  --text-2xs: 0.6875rem;
+  /* 11px */
+  --text-xs: 0.75rem;
+  /* 12px */
+  --text-sm: 0.84375rem;
+  /* 13.5px */
+  --text-base: 0.9375rem;
+  /* 15px */
+  --text-lg: 1.0625rem;
+  /* 17px */
+  --text-xl: 1.25rem;
+  /* 20px */
+  --text-2xl: 1.5rem;
+  /* 24px */
+  --text-3xl: 1.875rem;
+  /* 30px */
+
+  /* Spacing Scale */
+  --space-1: 0.25rem;
+  /* 4px */
+  --space-2: 0.5rem;
+  /* 8px */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-8: 2rem;
+  /* 32px */
+  --space-10: 2.5rem;
+  /* 40px */
+
+  /* Layout Dimensions */
+  --sidebar-width: 248px;
+  --header-height: 68px;
+  --container-max: 1560px;
+
+  /* Border Radius (12px - 16px High-End FinTech Standard) */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Soft Layered Shadows */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.06), 0 1px 3px -1px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.07), 0 4px 10px -3px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 20px 40px -12px rgba(15, 23, 42, 0.12), 0 8px 16px -6px rgba(15, 23, 42, 0.06);
+  --shadow-float: 0 24px 48px -12px rgba(67, 97, 238, 0.14), 0 12px 24px -8px rgba(15, 23, 42, 0.08);
+  --shadow-cell-focus: 0 0 0 2px var(--accent-primary), 0 4px 12px rgba(67, 97, 238, 0.15);
+
+  /* Smooth Transitions & Micro-interactions */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-base: 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 380ms cubic-bezier(0.16, 1, 0.3, 1);
+}

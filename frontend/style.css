@@ -1,0 +1,1689 @@
+/* ==========================================================================
+   PRICECRAFT — STATIC ENTERPRISE APPLICATION STYLESHEET (style.css)
+   หจก.โพรเทคส์ แอคเซสโซรี อินดัสเตรียล (PROTEX ACCESSORY INDUSTRIAL LTD., PART.)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Sarabun:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+:root {
+  /* ==========================================================================
+     TASK 1: PROTEX SIGNATURE CARBON BLACK & RED ACCENT PALETTE
+     ========================================================================== */
+  /* Primary (Deep Carbon Black) */
+  --navy-950: #09090B;
+  --navy-900: #111114;
+  --navy-800: #1C1C21;
+
+  /* Accent (Vibrant Brand Red) */
+  --protex-red: #DC2626;
+  --protex-red-bright: #E11D24;
+  --protex-red-dark: #B91C1C;
+  --primary: #111114;
+  --primary-hover: #1C1C21;
+  --primary-soft: rgba(225, 29, 36, 0.08);
+  --accent-focus: #E11D24;
+  --accent-focus-soft: rgba(225, 29, 36, 0.10);
+
+  /* Workspace Background (Clean & Airy) */
+  --bg-page: #F4F5F7;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F8FAFC;
+
+  /* Neutral / Text Hierarchy */
+  --text-main: #111114;
+  --text-secondary: #52525B;
+  --text-placeholder: #A1A1AA;
+
+  /* Status Accents */
+  --emerald: #10B981;
+  --danger: #EF4444;
+
+  /* Ultra-Soft Data Grid Lines */
+  --grid-border: #E4E4E7;
+  --grid-border-light: #F4F4F5;
+  --grid-header-bg: #111114;
+  --grid-header-text: #FFFFFF;
+
+  /* Typography */
+  --font-main: 'Sarabun', 'IBM Plex Sans Thai', 'TH Sarabun New', 'Tahoma', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'IBM Plex Sans Thai', 'Sarabun', 'Tahoma', sans-serif;
+  --font-doc: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+  --font-num: 'IBM Plex Sans', 'Sarabun', 'Tahoma', monospace;
+
+  /* Luxury Border Radii & Soft Blurred Shadows */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+
+  --shadow-luxury-card: 0 24px 60px -15px rgba(15, 23, 42, 0.06),
+    0 8px 24px -8px rgba(15, 23, 42, 0.04);
+  --shadow-luxury-subcard: 0 10px 30px -8px rgba(15, 23, 42, 0.05),
+    0 2px 10px -2px rgba(15, 23, 42, 0.03);
+  --shadow-modal: 0 24px 60px -12px rgba(15, 30, 54, 0.18),
+    0 8px 24px -6px rgba(15, 30, 54, 0.08);
+  --shadow-logo-pill: 0 8px 24px -4px rgba(15, 23, 42, 0.07),
+    0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-input: 0 4px 18px -2px rgba(15, 23, 42, 0.05);
+  --shadow-btn-navy: 0 12px 24px -6px rgba(15, 30, 54, 0.38);
+  --transition: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 15.5px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-main);
+  color: var(--text-main);
+  background: var(--bg-page);
+  min-height: 100vh;
+  line-height: 1.55;
+  letter-spacing: 0.005em;
+}
+
+.tabular-nums,
+input[type="number"],
+.num-cell {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* ==========================================================================
+   PART 1: LOGIN MODAL SCREEN (index.html — 100% Pixel-Matched to Reference)
+   ========================================================================== */
+.login-page-backdrop {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(circle at 50% 25%, #FFFFFF 0%, #EDF1F7 55%, #DDE4EE 100%);
+  position: relative;
+}
+
+.login-modal-card {
+  width: 100%;
+  max-width: 450px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-modal);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  padding: 38px 36px 40px;
+  position: relative;
+  text-align: center;
+  transition: transform var(--transition);
+}
+
+/* Top-Right Close Button (X) */
+.modal-close-x {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #EFF3F8;
+  border: none;
+  color: #526277;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.modal-close-x:hover {
+  background: #E2E8F0;
+  color: var(--navy-900);
+  transform: scale(1.05);
+}
+
+.modal-close-x svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 1. Logo Pill Container */
+.protex-logo-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 196px;
+  height: 76px;
+  background: #FFFFFF;
+  border: 1px solid #F1F5F9;
+  border-radius: 18px;
+  box-shadow: var(--shadow-logo-pill);
+  margin: 4px auto 22px;
+  padding: 10px 18px;
+}
+
+.protex-logo-pill img,
+.protex-logo-pill svg {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* 2. Red Small Bold Text: INTERNAL ACCESS GATEWAY */
+.gateway-tag {
+  font-family: 'Inter', var(--font-main);
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--protex-red-bright);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* 3. Main Heading (Dark Navy): Protex Center */
+.protex-center-title {
+  font-family: 'Inter', var(--font-main);
+  font-size: 2.05rem;
+  font-weight: 900;
+  color: var(--navy-900);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+/* 4. Subtitle (Gray): หจก.โพรเทคส์ แอคเซสโซรี อินดัสเตรียล */
+.protex-center-subtitle {
+  font-size: 0.96rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+}
+
+/* 5. Employee ID Form Section */
+.emp-form-group {
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.emp-label {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 10px;
+}
+
+/* 6. Input Field with Employee Badge Icon & Crisp Dark Navy Underline */
+.emp-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 12px 12px 3px 3px;
+  box-shadow: var(--shadow-input);
+  border: 1px solid #F1F5F9;
+  border-bottom: 2.2px solid var(--navy-900);
+  transition: border-color var(--transition), box-shadow var(--transition), background-color var(--transition);
+}
+
+.emp-input-wrapper:focus-within {
+  border-bottom-color: var(--primary);
+  box-shadow: 0 8px 22px -4px rgba(11, 31, 58, 0.1);
+}
+
+.emp-badge-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 16px;
+  padding-right: 10px;
+  color: var(--navy-900);
+  flex-shrink: 0;
+}
+
+.emp-badge-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.emp-input {
+  width: 100%;
+  height: 54px;
+  padding: 10px 16px 10px 4px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: var(--navy-900);
+  outline: none;
+}
+
+.emp-input::placeholder {
+  color: var(--text-placeholder);
+  font-weight: 400;
+}
+
+/* Error State + Apple UI Keyframe Shake Animation */
+@keyframes appleShake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  15% {
+    transform: translateX(-11px);
+  }
+
+  30% {
+    transform: translateX(10px);
+  }
+
+  45% {
+    transform: translateX(-8px);
+  }
+
+  60% {
+    transform: translateX(7px);
+  }
+
+  75% {
+    transform: translateX(-4px);
+  }
+
+  90% {
+    transform: translateX(3px);
+  }
+}
+
+.emp-input-wrapper.shake-error {
+  animation: appleShake 460ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  border-color: rgba(239, 68, 68, 0.45);
+  border-bottom: 2.5px solid var(--danger) !important;
+  background-color: #FFF8F8;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+.emp-input-wrapper.shake-error .emp-badge-icon {
+  color: var(--danger);
+}
+
+.emp-error-hint {
+  min-height: 20px;
+  margin-top: 7px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--danger);
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.emp-error-hint.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 7. Submit Button (PROTEX CI Charcoal & Red Accent) */
+.gateway-submit-btn {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #18181B 0%, #09090B 100%);
+  border-bottom: 3px solid var(--protex-red-bright);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow-btn-navy);
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.gateway-submit-btn:hover {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  transform: translateY(-1.5px);
+  box-shadow: 0 16px 28px -6px rgba(220, 38, 38, 0.42);
+}
+
+.gateway-submit-btn:active {
+  transform: translateY(0.5px) scale(0.99);
+}
+
+.gateway-submit-btn svg {
+  width: 20px;
+  height: 20px;
+  transition: transform var(--transition);
+}
+
+.gateway-submit-btn:hover svg {
+  transform: translateX(3px);
+}
+
+/* Subtle Helper Hint at Bottom of Modal */
+.gateway-demo-hint {
+  margin-top: 18px;
+  font-size: 0.76rem;
+  color: #71717A;
+}
+
+.gateway-demo-hint code {
+  background: #F4F4F5;
+  color: var(--navy-900);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   PART 2: WORKSPACE & EXCEL-LIKE SPREADSHEET (dashboard.html)
+   TASK 2: LUXURY NAVY TOP HEADER & GRADIENT "P" ICON
+   ========================================================================== */
+.workspace-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, #18181B 0%, #09090B 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: #FFFFFF;
+  padding: 12px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 3px solid var(--protex-red-bright);
+  box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.42);
+  flex-wrap: wrap;
+}
+
+.topbar-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-logo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  padding: 5px 12px;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  flex-shrink: 0;
+}
+
+.topbar-brand-logo {
+  display: block;
+  height: 34px;
+  width: auto;
+  max-width: 118px;
+  object-fit: contain;
+}
+
+.topbar-brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.topbar-app-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.topbar-app-sub {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: #94A3B8;
+  display: block;
+  line-height: 1.3;
+}
+
+.topbar-actions-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cmd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8.5px 15px;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.cmd-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.cmd-btn:active {
+  transform: scale(0.97);
+}
+
+.cmd-btn-import {
+  background: rgba(255, 255, 255, 0.08);
+  color: #F8FAFC;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.cmd-btn-import:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.cmd-btn-excel {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
+}
+
+.cmd-btn-excel:hover {
+  transform: translateY(-1px);
+}
+
+.cmd-btn-word {
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.28);
+}
+
+.cmd-btn-word:hover {
+  transform: translateY(-1px);
+}
+
+.cmd-btn-print {
+  background: linear-gradient(135deg, var(--protex-red-bright), #B91C1C);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(225, 29, 36, 0.32);
+}
+
+.cmd-btn-print:hover {
+  transform: translateY(-1px);
+}
+
+.cmd-btn-logout {
+  background: rgba(255, 255, 255, 0.05);
+  color: #CBD5E1;
+  border-color: rgba(255, 255, 255, 0.12);
+  padding: 8px 13px;
+}
+
+.cmd-btn-logout:hover {
+  color: #FFFFFF;
+  background: rgba(239, 68, 68, 0.25);
+}
+
+/* ==========================================================================
+   TASK 3: LUXURY CORPORATE DOCUMENT PAPER & BORDERLESS SOFT-SHADOW UI
+   ========================================================================== */
+.workspace-stage {
+  max-width: 1380px;
+  margin: 34px auto 72px;
+  padding: 0 28px;
+}
+
+.document-paper {
+  font-family: var(--font-doc);
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-luxury-card);
+  border: none;
+  border-top: none;
+  padding: 44px 48px;
+  position: relative;
+  isolation: isolate;
+}
+
+.document-paper::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  max-width: 400px;
+  height: 220px;
+  background-image: url("ChatGPT Image 9 พ.ย. 2569 21_02_33.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  opacity: 0.07;
+  z-index: -1;
+  pointer-events: none;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Official Document Header (Executive Corporate Letterhead — Prominent Top Logo + Balanced 2-Column Info) */
+.official-doc-header,
+.header-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 2px 0 26px;
+  border-bottom: 1.5px solid #E2E8F0;
+  margin-bottom: 26px;
+}
+
+.letterhead-top-brand {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Task 1: Pure Brand Logo (No Dashed Box, No Border, No Upload Text) */
+.company-brand-logo {
+  display: block;
+  width: 192px;
+  height: 68px;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: left center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  user-select: none;
+}
+
+.letterhead-main-grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 32px;
+  align-items: flex-end;
+}
+
+@media (max-width: 900px) {
+  .letterhead-main-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+.company-info-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.company-name-th {
+  font-family: var(--font-heading);
+  font-size: 1.68rem;
+  font-weight: 800;
+  color: var(--navy-900);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.company-address-th {
+  font-size: 0.96rem;
+  font-weight: 500;
+  color: #3F3F46;
+  line-height: 1.45;
+}
+
+.vendor-inline-row {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.vendor-label {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--navy-900);
+}
+
+.vendor-input {
+  flex: 1;
+  min-width: 240px;
+  max-width: 440px;
+  padding: 5px 10px;
+  font-family: inherit;
+  font-size: 0.96rem;
+  font-weight: 600;
+  color: var(--navy-900);
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid #52525B;
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.vendor-input:focus {
+  outline: none;
+  background: #FAFAFB;
+  border-bottom: 2px solid var(--protex-red);
+}
+
+/* Task 2: Seamless Right-Side Document Title Area (No Border, No Background Box) */
+.doc-title-meta-box {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.doc-main-heading {
+  font-family: var(--font-heading);
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--protex-red-bright);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0 0 4px 0;
+  text-align: right;
+}
+
+.doc-meta-line {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #52525B;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.doc-meta-label {
+  color: #52525B;
+  font-weight: 500;
+}
+
+.doc-meta-line strong,
+.doc-meta-value {
+  color: #18181B;
+  font-weight: 700;
+}
+
+.doc-meta-seller-row {
+  margin-top: 4px;
+  gap: 8px;
+}
+
+.doc-meta-seller-row .doc-meta-label {
+  font-weight: 700;
+  color: var(--navy-900);
+  white-space: nowrap;
+}
+
+.seller-meta-input {
+  width: 210px;
+  padding: 3px 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--navy-900);
+  text-align: right;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid #52525B;
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.seller-meta-input::placeholder {
+  color: var(--text-placeholder);
+  font-weight: 400;
+  text-align: right;
+}
+
+.seller-meta-input:focus {
+  outline: none;
+  background: #FAFBFD;
+  border-bottom: 2px solid var(--protex-red);
+}
+
+/* Excel Toolbar & Table (Luxury Borderless Soft-Shadow Grid) */
+.excel-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.excel-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.excel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: #F8FAFC;
+  color: var(--navy-900);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+  transition: all var(--transition);
+}
+
+.excel-btn:hover {
+  background: #F1F5F9;
+  color: var(--navy-900);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.07);
+}
+
+.excel-btn.primary {
+  background: linear-gradient(180deg, #18181B 0%, #09090B 100%);
+  border: none;
+  border-bottom: 3px solid var(--protex-red-bright);
+  color: #FFFFFF;
+  box-shadow: 0 8px 20px -4px rgba(9, 9, 11, 0.38);
+}
+
+.excel-btn.primary:hover {
+  background: linear-gradient(180deg, #27272A 0%, #111114 100%);
+  border-bottom: 3px solid var(--protex-red-bright);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.excel-hints {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.kbd-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  font-family: var(--font-num);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 5px;
+  color: #334155;
+}
+
+.excel-grid-container {
+  width: 100%;
+  overflow-x: auto;
+  border: none;
+  border-radius: var(--radius-md);
+  background: #FFFFFF;
+  box-shadow: var(--shadow-luxury-subcard), 0 0 0 1px rgba(226, 232, 240, 0.7);
+}
+
+.excel-table {
+  width: 100%;
+  min-width: 1040px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.excel-table thead th {
+  font-family: var(--font-heading);
+  background: linear-gradient(180deg, #18181B 0%, #09090B 100%);
+  color: var(--grid-header-text);
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 13px 10px;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 3px solid var(--protex-red-bright);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.excel-table thead th:last-child {
+  border-right: none;
+}
+
+.excel-table tbody tr:nth-child(even) {
+  background-color: #FCFDFE;
+}
+
+.excel-table tbody tr:hover {
+  background-color: #F8FAFC;
+}
+
+.excel-table tbody tr:focus-within {
+  background-color: #F5F7FF;
+}
+
+.excel-table tbody td {
+  padding: 3px;
+  border-right: 1px solid var(--grid-border);
+  border-bottom: 1px solid var(--grid-border-light);
+  height: 44px;
+  vertical-align: middle;
+}
+
+.excel-table tbody td:last-child {
+  border-right: none;
+}
+
+.excel-col-index {
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #64748B;
+  background: #FAFBFD;
+}
+
+.excel-table tbody tr:focus-within .excel-col-index {
+  background: var(--navy-900);
+  color: #FFFFFF;
+}
+
+.cell-input {
+  width: 100%;
+  height: 100%;
+  min-height: 38px;
+  padding: 6px 10px;
+  font-family: var(--font-doc);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-main);
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 7px;
+  outline: none;
+  transition: all var(--transition);
+}
+
+.cell-input:hover {
+  background: rgba(241, 245, 249, 0.65);
+}
+
+.cell-input::placeholder {
+  color: #CBD5E1;
+}
+
+.cell-input:focus {
+  background: #FFFFFF;
+  border-color: var(--accent-focus);
+  box-shadow: 0 0 0 3px var(--accent-focus-soft);
+}
+
+.cell-input.num-right {
+  text-align: right;
+  font-weight: 600;
+}
+
+.cell-input.center {
+  text-align: center;
+}
+
+.cell-calculated {
+  padding: 6px 10px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--navy-900);
+  background: rgba(248, 250, 252, 0.85);
+  border-radius: 7px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.cell-wht-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  min-height: 38px;
+  gap: 4px;
+}
+
+.cell-wht-check {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--navy-900);
+  cursor: pointer;
+}
+
+.cell-wht-val {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #B45309;
+  text-align: right;
+  flex: 1;
+}
+
+.row-action-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.row-sub-btn,
+.row-del-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #94A3B8;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  opacity: 0.38;
+  transition: all var(--transition);
+}
+
+.excel-table tbody tr:hover .row-sub-btn,
+.excel-table tbody tr:hover .row-del-btn,
+.excel-table tbody tr:focus-within .row-sub-btn,
+.excel-table tbody tr:focus-within .row-del-btn {
+  opacity: 1;
+}
+
+.row-sub-btn:hover {
+  background: #EEF2FF;
+  color: var(--accent-focus);
+}
+
+.row-del-btn:hover {
+  background: #FEF2F2;
+  color: var(--danger);
+}
+
+/* Sub-item Row Styling (Indented Item Name & Dash Sequence) */
+.excel-btn.sub-item-btn {
+  background: #EEF2FF;
+  color: #3730A3;
+  border: 1px solid rgba(79, 70, 229, 0.22);
+}
+
+.excel-btn.sub-item-btn:hover {
+  background: #E0E7FF;
+  color: #312E81;
+}
+
+.excel-table tbody tr.is-sub-item {
+  background-color: #FAFBFD;
+}
+
+.excel-table tbody tr.is-sub-item .excel-col-index {
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+.sub-item-name-wrap {
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+}
+
+.sub-item-branch-icon {
+  color: #64748B;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-right: 4px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.excel-table tbody tr.is-sub-item .cell-input[data-field="itemName"] {
+  padding-left: 6px;
+  color: #334155;
+}
+
+.col-w-68 { width: 68px; }
+
+/* Bottom Summary & Signatures (Luxury Soft-Shadow Cards) */
+.doc-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 410px;
+  gap: 32px;
+  margin-top: 28px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .doc-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.doc-notes-box {
+  background: #FAFBFD;
+  border: none;
+  box-shadow: var(--shadow-luxury-subcard), 0 0 0 1px rgba(226, 232, 240, 0.65);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+}
+
+.doc-notes-label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.doc-notes-textarea {
+  width: 100%;
+  min-height: 84px;
+  border: 1px solid #EDF2F7;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: #FFFFFF;
+  color: var(--text-main);
+  resize: vertical;
+  outline: none;
+  transition: all var(--transition);
+}
+
+.doc-notes-textarea:focus {
+  border-color: var(--accent-focus);
+  box-shadow: 0 0 0 3px var(--accent-focus-soft);
+}
+
+.summary-calc-box {
+  border: none;
+  box-shadow: var(--shadow-luxury-subcard), 0 0 0 1px rgba(226, 232, 240, 0.75);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #FFFFFF;
+}
+
+.summary-calc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid #F1F5F9;
+  font-size: 0.92rem;
+}
+
+.summary-calc-row:last-child {
+  border-bottom: none;
+}
+
+.summary-calc-label {
+  font-weight: 600;
+  color: var(--navy-900);
+}
+
+.summary-calc-sub {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.summary-calc-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy-900);
+}
+
+.shipping-input-inline {
+  width: 135px;
+  padding: 5px 10px;
+  text-align: right;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: 1.5px solid #94A3B8;
+  border-radius: 6px;
+  background: #F8FAFC;
+}
+
+.summary-calc-row.wht-ref-row {
+  background: #FFFBEB;
+  color: #B45309;
+  font-size: 0.84rem;
+}
+
+.summary-calc-row.grand-total-row {
+  background: linear-gradient(180deg, #18181B 0%, #09090B 100%);
+  color: #FFFFFF;
+  padding: 14px 16px;
+  border-bottom: 3px solid var(--protex-red-bright);
+}
+
+.summary-calc-row.grand-total-row .summary-calc-label {
+  color: #FFFFFF;
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+
+.summary-calc-row.grand-total-row .summary-calc-value {
+  color: #34D399;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.signatures-section {
+  margin-top: 38px;
+  padding-top: 20px;
+  border-top: 1px dashed #CBD5E1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+
+.signature-block {
+  text-align: center;
+  padding: 16px 20px;
+}
+
+.signature-role-line {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--navy-900);
+  margin-bottom: 10px;
+}
+
+.signature-dots {
+  font-weight: 400;
+  color: #475569;
+  letter-spacing: 1px;
+}
+
+.signature-name-input {
+  margin-top: 6px;
+  text-align: center;
+  border: none;
+  border-bottom: 1px dashed #94A3B8;
+  padding: 4px 12px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  width: 240px;
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast-msg {
+  background: rgba(11, 31, 58, 0.95);
+  backdrop-filter: blur(12px);
+  color: #FFFFFF;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-modal);
+  border-left: 4px solid var(--emerald);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+.no-underline {
+  text-decoration: none;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.col-w-44 {
+  width: 44px;
+}
+
+.col-w-52 {
+  width: 52px;
+}
+
+.col-w-82 {
+  width: 82px;
+}
+
+.col-w-88 {
+  width: 88px;
+}
+
+.col-w-118 {
+  width: 118px;
+}
+
+.col-w-130 {
+  width: 130px;
+}
+
+.col-w-138 {
+  width: 138px;
+}
+
+.col-w-142 {
+  width: 142px;
+}
+
+.col-w-155 {
+  width: 155px;
+}
+
+.col-w-270 {
+  width: 270px;
+}
+
+.summary-wht-label {
+  color: #B45309;
+  font-size: 0.84rem;
+}
+
+.summary-grand-sub {
+  color: #94A3B8;
+}
+
+.cmd-btn-preview {
+  background: linear-gradient(135deg, #4F46E5, #3730A3);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+.cmd-btn-preview:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #4338CA, #312E81);
+}
+
+.a4-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.a4-preview-overlay.is-open {
+  display: flex;
+}
+
+.a4-preview-topbar {
+  background: #071326;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.a4-preview-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.a4-badge {
+  background: rgba(52, 211, 153, 0.16);
+  color: #34D399;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  font-family: var(--font-num);
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+
+.a4-preview-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+.a4-preview-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.a4-zoom-group {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.a4-zoom-btn {
+  background: transparent;
+  border: none;
+  color: #E2E8F0;
+  padding: 5px 10px;
+  font-family: var(--font-num);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background var(--transition);
+}
+
+.a4-zoom-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #FFFFFF;
+}
+
+.a4-zoom-label {
+  min-width: 50px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.a4-close-btn {
+  background: rgba(239, 68, 68, 0.18);
+  color: #FCA5A5;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.a4-close-btn:hover {
+  background: #EF4444;
+  color: #FFFFFF;
+}
+
+.a4-preview-stage {
+  flex: 1;
+  overflow: auto;
+  padding: 32px 20px 60px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Physical A4 Sheet Dimensions: 210mm width x 297mm height */
+.a4-paper-sheet {
+  font-family: var(--font-doc);
+  width: 210mm;
+  min-height: 297mm;
+  background: #FFFFFF;
+  color: #000000;
+  padding: 12mm 12mm 14mm 12mm;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.15);
+  transform-origin: top center;
+  transition: transform 180ms ease;
+  font-size: 10.5pt;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.a4-paper-sheet::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 420px;
+  height: 180px;
+  background-image: url("ChatGPT Image 9 พ.ย. 2569 21_02_33.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.a4-paper-sheet>* {
+  position: relative;
+  z-index: 1;
+}
+
+.a4-sheet-header {
+  display: grid;
+  grid-template-columns: 125px 1.55fr 1fr;
+  gap: 14px;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #18181B;
+  margin-bottom: 12px;
+}
+
+.a4-sheet-logo-box {
+  width: 120px;
+  height: 54px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.a4-sheet-logo-box img {
+  max-width: 100%;
+  max-height: 52px;
+  object-fit: contain;
+}
+
+.a4-sheet-company-name {
+  font-size: 13.5pt;
+  font-weight: 800;
+  color: #18181B;
+  margin-bottom: 2px;
+}
+
+.a4-sheet-company-addr {
+  font-size: 8.8pt;
+  color: #3F3F46;
+  margin-bottom: 6px;
+}
+
+.a4-sheet-vendor-line {
+  font-size: 9.5pt;
+  font-weight: 700;
+  color: #18181B;
+}
+
+.a4-sheet-vendor-val {
+  color: #18181B;
+  border-bottom: 1px dotted #18181B;
+  padding: 0 8px;
+}
+
+.a4-sheet-meta-box {
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: right;
+}
+
+.a4-sheet-doc-title {
+  font-size: 16pt;
+  font-weight: 800;
+  color: #E11D24;
+  margin-bottom: 4px;
+  line-height: 1.15;
+}
+
+.a4-sheet-meta-row {
+  font-size: 8.5pt;
+  color: #334155;
+}
+
+.a4-sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 14px;
+  table-layout: fixed;
+}
+
+.a4-sheet-table th {
+  background: linear-gradient(180deg, #18181B 0%, #09090B 100%);
+  color: #FFFFFF;
+  font-size: 8.2pt;
+  font-weight: 700;
+  padding: 6px 4px;
+  border: 0.75pt solid #111114;
+  border-bottom: 2.5pt solid #E11D24;
+  text-align: center;
+}
+
+.a4-sheet-table td {
+  border: 0.75pt solid #CBD5E1;
+  padding: 5px 6px;
+  font-size: 8.8pt;
+  color: #0F172A;
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+.a4-sheet-table tbody tr:nth-child(even) {
+  background: rgba(248, 250, 252, 0.75);
+}
+
+.a4-sheet-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 265px;
+  gap: 16px;
+  align-items: stretch;
+  margin-top: 8px;
+}
+
+.a4-sheet-notes-box {
+  background: rgba(248, 250, 252, 0.85);
+  border: 0.75pt solid #CBD5E1;
+  border-radius: 6px;
+  padding: 8px 10px;
+  min-height: 92px;
+  font-size: 8.6pt;
+  white-space: pre-wrap;
+}
+
+.a4-sheet-notes-title {
+  font-weight: 700;
+  color: #111114;
+  margin-bottom: 4px;
+  font-size: 8.8pt;
+}
+
+.a4-sheet-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1pt solid #111114;
+}
+
+.a4-sheet-summary-table td {
+  border: 0.75pt solid #CBD5E1;
+  padding: 5px 8px;
+  font-size: 9pt;
+}
+
+.a4-sheet-summary-table tr.a4-grand-row td {
+  background: linear-gradient(180deg, #18181B 0%, #09090B 100%);
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 10.2pt;
+  border-bottom: 2.5pt solid #E11D24;
+}
+
+.a4-sheet-summary-table tr.a4-grand-row td:last-child {
+  color: #34D399;
+}
+
+.a4-sheet-signatures {
+  margin-top: 26px;
+  padding-top: 14px;
+  border-top: 1px dashed #94A3B8;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  text-align: center;
+  font-size: 9.5pt;
+}
+
+.a4-sheet-sign-role {
+  font-weight: 700;
+  color: #0B1F3A;
+  margin-bottom: 6px;
+}
+
+.a4-sheet-sign-name {
+  font-size: 9pt;
+  color: #334155;
+  min-height: 18px;
+}

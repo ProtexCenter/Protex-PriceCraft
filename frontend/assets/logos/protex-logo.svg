@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 90" width="280" height="90" role="img" aria-label="PROTEX GROUP Logo">
+  <!-- "PROTE" Heavy Black Typography -->
+  <text x="18" y="54" font-family="'Inter', 'Arial Black', Impact, sans-serif" font-size="40" font-weight="900" letter-spacing="1" fill="#1F1917">PROTE</text>
+  <!-- "GROUP" Bold Italic Red Subtitle -->
+  <text x="58" y="75" font-family="'Inter', 'Arial Black', sans-serif" font-size="18.5" font-weight="900" font-style="italic" letter-spacing="0.8" fill="#E11D24">GROUP</text>
+  <!-- Black Diagonal Leg of X (Top-Left to Bottom-Right) -->
+  <polygon points="182,18 202,18 238,76 218,76" fill="#1F1917" />
+  <!-- Red Curved Highway / Swoosh Diagonal of X (Bottom-Left to Top-Right) -->
+  <path d="M168,78 C188,58 214,32 248,8 L256,14 C226,40 202,62 182,78 Z" fill="#E11D24" />
+  <!-- White Dashed Highway Center Line inside Red Swoosh -->
+  <path d="M177,74 C197,55 220,34 250,12" stroke="#FFFFFF" stroke-width="2.2" stroke-dasharray="5,4" fill="none" stroke-linecap="round" />
+</svg>
+

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ใบรายการขอราคาต้นทุน | Pricecraft — PROTEX GROUP</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="print.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1" defer></script>
+  <script src="appwrite-config.js" defer></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js" defer></script>
+</head>
+
+<body>
+
+  <header class="workspace-topbar no-print" aria-label="แถบเครื่องมือหลัก">
+    <div class="topbar-brand-group">
+      <div class="topbar-logo-badge">
+        <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="PROTEX GROUP Logo" class="topbar-brand-logo" width="112"
+          height="38">
+      </div>
+      <div class="topbar-brand-text">
+        <span class="topbar-app-name">PRICECRAFT • Protex Center</span>
+        <span class="topbar-app-sub" id="loggedInUserBanner">ผู้ใช้งาน: พนักงานโพรเทคส์ (ID: 1234) • ผู้จัดทำใบขอราคาต้นทุน</span>
+      </div>
+    </div>
+
+    <div class="topbar-actions-toolbar">
+      <input type="file" id="importExcelFileInput" class="is-hidden" accept=".xlsx,.xls,.csv"
+        aria-label="เลือกไฟล์ Excel หรือ CSV เพื่อนำเข้า" title="เลือกไฟล์ Excel หรือ CSV เพื่อนำเข้า">
+
+      <button type="button" class="cmd-btn cmd-btn-import" id="btnImportExcel"
+        title="นำเข้าข้อมูลจากไฟล์ Excel หรือ CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        <span>นำเข้า Excel</span>
+      </button>
+
+      <button type="button" class="cmd-btn cmd-btn-excel" id="btnExportExcel"
+        title="ส่งออกเป็นไฟล์ Microsoft Excel (.xlsx)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="8" y1="13" x2="16" y2="17"></line>
+          <line x1="16" y1="13" x2="8" y2="17"></line>
+        </svg>
+        <span>ส่งออก Excel</span>
+      </button>
+
+      <button type="button" class="cmd-btn cmd-btn-word" id="btnExportWord"
+        title="ส่งออกเป็นไฟล์ Microsoft Word (.docx)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>ส่งออก Word</span>
+      </button>
+
+      <button type="button" class="cmd-btn cmd-btn-preview" id="btnPrintPreview"
+        title="ดูตัวอย่างกระดาษ A4 ก่อนสั่งพิมพ์ (Print Preview)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <span>ดูตัวอย่างก่อนพิมพ์ (A4)</span>
+      </button>
+
+      <button type="button" class="cmd-btn cmd-btn-print" id="btnPrintDoc" title="สั่งพิมพ์เอกสารลงกระดาษ A4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span>สั่งพิมพ์ (Print)</span>
+      </button>
+
+      <button type="button" class="cmd-btn cmd-btn-logout" id="btnLogout" title="ออกจากระบบกลับสู่หน้า Login">
+        <span>ออกจากระบบ</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace-stage">
+    <article class="document-paper" id="printableDocument">
+      <header class="official-doc-header header-section">
+        <div class="letterhead-top-brand">
+          <img id="companyLogoImg" class="company-brand-logo" src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png"
+            alt="PROTEX GROUP Logo" width="190" height="68">
+        </div>
+
+        <div class="letterhead-main-grid">
+          <div class="company-info-block">
+            <h1 class="company-name-th">หจก.โพรเทคส์ แอคเซสโซรี อินดัสเตรียล</h1>
+            <p class="company-address-th">
+              56/360 ม.1 ซ.วัดไตรสามัคคี3 ถ.สุขุมวิท ต.บางเมืองใหม่ อ.เมืองสมุทรปราการ จ.สมุทรปราการ 10270
+            </p>
+
+            <div class="vendor-inline-row">
+              <label class="vendor-label" for="customerNameInput">ชื่อลูกค้า :</label>
+              <input type="text" id="customerNameInput" class="vendor-input"
+                placeholder="กรอกชื่อลูกค้า / บริษัท / หน่วยงาน..." title="ชื่อลูกค้า" value="">
+            </div>
+          </div>
+
+          <div class="doc-title-meta-box">
+            <h2 class="doc-main-heading">รายการขอราคาต้นทุน</h2>
+            <div class="doc-meta-line">
+              <span class="doc-meta-label">เลขที่เอกสาร :</span>
+              <strong class="tabular-nums doc-meta-value" id="docNumberDisplay">PC-202611-0001</strong>
+            </div>
+            <div class="doc-meta-line">
+              <span class="doc-meta-label">วันที่และเวลาที่ออก :</span>
+              <strong class="tabular-nums doc-meta-value" id="issuedDateTimeDisplay">-</strong>
+            </div>
+            <div class="doc-meta-line doc-meta-seller-row">
+              <label class="doc-meta-label" for="sellerNameInput">ชื่อผู้ขาย :</label>
+              <input type="text" id="sellerNameInput" class="seller-meta-input"
+                placeholder="ระบุชื่อผู้ขาย / ซัพพลายเออร์..." title="ชื่อผู้ขาย" value="">
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="excel-toolbar no-print">
+        <div class="excel-toolbar-left">
+          <button type="button" class="excel-btn primary" id="btnAddRow">
+            <span>+ เพิ่มบรรทัดใหม่</span>
+          </button>
+          <button type="button" class="excel-btn sub-item-btn" id="btnAddSubItem"
+            title="เพิ่มรายการย่อยโดยไม่รันเลขลำดับใหม่">
+            <span>↳ + เพิ่มรายการย่อย</span>
+          </button>
+          <button type="button" class="excel-btn" id="btnAddFiveRows">
+            <span>+ เพิ่ม 5 บรรทัด</span>
+          </button>
+          <button type="button" class="excel-btn" id="btnLoadSampleData">
+            <span>โหลดข้อมูลตัวอย่าง</span>
+          </button>
+          <button type="button" class="excel-btn" id="btnClearRows">
+            <span>ล้างตาราง</span>
+          </button>
+        </div>
+
+        <div class="excel-hints">
+          <span><kbd class="kbd-tag">Tab</kbd> เลื่อนช่องถัดไป</span>
+          <span><kbd class="kbd-tag">Enter</kbd> ที่ช่องสุดท้าย = เพิ่มบรรทัดใหม่ทันที</span>
+          <span><kbd class="kbd-tag">↑</kbd> <kbd class="kbd-tag">↓</kbd> เลื่อนขึ้น-ลงเหมือน Excel</span>
+        </div>
+      </div>
+
+      <div class="excel-grid-container">
+        <table class="excel-table" id="costExcelTable">
+          <thead>
+            <tr>
+              <th scope="col" class="col-w-52">ลำดับ</th>
+              <th scope="col" class="col-w-270">รายการ</th>
+              <th scope="col" class="col-w-88">จำนวน</th>
+              <th scope="col" class="col-w-82">หน่วย</th>
+              <th scope="col" class="col-w-138">ราคาต้นทุน(ก่อนVAT)</th>
+              <th scope="col" class="col-w-142">ราคารวม (ก่อนVAT)</th>
+              <th scope="col" class="col-w-118">หักภาษี3%</th>
+              <th scope="col" class="col-w-130">การส่งมอบ</th>
+              <th scope="col" class="col-w-155">หมายเหตุ</th>
+              <th scope="col" class="col-action-header no-print col-w-68">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="excelTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <section class="doc-bottom-grid" aria-label="สรุปยอดคำนวณราคาต้นทุน">
+        <div class="doc-notes-box">
+          <label class="doc-notes-label" for="docGeneralNotes">หมายเหตุ / เงื่อนไขประกอบใบขอราคาต้นทุน :</label>
+          <textarea id="docGeneralNotes" class="doc-notes-textarea"
+            placeholder="ระบุเงื่อนไขการชำระเงิน การรับประกันสินค้า หรือรายละเอียดเพิ่มเติม..."
+            title="หมายเหตุและเงื่อนไขประกอบใบขอราคาต้นทุน">1. ราคาต้นทุนข้างต้นยังไม่รวมภาษีมูลค่าเพิ่ม (คำนวณ VAT 7% แยกในสรุปท้ายตาราง)
+2. ค่าขนส่งไม่มี VAT</textarea>
+        </div>
+
+        <div class="summary-calc-box">
+          <div class="summary-calc-row">
+            <div>
+              <div class="summary-calc-label">ยอดรวม</div>
+              <div class="summary-calc-sub">ผลรวมของ 'ราคารวม (ก่อนVAT)' ทุกบรรทัด</div>
+            </div>
+            <div class="summary-calc-value tabular-nums" id="sumSubtotal">0.00</div>
+          </div>
+
+          <div class="summary-calc-row">
+            <div>
+              <div class="summary-calc-label">VAT 7%</div>
+              <div class="summary-calc-sub">ยอดรวม × 0.07</div>
+            </div>
+            <div class="summary-calc-value tabular-nums" id="sumVat7">0.00</div>
+          </div>
+
+          <div class="summary-calc-row">
+            <div>
+              <label class="summary-calc-label" for="shippingCostInput">ค่าขนส่ง</label>
+              <div class="summary-calc-sub">*หมายเหตุ: ค่าขนส่งไม่มี VAT</div>
+            </div>
+            <div>
+              <input type="number" step="0.01" min="0" id="shippingCostInput" class="shipping-input-inline tabular-nums"
+                value="500.00" title="ค่าขนส่ง (ไม่มี VAT)">
+            </div>
+          </div>
+
+          <div class="summary-calc-row wht-ref-row">
+            <div>
+              <div class="summary-calc-label summary-wht-label">รวมหักภาษี 3% (แสดงแยก)</div>
+            </div>
+            <div class="tabular-nums fw-700" id="sumWht3">0.00</div>
+          </div>
+
+          <div class="summary-calc-row grand-total-row">
+            <div>
+              <div class="summary-calc-label">ยอดรวมสุทธิ</div>
+              <div class="summary-calc-sub summary-grand-sub">ยอดรวม + VAT 7% + ค่าขนส่ง</div>
+            </div>
+            <div class="summary-calc-value tabular-nums" id="sumGrandTotal">0.00</div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="signatures-section">
+        <div class="signature-block">
+          <div class="signature-role-line">
+            <label for="approverSignName">ผู้อนุมัติ (<span
+                class="signature-dots">................................................</span>)</label>
+          </div>
+          <input type="text" id="approverSignName" class="signature-name-input"
+            placeholder="(ลงชื่อ / ตำแหน่งผู้อนุมัติ)" title="ชื่อผู้อนุมัติ" value="">
+        </div>
+
+        <!-- ฝั่งขวา: ผู้จัดทำ -->
+        <div class="signature-block">
+          <div class="signature-role-line">
+            <label for="preparerSignName">ผู้จัดทำ (<span
+                class="signature-dots">................................................</span>)</label>
+          </div>
+          <input type="text" id="preparerSignName" class="signature-name-input" placeholder="(ลงชื่อ / ตำแหน่งผู้จัดทำ)"
+            title="ชื่อผู้จัดทำ" value="">
+        </div>
+      </footer>
+    </article>
+  </main>
+
+  <div class="a4-preview-overlay no-print" id="a4PrintPreviewModal" role="dialog" aria-modal="true"
+    aria-labelledby="a4PreviewTitle">
+    <header class="a4-preview-topbar" aria-label="แถบเครื่องมือตัวอย่างก่อนพิมพ์">
+      <div class="a4-preview-title-group">
+        <span class="a4-badge">A4 STANDARD (210 × 297 mm)</span>
+        <h2 class="a4-preview-heading" id="a4PreviewTitle">ดูตัวอย่างก่อนพิมพ์ (Print Preview — ขนาดกระดาษ A4 จริง)</h2>
+      </div>
+
+      <div class="a4-preview-controls">
+        <div class="a4-zoom-group">
+          <button type="button" class="a4-zoom-btn" id="btnZoomOut" title="ย่อขนาดกระดาษ">−</button>
+          <span class="a4-zoom-label tabular-nums" id="a4ZoomLevelText">100%</span>
+          <button type="button" class="a4-zoom-btn" id="btnZoomIn" title="ขยายขนาดกระดาษ">+</button>
+          <button type="button" class="a4-zoom-btn" id="btnZoomReset" title="ขนาดมาตรฐาน 100%">100%</button>
+        </div>
+
+        <button type="button" class="cmd-btn cmd-btn-word" id="btnPreviewExportWord"
+          title="ส่งออกเป็นไฟล์ Microsoft Word (.docx)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <span>ส่งออก Word (.docx)</span>
+        </button>
+
+        <button type="button" class="cmd-btn cmd-btn-print" id="btnPreviewConfirmPrint"
+          title="สั่งพิมพ์ลงกระดาษ A4 ทันที">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          <span>สั่งพิมพ์ A4 ทันที (Print Now)</span>
+        </button>
+
+        <button type="button" class="a4-close-btn" id="btnClosePrintPreview" title="ปิดหน้าต่างดูตัวอย่าง">
+          <span>✕ ปิดตัวอย่าง</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="a4-preview-stage" id="a4PreviewStage">
+      <div class="a4-paper-sheet" id="a4PaperSheetContent">
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container no-print" id="toastContainer" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
