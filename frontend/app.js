@@ -132,6 +132,241 @@
     },
   ];
 
+  /* ==========================================================================
+     2B. HARDCODED LOCAL CATALOG DATABASE (SMART SEARCH & AUTO-FILL)
+     ========================================================================== */
+  const localItemsDB = [
+    {
+      mainName: 'ถังพรีฮีต 300 ลิตร',
+      items: [
+        { name: 'เหล็กฉาก 50x50x4mm. (2")', qty: 1, unit: 'เส้น', price: 406.54 },
+        { name: "เหล็กแผ่น 4'x8' หนา 3มม.", qty: 2, unit: 'แผ่น', price: 2691.59 },
+        { name: 'รางน้ำ 4" (ซัพพอร์ตถัง)', qty: 1, unit: 'เส้น', price: 1242.99 },
+        { name: 'หน้าแปลนเชื่อม 10K 3"', qty: 3, unit: 'ตัว', price: 148.00 },
+        { name: 'หน้าแปลนเชื่อม 10K 2-1/2"', qty: 1, unit: 'ตัว', price: 130.00 },
+        { name: 'หน้าแปลนเชื่อม 10K 1-1/2"', qty: 1, unit: 'ตัว', price: 115.00 },
+        { name: 'ท่อสตรีมดำ API #SCH40 3"', qty: 1, unit: 'เส้น', price: 1850.47 },
+        { name: 'ข้อต่อตรงเกลียวในสตรีมแดง ขนาด 4หุน', qty: 2, unit: 'ตัว', price: 64.00 },
+        { name: 'ข้อต่อตรงเกลียวในสตรีมแดง ขนาด 1"', qty: 2, unit: 'ตัว', price: 50.00 },
+        { name: 'บอลวาล์วทองเหลือง 1"', qty: 1, unit: 'ตัว', price: 545.00 },
+        {
+          name: 'เทอร์โมคัปเปิ้ลหัวกะโหลก Type K เกลียว 1/2นิ้ว',
+          qty: 1,
+          unit: 'ตัว',
+          price: 1650.00,
+          subSpecs: ['- แกนโต 8mm. ความยาวแกน 30cm. อุณหภูมิ 0-800องศา'],
+        },
+        {
+          name: 'เทอร์โมมิเตอร์เกจ หน้าปัด 4นิ้ว ขนาดเกลียว 1/2นิ้ว',
+          qty: 1,
+          unit: 'ตัว',
+          price: 800.00,
+          subSpecs: ['- ความยาวแกน 30cm. ออกข้าง อุณหภูมิ 0-300องศา'],
+        },
+        {
+          name: 'ฮีตเตอร์หน้าแปลน 3U แบบหน้าแปลน 3นิ้ว 10K',
+          qty: 3,
+          unit: 'ชุด',
+          price: 11800.00,
+          subSpecs: [
+            '- ขนาด 11.1x1100mm. ไฟ 220/380V 12,000W',
+            '- Cool Zone 150mm. พร้อมฝาครอบสแตนเลส 4นิ้ว',
+          ],
+        },
+      ],
+    },
+    {
+      mainName: 'ตู้ไฟ ถังพรีฮีต 300 ลิตร',
+      items: [
+        { name: 'หางปลากลมเปลือย เบอร์ 6-6', qty: 100, unit: 'ตัว', price: 2.13 },
+        { name: 'สายทนความร้อน No.6 (ขายยกม้วน 100เมตร)', qty: 50, unit: 'เมตร', price: 135.00 },
+        { name: 'แมกเนติกส์ ST-35 Mitsu คอยล์ 220V.', qty: 3, unit: 'ตัว', price: 1275.00 },
+        { name: 'เบรกเกอร์ 100A Mitsu 3 เฟส ไฟ 380V.', qty: 1, unit: 'ตัว', price: 1850.00 },
+        { name: 'Serector Switch 2 Position 22mm.', qty: 3, unit: 'ตัว', price: 102.15 },
+        { name: 'Pilot Lamp Green 22mm. (Idec-YM1P-2EQM3G)', qty: 3, unit: 'ตัว', price: 73.35 },
+        { name: 'Pilot Lamp Red 22mm. (Idec-YM1P-2EQM3R)', qty: 3, unit: 'ตัว', price: 63.00 },
+        { name: 'VOLT PANAL METER ขนาด 72*72 ยี่ห้อ Shinohawa 0-500V', qty: 1, unit: 'ตัว', price: 361.90 },
+        { name: 'AMP PANAL METER ขนาด 72*72 ยี่ห้อ Shinohawa 0-100/5A', qty: 1, unit: 'ตัว', price: 361.90 },
+        { name: 'Current Tranformer (CT) 100/5A.', qty: 1, unit: 'ตัว', price: 171.50 },
+        {
+          name: 'ตู้ไฟกันน้ำ 2ชั้น แบบมีกระจก ยี่ห้อ DENCO รุ่น DSG-09',
+          qty: 1,
+          unit: 'ตู้',
+          price: 2385.00,
+          subSpecs: ['- Size 450x600x250mm.'],
+        },
+        { name: 'สายไฟ VSF สีเหลือง 1x1Sqm. (100เมตร)', qty: 1, unit: 'ม้วน', price: 746.06 },
+        { name: 'หางปลาแฉกหุ้ม 1.5-3s', qty: 100, unit: 'ตัว', price: 1.02 },
+        { name: 'รางเก็บสายไฟ WD 40*40', qty: 1, unit: 'เส้น', price: 195.00 },
+        { name: 'หางปลากลมเปลือย เบอร์ 16-8', qty: 20, unit: 'ตัว', price: 5.10 },
+        { name: 'รางปีกนก 1เมตร', qty: 1, unit: 'เส้น', price: 75.00 },
+        { name: 'เท็มคอนโทรล OMRON 48x48', qty: 1, unit: 'ตัว', price: 1890.00 },
+      ],
+    },
+  ];
+
+  function insertCategorySet(tbody, category) {
+    if (!tbody || !category) return;
+    // Main Item Header Row (numbered 1, 2, 3...)
+    appendExcelRow(tbody, {
+      isSubItem: false,
+      itemName: category.mainName,
+      quantity: '1',
+      unit: 'ชุด',
+      unitCost: '0.00',
+    });
+
+    // Sub Items (-) inside the category
+    category.items.forEach((item) => {
+      appendExcelRow(tbody, {
+        isSubItem: true,
+        itemName: item.name,
+        quantity: String(item.qty),
+        unit: item.unit,
+        unitCost: Number(item.price || 0).toFixed(2),
+      });
+      if (Array.isArray(item.subSpecs)) {
+        item.subSpecs.forEach((specText) => {
+          appendExcelRow(tbody, {
+            isSubItem: true,
+            itemName: specText,
+            quantity: '',
+            unit: '',
+            unitCost: '',
+          });
+        });
+      }
+    });
+
+    recalculateAll(tbody);
+    showToast(`เพิ่มชุด "${category.mainName}" (${category.items.length} รายการย่อย) เรียบร้อยแล้ว`);
+  }
+
+  function insertSingleCatalogItem(tbody, item) {
+    if (!tbody || !item) return;
+    appendExcelRow(tbody, {
+      isSubItem: false,
+      itemName: item.name,
+      quantity: String(item.qty),
+      unit: item.unit,
+      unitCost: Number(item.price || 0).toFixed(2),
+    });
+
+    if (Array.isArray(item.subSpecs)) {
+      item.subSpecs.forEach((specText) => {
+        appendExcelRow(tbody, {
+          isSubItem: true,
+          itemName: specText,
+          quantity: '',
+          unit: '',
+          unitCost: '',
+        });
+      });
+    }
+
+    recalculateAll(tbody);
+    showToast(`เพิ่ม "${item.name}" ลงตารางเรียบร้อยแล้ว`);
+  }
+
+  function initSmartSearch(tbody, onChanged) {
+    const searchInput = document.getElementById('smartSearchInput');
+    const dropdown = document.getElementById('smartSearchDropdown');
+    const box = document.getElementById('smartSearchBox');
+    if (!searchInput || !dropdown || !box) return;
+
+    const renderOptions = (queryText) => {
+      const q = String(queryText || '').trim().toLowerCase();
+      const matchedGroups = [];
+      const matchedItems = [];
+
+      localItemsDB.forEach((cat) => {
+        const groupTotal = cat.items.reduce(
+          (sum, it) => sum + Number(it.qty || 0) * Number(it.price || 0),
+          0
+        );
+        if (!q || cat.mainName.toLowerCase().includes(q)) {
+          matchedGroups.push({ cat, groupTotal });
+        }
+        cat.items.forEach((it) => {
+          if (!q || it.name.toLowerCase().includes(q) || cat.mainName.toLowerCase().includes(q)) {
+            matchedItems.push({ catName: cat.mainName, item: it });
+          }
+        });
+      });
+
+      dropdown.innerHTML = '';
+      if (matchedGroups.length === 0 && matchedItems.length === 0) {
+        dropdown.innerHTML = '<div class="smart-search-empty">ไม่พบรายการที่ค้นหา</div>';
+        dropdown.classList.add('is-open');
+        return;
+      }
+
+      if (matchedGroups.length > 0) {
+        const lbl = document.createElement('div');
+        lbl.className = 'smart-search-section-label';
+        lbl.textContent = 'เพิ่มทั้งชุด (1 Main Item + รายการย่อย)';
+        dropdown.appendChild(lbl);
+
+        matchedGroups.forEach(({ cat, groupTotal }) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'smart-search-option is-group';
+          btn.innerHTML = `
+            <span class="smart-search-opt-main">
+              <span class="smart-search-opt-title">📦 ${escapeAttr(cat.mainName)}</span>
+              <span class="smart-search-opt-sub">เพิ่มทั้งหมด ${cat.items.length} รายการ (รันเลขหัวข้อหลัก + รายการย่อยอัตโนมัติ)</span>
+            </span>
+            <span class="smart-search-opt-price">${formatCurrency(groupTotal)} ฿</span>
+          `;
+          btn.addEventListener('click', () => {
+            insertCategorySet(tbody, cat);
+            if (typeof onChanged === 'function') onChanged();
+            dropdown.classList.remove('is-open');
+            searchInput.value = '';
+          });
+          dropdown.appendChild(btn);
+        });
+      }
+
+      if (matchedItems.length > 0) {
+        const lbl = document.createElement('div');
+        lbl.className = 'smart-search-section-label';
+        lbl.textContent = `รายการเดี่ยว (${matchedItems.length})`;
+        dropdown.appendChild(lbl);
+
+        matchedItems.slice(0, 20).forEach(({ catName, item }) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'smart-search-option';
+          btn.innerHTML = `
+            <span class="smart-search-opt-main">
+              <span class="smart-search-opt-title">${escapeAttr(item.name)}</span>
+              <span class="smart-search-opt-sub">${escapeAttr(catName)} • ${item.qty} ${escapeAttr(item.unit)}</span>
+            </span>
+            <span class="smart-search-opt-price">${formatCurrency(item.price)} ฿</span>
+          `;
+          btn.addEventListener('click', () => {
+            insertSingleCatalogItem(tbody, item);
+            if (typeof onChanged === 'function') onChanged();
+            dropdown.classList.remove('is-open');
+            searchInput.value = '';
+          });
+          dropdown.appendChild(btn);
+        });
+      }
+
+      dropdown.classList.add('is-open');
+    };
+
+    searchInput.addEventListener('focus', () => renderOptions(searchInput.value));
+    searchInput.addEventListener('input', () => renderOptions(searchInput.value));
+    document.addEventListener('click', (e) => {
+      if (!box.contains(e.target)) {
+        dropdown.classList.remove('is-open');
+      }
+    });
+  }
+
   let rowCounter = 0;
   let currentPreviewZoom = 100;
 
@@ -1721,6 +1956,9 @@
     });
 
     recalculateAll(tbody);
+
+    // Initialize Smart Search & Auto-Fill Catalog
+    initSmartSearch(tbody, () => saveUserDraftByEmployeeId(currentEmpId, tbody));
   }
 
   const exportedApi = {

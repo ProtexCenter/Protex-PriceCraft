@@ -808,6 +808,147 @@ input[type="number"],
   flex-wrap: wrap;
 }
 
+/* Smart Search & Auto-Fill Box */
+.smart-search-box {
+  position: relative;
+  flex: 1 1 320px;
+  max-width: 460px;
+}
+
+.smart-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #64748B;
+  pointer-events: none;
+}
+
+.smart-search-input {
+  width: 100%;
+  padding: 8px 14px 8px 36px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--navy-900);
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 9px;
+  transition: border-color var(--transition), box-shadow var(--transition), background-color var(--transition);
+}
+
+.smart-search-input:focus {
+  outline: none;
+  background: #FFFFFF;
+  border-color: var(--protex-red-bright);
+  box-shadow: 0 0 0 3px rgba(225, 29, 36, 0.12);
+}
+
+.smart-search-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 360px;
+  overflow-y: auto;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 10px;
+  box-shadow: 0 18px 40px rgba(9, 9, 11, 0.16);
+  z-index: 60;
+  padding: 6px;
+}
+
+.smart-search-dropdown.is-open {
+  display: block;
+}
+
+.smart-search-section-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #64748B;
+  padding: 6px 10px 4px;
+  text-transform: uppercase;
+}
+
+.smart-search-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.smart-search-option:hover {
+  background: #F1F5F9;
+}
+
+.smart-search-option.is-group {
+  background: linear-gradient(180deg, #18181B 0%, #09090B 100%);
+  color: #FFFFFF;
+  border-bottom: 2px solid var(--protex-red-bright);
+  margin-bottom: 4px;
+}
+
+.smart-search-option.is-group:hover {
+  background: linear-gradient(180deg, #27272A 0%, #111114 100%);
+}
+
+.smart-search-opt-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.smart-search-opt-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.smart-search-opt-sub {
+  font-size: 0.74rem;
+  color: #64748B;
+}
+
+.smart-search-option.is-group .smart-search-opt-sub {
+  color: #CBD5E1;
+}
+
+.smart-search-opt-price {
+  font-family: var(--font-num);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--protex-red-bright);
+  white-space: nowrap;
+}
+
+.smart-search-option.is-group .smart-search-opt-price {
+  color: #34D399;
+}
+
+.smart-search-empty {
+  padding: 14px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: #64748B;
+}
+
 .excel-btn {
   display: inline-flex;
   align-items: center;
