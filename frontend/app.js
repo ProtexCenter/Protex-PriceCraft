@@ -1,37 +1,6 @@
-/**
- * ============================================================================
- * PRICECRAFT — CORE WORKSPACE, EXCEL ENGINE, TRUE .DOCX & A4 PRINT PREVIEW
- * หจก.โพรเทคส์ แอคเซสโซรี อินดัสเตรียล (PROTEX GROUP)
- *
- * Self-contained Vanilla JavaScript (ES6+) — Works via file:// and HTTP servers
- * Features:
- *   1. Auto-Updating Current Date & Time ("วันที่และเวลาที่ออก")
- *   2. 9-Column Excel-Like Data Grid:
- *      ลำดับ | รายการ | จำนวน | หน่วย | ราคาต้นทุน(ก่อนVAT) |
- *      ราคารวม (ก่อนVAT) | หักภาษี3% | การส่งมอบ | หมายเหตุ
- *   3. Excel Keyboard Navigation:
- *      - Tab: Next cell
- *      - Enter on last column ("หมายเหตุ"): Automatically adds a new row below
- *      - Enter on other columns: Moves to next cell in the same row
- *      - ArrowUp / ArrowDown: Moves vertically within the same column
- *   4. 100% Exact Fixed-Point BigInt Calculation Engine:
- *      - ราคารวม (ก่อนVAT) = จำนวน × ราคาต้นทุน(ก่อนVAT)
- *      - ยอดรวม = ผลรวมของ 'ราคารวม (ก่อนVAT)' ทุกบรรทัด
- *      - VAT 7% = ยอดรวม × 0.07
- *      - ค่าขนส่ง = ช่องให้กรอกตัวเลข (ไม่มี VAT)
- *      - ยอดรวมสุทธิ = ยอดรวม + VAT 7% + ค่าขนส่ง
- *   5. True OpenXML (.docx) Binary ZIP Generator (100% MS Word Compatible,
- *      Never Corrupted) + Excel (.xlsx) Import/Export
- *   6. Interactive A4 Print Preview Modal (Exact 210mm × 297mm A4 Simulation)
- * ============================================================================
- */
-
 (function initPricecraftWorkspaceApp() {
   'use strict';
 
-  /* ==========================================================================
-     1. FIXED-POINT BIGINT DECIMAL ENGINE (ZERO FLOATING-POINT DRIFT)
-     ========================================================================== */
   const INTERNAL_SCALE = 1000000n;
   const DISPLAY_DIFF = 10000n;
   const HALF_STEP = 5000n;
@@ -1294,7 +1263,10 @@
 
   async function exportToPdf(tbody) {
     const snap = collectDocumentSnapshot(tbody);
-    if (typeof window.html2pdf !== 'function') {
+    const hasHtmlToImage = typeof window.htmlToImage !== 'undefined' && typeof window.htmlToImage.toPng === 'function';
+    const jsPdfCtor = window.jspdf && window.jspdf.jsPDF;
+
+    if (!hasHtmlToImage || !jsPdfCtor) {
       showToast('กำลังเปิดหน้าต่างบันทึกเป็น PDF...');
       window.print();
       return;
@@ -1302,46 +1274,76 @@
 
     const host = document.createElement('div');
     host.style.position = 'fixed';
-    host.style.left = '-99999px';
+    host.style.left = '0';
     host.style.top = '0';
     host.style.width = '210mm';
+    host.style.opacity = '0';
+    host.style.pointerEvents = 'none';
+    host.style.zIndex = '-9999';
     host.style.background = '#FFFFFF';
-    host.style.zIndex = '-1';
 
     const sheet = document.createElement('div');
     sheet.className = 'a4-paper-sheet';
     sheet.style.boxShadow = 'none';
     sheet.style.margin = '0';
     sheet.style.width = '210mm';
-    sheet.style.minHeight = '286mm';
+    sheet.style.minHeight = '296mm';
     sheet.style.letterSpacing = '0px';
+    sheet.style.fontFamily = "'Sarabun', 'Prompt', sans-serif";
     sheet.innerHTML = buildA4PreviewHtml(snap);
 
     host.appendChild(sheet);
     document.body.appendChild(host);
 
     const filename = `Pricecraft_${snap.docNumber || 'Document'}.pdf`;
-    showToast('กำลังสร้างไฟล์ PDF...');
+    showToast('กำลังสร้างไฟล์ PDF (ฟอนต์ไทยคมชัด)...');
 
     try {
       if (document.fonts && document.fonts.ready) {
         await document.fonts.ready;
       }
-      await window
-        .html2pdf()
-        .set({
-          margin: 0,
-          filename,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: false },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-        })
-        .from(sheet)
-        .save();
+
+      // ใช้ Browser Native HarfBuzz Engine ผ่าน SVG foreignObject เพื่อไม่ให้สระ/วรรณยุกต์ภาษาไทยเพี้ยน
+      const dataUrl = await window.htmlToImage.toPng(sheet, {
+        pixelRatio: 2.2,
+        backgroundColor: '#FFFFFF',
+        cacheBust: true,
+        style: {
+          transform: 'none',
+          letterSpacing: '0px',
+        },
+      });
+
+      const pdf = new jsPdfCtor({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true,
+      });
+
+      const pageWidthMm = 210;
+      const pageHeightMm = 297;
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const renderedHeightMm = (imgProps.height * pageWidthMm) / imgProps.width;
+
+      let heightLeft = renderedHeightMm;
+      let positionY = 0;
+
+      pdf.addImage(dataUrl, 'PNG', 0, positionY, pageWidthMm, renderedHeightMm, undefined, 'FAST');
+      heightLeft -= pageHeightMm;
+
+      while (heightLeft > 2) {
+        positionY -= pageHeightMm;
+        pdf.addPage();
+        pdf.addImage(dataUrl, 'PNG', 0, positionY, pageWidthMm, renderedHeightMm, undefined, 'FAST');
+        heightLeft -= pageHeightMm;
+      }
+
+      pdf.save(filename);
       showToast(`ดาวน์โหลด ${filename} เรียบร้อยแล้ว`);
     } catch {
-      showToast('เกิดข้อผิดพลาดในการสร้าง PDF กรุณาใช้ปุ่มสั่งพิมพ์แล้วเลือก Save as PDF');
+      showToast('กำลังเปิดหน้าต่างสั่งพิมพ์ (เลือก Save as PDF)...');
+      window.print();
     } finally {
       host.remove();
     }
