@@ -1078,7 +1078,8 @@
     sheet.style.boxShadow = 'none';
     sheet.style.margin = '0';
     sheet.style.width = '210mm';
-    sheet.style.minHeight = '296mm';
+    sheet.style.minHeight = '286mm';
+    sheet.style.letterSpacing = '0px';
     sheet.innerHTML = buildA4PreviewHtml(snap);
 
     host.appendChild(sheet);
@@ -1088,13 +1089,16 @@
     showToast('กำลังสร้างไฟล์ PDF...');
 
     try {
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
       await window
         .html2pdf()
         .set({
           margin: 0,
           filename,
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, logging: false },
+          html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: false },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
           pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
         })

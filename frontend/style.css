@@ -90,7 +90,7 @@ body {
   background: var(--bg-page);
   min-height: 100vh;
   line-height: 1.55;
-  letter-spacing: 0.005em;
+  letter-spacing: 0;
 }
 
 .tabular-nums,
@@ -1483,22 +1483,29 @@ input[type="number"],
 
 /* Physical A4 Sheet Dimensions: 210mm width x 297mm height */
 .a4-paper-sheet {
-  font-family: var(--font-doc);
+  font-family: 'Sarabun', 'Prompt', sans-serif;
   width: 210mm;
-  min-height: 297mm;
+  min-height: 290mm;
   background: #FFFFFF;
   color: #000000;
-  padding: 12mm 12mm 14mm 12mm;
+  padding: 11mm 12mm 12mm 12mm;
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.15);
   transform-origin: top center;
   transition: transform 180ms ease;
   font-size: 10.5pt;
   line-height: 1.45;
+  letter-spacing: 0 !important;
+  font-feature-settings: normal !important;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   overflow: hidden;
+}
+
+.a4-paper-sheet * {
+  letter-spacing: 0 !important;
+  font-variant-ligatures: normal !important;
 }
 
 .a4-paper-sheet::before {
