@@ -527,6 +527,16 @@ input[type="number"],
   transform: translateY(-1px);
 }
 
+.cmd-btn-pdf {
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28);
+}
+
+.cmd-btn-pdf:hover {
+  transform: translateY(-1px);
+}
+
 .cmd-btn-print {
   background: linear-gradient(135deg, var(--protex-red-bright), #B91C1C);
   color: #FFFFFF;

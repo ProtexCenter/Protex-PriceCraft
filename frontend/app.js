@@ -1057,6 +1057,57 @@
     }
   }
 
+  async function exportToPdf(tbody) {
+    const snap = collectDocumentSnapshot(tbody);
+    if (typeof window.html2pdf !== 'function') {
+      showToast('กำลังเปิดหน้าต่างบันทึกเป็น PDF...');
+      window.print();
+      return;
+    }
+
+    const host = document.createElement('div');
+    host.style.position = 'fixed';
+    host.style.left = '-99999px';
+    host.style.top = '0';
+    host.style.width = '210mm';
+    host.style.background = '#FFFFFF';
+    host.style.zIndex = '-1';
+
+    const sheet = document.createElement('div');
+    sheet.className = 'a4-paper-sheet';
+    sheet.style.boxShadow = 'none';
+    sheet.style.margin = '0';
+    sheet.style.width = '210mm';
+    sheet.style.minHeight = '296mm';
+    sheet.innerHTML = buildA4PreviewHtml(snap);
+
+    host.appendChild(sheet);
+    document.body.appendChild(host);
+
+    const filename = `Pricecraft_${snap.docNumber || 'Document'}.pdf`;
+    showToast('กำลังสร้างไฟล์ PDF...');
+
+    try {
+      await window
+        .html2pdf()
+        .set({
+          margin: 0,
+          filename,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+        })
+        .from(sheet)
+        .save();
+      showToast(`ดาวน์โหลด ${filename} เรียบร้อยแล้ว`);
+    } catch {
+      showToast('เกิดข้อผิดพลาดในการสร้าง PDF กรุณาใช้ปุ่มสั่งพิมพ์แล้วเลือก Save as PDF');
+    } finally {
+      host.remove();
+    }
+  }
+
   /* ==========================================================================
      7. EXCEL (.XLSX) EXPORT & IMPORT
      ========================================================================== */
@@ -1611,6 +1662,10 @@
 
     document.getElementById('btnExportExcel')?.addEventListener('click', () => exportToExcel(tbody));
     document.getElementById('btnExportWord')?.addEventListener('click', () => exportToWord(tbody));
+    document.getElementById('btnExportPdf')?.addEventListener('click', () => {
+      updateClock();
+      exportToPdf(tbody);
+    });
 
     // A4 Print Preview Modal Controls
     document.getElementById('btnPrintPreview')?.addEventListener('click', () => {
@@ -1629,6 +1684,10 @@
     });
     document.getElementById('btnPreviewExportWord')?.addEventListener('click', () => {
       exportToWord(tbody);
+    });
+    document.getElementById('btnPreviewExportPdf')?.addEventListener('click', () => {
+      updateClock();
+      exportToPdf(tbody);
     });
     document.getElementById('btnPreviewConfirmPrint')?.addEventListener('click', () => {
       updateClock();

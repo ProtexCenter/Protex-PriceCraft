@@ -11,6 +11,7 @@
   <script src="appwrite-config.js" defer></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
 </head>
 
 <body>
@@ -61,6 +62,17 @@
           <line x1="16" y1="17" x2="8" y2="17"></line>
         </svg>
         <span>ส่งออก Word</span>
+      </button>
+
+      <button type="button" class="cmd-btn cmd-btn-pdf" id="btnExportPdf"
+        title="ดาวน์โหลดเป็นไฟล์ PDF ขนาด A4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <path d="M12 18v-6"></path>
+          <path d="M9 15l3 3 3-3"></path>
+        </svg>
+        <span>ส่งออก PDF</span>
       </button>
 
       <button type="button" class="cmd-btn cmd-btn-preview" id="btnPrintPreview"
@@ -278,6 +290,17 @@
             <line x1="16" y1="17" x2="8" y2="17"></line>
           </svg>
           <span>ส่งออก Word (.docx)</span>
+        </button>
+
+        <button type="button" class="cmd-btn cmd-btn-pdf" id="btnPreviewExportPdf"
+          title="ดาวน์โหลดเป็นไฟล์ PDF ขนาด A4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <path d="M12 18v-6"></path>
+            <path d="M9 15l3 3 3-3"></path>
+          </svg>
+          <span>ดาวน์โหลด PDF</span>
         </button>
 
         <button type="button" class="cmd-btn cmd-btn-print" id="btnPreviewConfirmPrint"
