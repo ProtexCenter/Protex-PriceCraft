@@ -9,8 +9,11 @@
 (function initProtexGatewayLogin() {
   'use strict';
 
-  // รหัสประจำตัวพนักงานที่ลงทะเบียนในระบบ (Hardcoded Employee IDs)
+  // รหัสประจำตัวพนักงานที่ลงทะเบียนในระบบ (อ้างอิงจากตาราง Employees + สำรองกรณีออฟไลน์)
   const REGISTERED_EMPLOYEE_IDS = new Map([
+    ['hr0000000', { id: 'HR0000000', name: 'พี่สุ', role: 'พนักงานโพรเทคส์' }],
+    ['spt5012531', { id: 'SPT5012531', name: 'พี่ป๋อม', role: 'พนักงานโพรเทคส์' }],
+    ['spt7122004', { id: 'SPT7122004', name: 'ฟลุ๊ค', role: 'พนักงานโพรเทคส์' }],
     ['1234', { id: '1234', name: 'พนักงานโพรเทคส์ (ID: 1234)', role: 'ผู้จัดทำใบขอราคาต้นทุน' }],
     ['admin', { id: 'admin', name: 'ผู้ดูแลระบบ (Admin)', role: 'Protex Center Administrator' }],
     ['emp-001', { id: 'EMP-001', name: 'นภัสสร ศรีสุวรรณ', role: 'ฝ่ายขายอุตสาหกรรม' }],
@@ -79,13 +82,25 @@
   });
 
   // Handle Form Submission
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    const enteredCode = (input.value || '').trim().toLowerCase();
-    const matchedEmployee = REGISTERED_EMPLOYEE_IDS.get(enteredCode);
+    const rawEntered = (input.value || '').trim();
+    const enteredCode = rawEntered.toLowerCase();
+    if (!enteredCode) {
+      triggerInvalidShake();
+      return;
+    }
 
-    if (!enteredCode || !matchedEmployee) {
+    let matchedEmployee = null;
+    if (window.PricecraftAppwrite && typeof window.PricecraftAppwrite.verifyEmployee === 'function') {
+      matchedEmployee = await window.PricecraftAppwrite.verifyEmployee(rawEntered);
+    }
+    if (!matchedEmployee) {
+      matchedEmployee = REGISTERED_EMPLOYEE_IDS.get(enteredCode) || null;
+    }
+
+    if (!matchedEmployee) {
       triggerInvalidShake();
       return;
     }
@@ -93,7 +108,8 @@
     // Store authenticated employee info for workspace header
     try {
       sessionStorage.setItem('pc_emp_id', matchedEmployee.id);
-      sessionStorage.setItem('pc_emp_name', `${matchedEmployee.name} • ${matchedEmployee.role}`);
+      sessionStorage.setItem('pc_emp_name', matchedEmployee.name);
+      sessionStorage.setItem('pc_emp_role', matchedEmployee.role || 'ผู้จัดทำใบขอราคาต้นทุน');
     } catch {
       // Ignore storage restrictions in private mode
     }

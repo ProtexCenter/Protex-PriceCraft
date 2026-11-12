@@ -11,8 +11,9 @@
   const APPWRITE_CONFIG = {
     endpoint: env.VITE_APPWRITE_ENDPOINT || 'https://sgp.cloud.appwrite.io/v1',
     projectId: env.VITE_APPWRITE_PROJECT_ID || '6af2e5a000218106d920',
-    databaseId: env.VITE_APPWRITE_DATABASE_ID || 'YOUR_DATABASE_ID',    // <-- ใส่ Database ID ของคุณ
-    collectionId: env.VITE_APPWRITE_COLLECTION_ID || 'user_drafts',     // <-- ชื่อ Collection
+    databaseId: env.VITE_APPWRITE_DATABASE_ID || 'YOUR_DATABASE_ID',    // <-- ใส่ Database ID ของ ProtexNewsDB
+    collectionId: env.VITE_APPWRITE_COLLECTION_ID || 'user_drafts',     // <-- ชื่อ Collection สำหรับเก็บ Draft
+    employeesCollectionId: env.VITE_APPWRITE_EMPLOYEES_COLLECTION_ID || '6af2e9c6003dafa5b692', // <-- ตาราง Employees
   };
 
   let client = null;
@@ -131,12 +132,49 @@
     }
   }
 
+  /**
+   * ตรวจสอบรหัสพนักงานจากตาราง Employees บน Appwrite (Table ID: 6af2e9c6003dafa5b692)
+   * @param {string} employeeId รหัสพนักงาน เช่น HR0000000
+   * @returns {Promise<{id: string, name: string, role: string}|null>}
+   */
+  async function verifyEmployee(employeeId) {
+    const rawKey = String(employeeId || '').trim();
+    if (!rawKey || !databases || !global.Appwrite || APPWRITE_CONFIG.databaseId === 'YOUR_DATABASE_ID') {
+      return null;
+    }
+
+    const { Query } = global.Appwrite;
+    const candidates = Array.from(new Set([rawKey, rawKey.toUpperCase(), rawKey.toLowerCase()]));
+
+    for (const candidate of candidates) {
+      try {
+        const res = await databases.listDocuments(
+          APPWRITE_CONFIG.databaseId,
+          APPWRITE_CONFIG.employeesCollectionId,
+          [Query.equal('id', candidate), Query.limit(1)]
+        );
+        if (res && res.documents && res.documents.length > 0) {
+          const emp = res.documents[0];
+          return {
+            id: emp.id || candidate,
+            name: emp.fullname || emp.name || candidate,
+            role: emp.role || emp.department || 'พนักงานโพรเทคส์',
+          };
+        }
+      } catch {
+        // Fallback to local registered map if databaseId/permissions are not yet configured
+      }
+    }
+    return null;
+  }
+
   global.PricecraftAppwrite = {
     config: APPWRITE_CONFIG,
     client,
     databases,
     saveData,
     loadData,
+    verifyEmployee,
   };
   global.saveData = saveData;
   global.loadData = loadData;

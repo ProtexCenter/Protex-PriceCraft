@@ -1453,9 +1453,10 @@
     let currentEmpId = '1234';
     try {
       currentEmpId = sessionStorage.getItem('pc_emp_id') || '1234';
+      const currentEmpName = sessionStorage.getItem('pc_emp_name') || 'พนักงานโพรเทคส์';
       const userBanner = document.getElementById('loggedInUserBanner');
       if (userBanner) {
-        userBanner.textContent = `ผู้ใช้งาน: พนักงานโพรเทคส์ (ID: ${currentEmpId}) • ผู้จัดทำใบขอราคาต้นทุน`;
+        userBanner.textContent = `ผู้ใช้งาน: ${currentEmpName} (ID: ${currentEmpId}) • ผู้จัดทำใบขอราคาต้นทุน`;
       }
     } catch {
       // Ignore storage access errors in strict privacy mode
