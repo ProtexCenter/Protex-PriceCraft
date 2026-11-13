@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>รายชื่อลูกค้า & สัญญาซื้อขาย (Sales Contract) | Pricecraft — PROTEX GROUP</title>
+  <title>รายชื่อลูกค้าและสัญญาซื้อขาย | Pricecraft</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Center Circular Hover Menu (Task 1) -->
-    <div class="topbar-center-menu" aria-label="เมนูลัดระบบ">
+    <nav class="topbar-center-menu" aria-label="เมนูลัดระบบ">
       <div class="circular-menu-wrapper">
         <button type="button" class="circular-menu-btn" aria-label="เมนูระบบ Pricecraft" title="เมนูลัดสลับหน้าต่าง (ชี้เพื่อเปิดเมนู)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" width="22" height="22" aria-hidden="true">
@@ -46,7 +46,7 @@
             <span class="dropdown-item-icon">👥</span>
             <div class="dropdown-item-info">
               <span class="dropdown-item-title">รายชื่อลูกค้า / สัญญาซื้อขาย (หน้าปัจจุบัน)</span>
-              <span class="dropdown-item-sub">A4 Sales Contract & ข้อมูลคำสั่งซื้อ</span>
+              <span class="dropdown-item-sub">A4 Sales Contract &amp; ข้อมูลคำสั่งซื้อ</span>
             </div>
             <span class="dropdown-badge">ใช้งานอยู่</span>
           </a>
@@ -59,7 +59,7 @@
           </a>
         </div>
       </div>
-    </div>
+    </nav>
 
     <div class="topbar-actions-toolbar">
       <button type="button" class="cmd-btn cmd-btn-excel" id="btnSaveContract" title="บันทึกสัญญาลง Appwrite Database">
@@ -102,7 +102,7 @@
     </div>
   </header>
 
-  <main class="workspace-stage" style="padding-top: 16px;">
+  <main class="workspace-stage contract-stage">
     <!-- Smart Search Bar (Task 4) -->
     <section class="contract-search-container no-print" aria-label="ค้นหาสัญญาและรายชื่อลูกค้า">
       <div class="contract-search-box">
@@ -120,25 +120,25 @@
       <div class="contract-search-dropdown" id="contractSearchDropdown"></div>
     </section>
 
-    <!-- A4 Contract Paper Sheet (Task 2 & 3) -->
+    <!-- A4 Contract Paper Sheet (Task 2 and 3) -->
     <article class="contract-paper-sheet" id="contractA4Sheet">
       <!-- Default Header (Protex Group Logo + Official Header) -->
       <header class="contract-header-logo-row">
         <div>
-          <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="PROTEX GROUP Logo" style="height: 38px; object-fit: contain;">
+          <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="PROTEX GROUP Logo" class="contract-header-logo-img">
         </div>
         <div class="contract-company-name-bold">
           AMMA CONSTRUCTION MACHINERY CO., LTD.
         </div>
       </header>
 
-      <div style="font-size: 8pt; font-weight: 700; text-align: center; margin-bottom: 2px;">
+      <div class="contract-company-subhead">
         AMMA CONSTRUCTION MACHINERY CO., LTD.
       </div>
-      <div style="font-size: 7.5pt; text-align: center; border: 1pt solid #000; padding: 2px 4px; margin-bottom: 2px;">
+      <div class="contract-address-box">
         <strong>ADD:</strong> No.51,14th floor,Unit 1,No.95 Jinshui Road, Jinshui district,Zhengzhou,Henan ,China 450000
       </div>
-      <div style="font-size: 7.5pt; text-align: left; border: 1pt solid #000; border-top: none; padding: 2px 4px; margin-bottom: 8px;">
+      <div class="contract-tel-box">
         <strong>TEL:</strong> +86-371-63386087
       </div>
 
@@ -149,17 +149,17 @@
         <div>DATE: <span id="contractDateDisplay">(China)May 14th, 2026</span></div>
       </div>
 
-      <!-- Static Read-only TO: & FROM: Box -->
+      <!-- Static Read-only TO: and FROM: Box -->
       <div class="contract-two-col-box">
         <div class="contract-col-side">
           <div class="contract-col-label">TO:</div>
-          <div style="font-weight: 700;">PROTEX ACCESSORY INDUSTRIAL LTD.,PART.</div>
+          <div class="contract-party-name">PROTEX ACCESSORY INDUSTRIAL LTD.,PART.</div>
           <div><strong>ADD:</strong> 56/360 M.1 , Soi wattrisamakki 3, Sukhumvit Rd. , T.Bangmuangmai , A.Muangsamutprakarn , Samutprakarn 10270,Thailand</div>
           <div><strong>Tel:</strong> 085-392-4448</div>
         </div>
         <div class="contract-col-side">
           <div class="contract-col-label">FROM:</div>
-          <div style="font-weight: 700;">AMMA CONSTRUCTION MACHINERY CO., LTD.</div>
+          <div class="contract-party-name">AMMA CONSTRUCTION MACHINERY CO., LTD.</div>
           <div><strong>ADD:</strong> No.51,14th floor,Unit 1,No.95 Jinshui Road, Jinshui district,Zhengzhou,Henan ,China 450000</div>
           <div><strong>TEL:</strong> +86-371-63386087</div>
           <div><strong>MOB:</strong> +86-13598880213</div>
@@ -170,21 +170,21 @@
       <table class="contract-table" id="contractInteractiveTable">
         <thead>
           <tr>
-            <th style="width: 22%;">HS CODE</th>
-            <th style="width: 44%;">ITEM</th>
-            <th style="width: 14%;">QUANTITY</th>
-            <th style="width: 20%;">PRICE<br><span style="font-size: 7.5pt; font-weight: 700;">(CIF BANGKOK PORT,THAILAND)</span></th>
-            <th class="no-print" style="width: 38px; border: none; background: transparent;"></th>
+            <th class="col-contract-hs">HS CODE</th>
+            <th class="col-contract-item">ITEM</th>
+            <th class="col-contract-qty">QUANTITY</th>
+            <th class="col-contract-price">PRICE<br><span class="contract-price-sublabel">(CIF BANGKOK PORT,THAILAND)</span></th>
+            <th class="no-print col-contract-action"></th>
           </tr>
         </thead>
         <tbody id="contractTableBody">
-          <!-- Default Interactive Rows from Image 1 & 2 -->
+          <!-- Default Interactive Rows from Image 1 and 2 -->
           <tr>
             <td><input type="text" class="contract-cell-input cell-center hs-code-input" value="8474320000" aria-label="HS CODE"></td>
             <td><input type="text" class="contract-cell-input item-input" value="PT2010RAP Asphalt Mixing Plant" aria-label="ITEM"></td>
             <td><input type="text" class="contract-cell-input cell-center qty-input" value="1 SET" aria-label="QUANTITY"></td>
             <td><input type="text" class="contract-cell-input cell-right price-input" value="CNY4,523,000" aria-label="PRICE"></td>
-            <td class="no-print" style="border: none; text-align: center;">
+            <td class="no-print cell-action-del">
               <button type="button" class="contract-row-del-btn" title="ลบรายการนี้">✕</button>
             </td>
           </tr>
@@ -193,7 +193,7 @@
             <td><input type="text" class="contract-cell-input item-input" value="RC80 RAP Crusher" aria-label="ITEM"></td>
             <td><input type="text" class="contract-cell-input cell-center qty-input" value="1 SET" aria-label="QUANTITY"></td>
             <td><input type="text" class="contract-cell-input cell-right price-input" value="CNY680,000" aria-label="PRICE"></td>
-            <td class="no-print" style="border: none; text-align: center;">
+            <td class="no-print cell-action-del">
               <button type="button" class="contract-row-del-btn" title="ลบรายการนี้">✕</button>
             </td>
           </tr>
@@ -202,16 +202,16 @@
             <td><input type="text" class="contract-cell-input item-input" value="Asphalt smoke treatment system" aria-label="ITEM"></td>
             <td><input type="text" class="contract-cell-input cell-center qty-input" value="1 SET" aria-label="QUANTITY"></td>
             <td><input type="text" class="contract-cell-input cell-right price-input" value="CNY230,000" aria-label="PRICE"></td>
-            <td class="no-print" style="border: none; text-align: center;">
+            <td class="no-print cell-action-del">
               <button type="button" class="contract-row-del-btn" title="ลบรายการนี้">✕</button>
             </td>
           </tr>
         </tbody>
         <tfoot>
           <tr class="total-row">
-            <td colspan="3" style="text-align: center; font-weight: 900; font-family: Arial, sans-serif;">TOTAL PRICE</td>
-            <td class="cell-right" id="contractTotalPriceCell" style="font-weight: 900; font-family: 'Times New Roman', serif;">CNY5,433,000</td>
-            <td class="no-print" style="border: none;"></td>
+            <td colspan="3" class="cell-total-label">TOTAL PRICE</td>
+            <td class="cell-right cell-total-value" id="contractTotalPriceCell">CNY5,433,000</td>
+            <td class="no-print cell-total-empty"></td>
           </tr>
         </tfoot>
       </table>
@@ -225,7 +225,7 @@
       <!-- Static Read-only NOTE: (Task 2) -->
       <div class="contract-static-box">
         <strong>NOTE:</strong>
-        <div style="padding-left: 24px;">
+        <div class="contract-notes-list">
           1. Excluding the filler elevator, but including the filler weighing and filler control system.<br>
           2. Excluding automatic lubrication pump for mixer and dryer and elevator.<br>
           3. Adopt China brand inverter for fan of bag filter.<br>
@@ -261,27 +261,27 @@
       </div>
 
       <!-- Static Read-only Erection / Commissioning / Training -->
-      <div class="contract-static-box" style="text-align: center; font-weight: 900; font-family: Arial, sans-serif; background: #F8FAFC;">
+      <div class="contract-static-box contract-training-header">
         ERECTION/COMMISSIONING/TRAINING
       </div>
       <div class="contract-static-box">
         1. The buyer should prepare the earthwork , electrical power supply etc based on the seller's technical drawings,the buyer should prepare professional worker-team, including: electrical workers, welding workers, maintain workers, operators;<br>
         2. The seller should send 2 engineers to guiding erection in the buyer's working site. And training operators for the buyer.<br>
-        3. Free erection & commissioning time is 15 days. The buyer should bear accommodation, round-trip flight ticket, local transportation fees, medical care; and allowance USD100/day for each engineer after 15 days..
+        3. Free erection &amp; commissioning time is 15 days. The buyer should bear accommodation, round-trip flight ticket, local transportation fees, medical care; and allowance USD100/day for each engineer after 15 days..
       </div>
 
-      <!-- Static Signatures & Red Seal Stamp -->
+      <!-- Static Signatures and Red Seal Stamp -->
       <div class="contract-signatures-row">
         <div>
           <div>The Buyer:</div>
-          <div style="margin-top: 36px; border-bottom: 1px dotted #000; width: 180px;"></div>
+          <div class="contract-buyer-line"></div>
         </div>
         <div class="contract-seller-stamp-zone">
-          <div style="margin-bottom: 4px;">The Seller:</div>
+          <div class="contract-seller-label">The Seller:</div>
           <div class="contract-signature-img">Manuel chan</div>
           <div class="contract-red-seal">
             安玛工程设备 (河南) 有限公司<br>
-            <span style="font-size: 7pt; font-weight: 700;">AMMA CONSTRUCTION MACHINERY CO.,LTD.</span>
+            <span class="contract-seal-sub">AMMA CONSTRUCTION MACHINERY CO.,LTD.</span>
           </div>
         </div>
       </div>

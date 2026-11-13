@@ -2433,3 +2433,121 @@ input[type="number"],
   border-top: 1px dashed #CBD5E1;
   padding-top: 6px;
 }
+
+/* Contract Helper Classes (Zero Inline Styles for Strict html-validate) */
+.contract-stage {
+  padding-top: 16px;
+}
+
+.contract-header-logo-img {
+  height: 38px;
+  object-fit: contain;
+}
+
+.contract-company-subhead {
+  font-size: 8pt;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.contract-address-box {
+  font-size: 7.5pt;
+  text-align: center;
+  border: 1pt solid #000000;
+  padding: 2px 4px;
+  margin-bottom: 2px;
+}
+
+.contract-tel-box {
+  font-size: 7.5pt;
+  text-align: left;
+  border: 1pt solid #000000;
+  border-top: none;
+  padding: 2px 4px;
+  margin-bottom: 8px;
+}
+
+.contract-party-name {
+  font-weight: 700;
+}
+
+.col-contract-hs {
+  width: 22%;
+}
+
+.col-contract-item {
+  width: 44%;
+}
+
+.col-contract-qty {
+  width: 14%;
+}
+
+.col-contract-price {
+  width: 20%;
+}
+
+.col-contract-action {
+  width: 38px;
+  border: none !important;
+  background: transparent !important;
+}
+
+.contract-price-sublabel {
+  font-size: 7.5pt;
+  font-weight: 700;
+}
+
+.cell-action-del {
+  border: none !important;
+  text-align: center;
+}
+
+.cell-total-label {
+  text-align: center;
+  font-weight: 900;
+  font-family: Arial, sans-serif;
+}
+
+.cell-total-value {
+  font-weight: 900;
+  font-family: 'Times New Roman', serif;
+}
+
+.cell-total-empty {
+  border: none !important;
+}
+
+.contract-notes-list {
+  padding-left: 24px;
+}
+
+.contract-training-header {
+  text-align: center;
+  font-weight: 900;
+  font-family: Arial, sans-serif;
+  background: #F8FAFC;
+}
+
+.contract-buyer-line {
+  margin-top: 36px;
+  border-bottom: 1px dotted #000000;
+  width: 180px;
+}
+
+.contract-seller-label {
+  margin-bottom: 4px;
+}
+
+.contract-seal-sub {
+  font-size: 7pt;
+  font-weight: 700;
+}
+
+.contract-search-empty {
+  padding: 14px;
+  text-align: center;
+  color: #64748B;
+  font-size: 9pt;
+}
