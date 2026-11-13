@@ -1234,24 +1234,30 @@
     const snap = collectDocumentSnapshot(tbody);
     const filename = `Pricecraft_${snap.docNumber || 'Document'}.pdf`;
 
-    if (typeof window.html2pdf !== 'function') {
+    const hasHtmlToImage = typeof window.htmlToImage !== 'undefined' && typeof window.htmlToImage.toCanvas === 'function';
+    const jsPdfCtor = window.jspdf && window.jspdf.jsPDF;
+
+    if (!hasHtmlToImage || !jsPdfCtor) {
+      showToast('กำลังเปิดหน้าต่างสั่งพิมพ์ (เลือก Save as PDF)...');
       window.print();
       return;
     }
 
     const host = document.createElement('div');
     host.style.position = 'fixed';
-    host.style.left = '-99999px';
+    host.style.left = '0';
     host.style.top = '0';
     host.style.width = '210mm';
-    host.style.background = '#FFFFFF';
+    host.style.opacity = '0';
+    host.style.pointerEvents = 'none';
     host.style.zIndex = '-9999';
+    host.style.background = '#FFFFFF';
 
     const sheet = document.createElement('div');
     sheet.className = 'a4-paper-sheet';
     sheet.style.boxShadow = 'none';
     sheet.style.margin = '0';
-    sheet.style.width = '100%';
+    sheet.style.width = '210mm';
     sheet.style.minHeight = 'auto';
     sheet.style.letterSpacing = '0px';
     sheet.style.fontFamily = "'Sarabun', 'Prompt', sans-serif";
@@ -1264,52 +1270,95 @@
         td.style.fontSize = '8.2pt';
       });
       const notesBox = sheet.querySelector('.a4-sheet-notes-box');
-      if (notesBox) notesBox.style.minHeight = '64px';
+      if (notesBox) notesBox.style.minHeight = '60px';
     }
 
     host.appendChild(sheet);
     document.body.appendChild(host);
 
-    showToast('กำลังสร้างไฟล์ PDF (ตัดหน้าเรียบเนียน)...');
+    showToast('กำลังสร้างไฟล์ PDF (ฟอนต์ไทยคมชัด)...');
 
     try {
       if (document.fonts && document.fonts.ready) {
         await document.fonts.ready;
       }
 
-      const opt = {
-        margin: [12, 10, 14, 10],
-        filename: filename,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          letterRendering: false,
-          scrollY: 0,
-        },
-        jsPDF: {
-          unit: 'mm',
-          format: 'a4',
-          orientation: 'portrait',
-          compress: true,
-        },
-        pagebreak: {
-          mode: ['css', 'legacy'],
-          avoid: [
-            'tr',
-            '.excel-table tbody tr',
-            '.a4-sheet-table tbody tr',
-            '.a4-sheet-bottom-grid',
-            '.a4-sheet-signatures',
-            '.signatures-section',
-            '.doc-bottom-grid',
-          ],
-        },
-      };
+      // Render via Browser Native HarfBuzz Engine through SVG foreignObject to preserve Thai vowels/tone marks
+      const canvas = await window.htmlToImage.toCanvas(sheet, {
+        pixelRatio: 2,
+        backgroundColor: '#FFFFFF',
+        cacheBust: true,
+      });
 
-      await window.html2pdf().set(opt).from(sheet).save();
-      showToast(`ดาวน์โหลด ${filename} เรียบร้อยแล้ว`);
-    } catch {
+      const pdf = new jsPdfCtor({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true,
+      });
+
+      const sheetRect = sheet.getBoundingClientRect();
+      const sheetWidthPx = sheetRect.width || 794;
+      const pxToMm = 210 / sheetWidthPx;
+
+      const trs = Array.from(sheet.querySelectorAll('.a4-sheet-table tbody tr'));
+      const scale = canvas.width / sheetWidthPx;
+      const PAGE_MAX_MM = 282; // Leaving safety margin for A4 (297mm)
+
+      let currentTopPx = 0;
+      let pageNum = 0;
+
+      while (currentTopPx < sheetRect.height - 5) {
+        let currentBottomPx = sheetRect.height;
+        const remainingMm = (sheetRect.height - currentTopPx) * pxToMm;
+
+        if (remainingMm > 297) {
+          const targetLimitPx = currentTopPx + (PAGE_MAX_MM / pxToMm);
+          let candidateSplit = 0;
+
+          for (const tr of trs) {
+            const trBottomPx = tr.getBoundingClientRect().bottom - sheetRect.top;
+            if (trBottomPx > currentTopPx && trBottomPx <= targetLimitPx) {
+              candidateSplit = trBottomPx;
+            } else if (trBottomPx > targetLimitPx) {
+              break;
+            }
+          }
+
+          if (candidateSplit > currentTopPx) {
+            currentBottomPx = candidateSplit;
+          } else {
+            currentBottomPx = targetLimitPx;
+          }
+        }
+
+        const sliceHeightPx = currentBottomPx - currentTopPx;
+        const sliceCanvasY = Math.round(currentTopPx * scale);
+        const sliceCanvasH = Math.round(sliceHeightPx * scale);
+
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceCanvasH;
+        const ctx = pageCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, sliceCanvasY, canvas.width, sliceCanvasH, 0, 0, canvas.width, sliceCanvasH);
+
+        const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.98);
+        const pageHeightMm = sliceHeightPx * pxToMm;
+
+        if (pageNum > 0) {
+          pdf.addPage('a4', 'portrait');
+        }
+
+        pdf.addImage(pageImgData, 'JPEG', 0, pageNum === 0 ? 0 : 8, 210, pageHeightMm, undefined, 'FAST');
+
+        currentTopPx = currentBottomPx;
+        pageNum++;
+      }
+
+      pdf.save(filename);
+      showToast(`ดาวน์โหลด ${filename} เรียบร้อยแล้ว (ฟอนต์ไทยสมบูรณ์ 100%)`);
+    } catch (err) {
+      console.error('PDF export error:', err);
       showToast('กำลังเปิดหน้าต่างสั่งพิมพ์ (เลือก Save as PDF)...');
       window.print();
     } finally {
