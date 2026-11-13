@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายชื่อลูกค้า & สัญญาซื้อขาย (Sales Contract) | Pricecraft — PROTEX GROUP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="print.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1" defer></script>
+  <script src="appwrite-config.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+  <script src="customer-contract.js" defer></script>
+</head>
+
+<body>
+
+  <header class="workspace-topbar no-print" aria-label="แถบเครื่องมือหลัก">
+    <div class="topbar-brand-group">
+      <div class="topbar-logo-badge">
+        <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="PROTEX GROUP Logo" class="topbar-brand-logo" width="112" height="38">
+      </div>
+      <div class="topbar-brand-text">
+        <span class="topbar-app-name">PRICECRAFT • รายชื่อลูกค้า / สัญญาซื้อขาย</span>
+        <span class="topbar-app-sub" id="loggedInUserBanner">ระบบสัญญาซื้อขายและประวัติคำสั่งซื้อ A4 (Sales Contract)</span>
+      </div>
+    </div>
+
+    <!-- Center Circular Hover Menu (Task 1) -->
+    <div class="topbar-center-menu" aria-label="เมนูลัดระบบ">
+      <div class="circular-menu-wrapper">
+        <button type="button" class="circular-menu-btn" aria-label="เมนูระบบ Pricecraft" title="เมนูลัดสลับหน้าต่าง (ชี้เพื่อเปิดเมนู)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" width="22" height="22" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"></circle>
+            <line x1="12" y1="3" x2="12" y2="21"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+          </svg>
+        </button>
+        <div class="circular-dropdown-menu" role="menu">
+          <a href="customer-contract.html" class="circular-dropdown-item active" role="menuitem">
+            <span class="dropdown-item-icon">👥</span>
+            <div class="dropdown-item-info">
+              <span class="dropdown-item-title">รายชื่อลูกค้า / สัญญาซื้อขาย (หน้าปัจจุบัน)</span>
+              <span class="dropdown-item-sub">A4 Sales Contract & ข้อมูลคำสั่งซื้อ</span>
+            </div>
+            <span class="dropdown-badge">ใช้งานอยู่</span>
+          </a>
+          <a href="dashboard.html" class="circular-dropdown-item" role="menuitem">
+            <span class="dropdown-item-icon">📊</span>
+            <div class="dropdown-item-info">
+              <span class="dropdown-item-title">ใบขอราคาต้นทุน (Cost Sheet)</span>
+              <span class="dropdown-item-sub">Pricecraft Cost Estimation Table</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar-actions-toolbar">
+      <button type="button" class="cmd-btn cmd-btn-excel" id="btnSaveContract" title="บันทึกสัญญาลง Appwrite Database">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        <span>บันทึกสัญญา</span>
+      </button>
+
+      <button type="button" class="cmd-btn cmd-btn-word" id="btnExportWord" title="ส่งออกเป็นไฟล์ Microsoft Word (.docx)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>ส่งออก Word</span>
+      </button>
+
+      <button type="button" class="cmd-btn cmd-btn-pdf" id="btnExportPdf" title="ดาวน์โหลดเป็นไฟล์ PDF ขนาด A4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <path d="M12 18v-6"></path>
+          <path d="M9 15l3 3 3-3"></path>
+        </svg>
+        <span>ดาวน์โหลด PDF</span>
+      </button>
+
+      <button type="button" class="cmd-btn cmd-btn-print" id="btnPrintContract" title="สั่งพิมพ์สัญญาซื้อขายขนาด A4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span>พิมพ์ A4</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace-stage" style="padding-top: 16px;">
+    <!-- Smart Search Bar (Task 4) -->
+    <section class="contract-search-container no-print" aria-label="ค้นหาสัญญาและรายชื่อลูกค้า">
+      <div class="contract-search-box">
+        <div class="contract-search-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="20" height="20">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <input type="text" id="contractSearchInput" class="contract-search-input"
+          placeholder="ค้นหาชื่อลูกค้า (เช่น AMMA, ยูโรเปียน, เอสพีที) หรือชื่อสินค้า (เช่น Asphalt Mixing Plant, Crusher)..."
+          autocomplete="off">
+        <span class="contract-search-badge" id="contractSearchBadge">ค้นหาประวัติสัญญา Appwrite</span>
+      </div>
+      <div class="contract-search-dropdown" id="contractSearchDropdown"></div>
+    </section>
+
+    <!-- A4 Contract Paper Sheet (Task 2 & 3) -->
+    <article class="contract-paper-sheet" id="contractA4Sheet">
+      <!-- Default Header (Protex Group Logo + Official Header) -->
+      <header class="contract-header-logo-row">
+        <div>
+          <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="PROTEX GROUP Logo" style="height: 38px; object-fit: contain;">
+        </div>
+        <div class="contract-company-name-bold">
+          AMMA CONSTRUCTION MACHINERY CO., LTD.
+        </div>
+      </header>
+
+      <div style="font-size: 8pt; font-weight: 700; text-align: center; margin-bottom: 2px;">
+        AMMA CONSTRUCTION MACHINERY CO., LTD.
+      </div>
+      <div style="font-size: 7.5pt; text-align: center; border: 1pt solid #000; padding: 2px 4px; margin-bottom: 2px;">
+        <strong>ADD:</strong> No.51,14th floor,Unit 1,No.95 Jinshui Road, Jinshui district,Zhengzhou,Henan ,China 450000
+      </div>
+      <div style="font-size: 7.5pt; text-align: left; border: 1pt solid #000; border-top: none; padding: 2px 4px; margin-bottom: 8px;">
+        <strong>TEL:</strong> +86-371-63386087
+      </div>
+
+      <h1 class="contract-title-banner">SALES CONTRACT</h1>
+
+      <div class="contract-meta-row">
+        <div>SC No.: <span id="contractNoDisplay">AM251202</span></div>
+        <div>DATE: <span id="contractDateDisplay">(China)May 14th, 2026</span></div>
+      </div>
+
+      <!-- Static Read-only TO: & FROM: Box -->
+      <div class="contract-two-col-box">
+        <div class="contract-col-side">
+          <div class="contract-col-label">TO:</div>
+          <div style="font-weight: 700;">PROTEX ACCESSORY INDUSTRIAL LTD.,PART.</div>
+          <div><strong>ADD:</strong> 56/360 M.1 , Soi wattrisamakki 3, Sukhumvit Rd. , T.Bangmuangmai , A.Muangsamutprakarn , Samutprakarn 10270,Thailand</div>
+          <div><strong>Tel:</strong> 085-392-4448</div>
+        </div>
+        <div class="contract-col-side">
+          <div class="contract-col-label">FROM:</div>
+          <div style="font-weight: 700;">AMMA CONSTRUCTION MACHINERY CO., LTD.</div>
+          <div><strong>ADD:</strong> No.51,14th floor,Unit 1,No.95 Jinshui Road, Jinshui district,Zhengzhou,Henan ,China 450000</div>
+          <div><strong>TEL:</strong> +86-371-63386087</div>
+          <div><strong>MOB:</strong> +86-13598880213</div>
+        </div>
+      </div>
+
+      <!-- Fillable Interactive Table (Task 3) -->
+      <table class="contract-table" id="contractInteractiveTable">
+        <thead>
+          <tr>
+            <th style="width: 22%;">HS CODE</th>
+            <th style="width: 44%;">ITEM</th>
+            <th style="width: 14%;">QUANTITY</th>
+            <th style="width: 20%;">PRICE<br><span style="font-size: 7.5pt; font-weight: 700;">(CIF BANGKOK PORT,THAILAND)</span></th>
+            <th class="no-print" style="width: 38px; border: none; background: transparent;"></th>
+          </tr>
+        </thead>
+        <tbody id="contractTableBody">
+          <!-- Default Interactive Rows from Image 1 & 2 -->
+          <tr>
+            <td><input type="text" class="contract-cell-input cell-center hs-code-input" value="8474320000" aria-label="HS CODE"></td>
+            <td><input type="text" class="contract-cell-input item-input" value="PT2010RAP Asphalt Mixing Plant" aria-label="ITEM"></td>
+            <td><input type="text" class="contract-cell-input cell-center qty-input" value="1 SET" aria-label="QUANTITY"></td>
+            <td><input type="text" class="contract-cell-input cell-right price-input" value="CNY4,523,000" aria-label="PRICE"></td>
+            <td class="no-print" style="border: none; text-align: center;">
+              <button type="button" class="contract-row-del-btn" title="ลบรายการนี้">✕</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="text" class="contract-cell-input cell-center hs-code-input" value="8474201000" aria-label="HS CODE"></td>
+            <td><input type="text" class="contract-cell-input item-input" value="RC80 RAP Crusher" aria-label="ITEM"></td>
+            <td><input type="text" class="contract-cell-input cell-center qty-input" value="1 SET" aria-label="QUANTITY"></td>
+            <td><input type="text" class="contract-cell-input cell-right price-input" value="CNY680,000" aria-label="PRICE"></td>
+            <td class="no-print" style="border: none; text-align: center;">
+              <button type="button" class="contract-row-del-btn" title="ลบรายการนี้">✕</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="text" class="contract-cell-input cell-center hs-code-input" value="8417809090" aria-label="HS CODE"></td>
+            <td><input type="text" class="contract-cell-input item-input" value="Asphalt smoke treatment system" aria-label="ITEM"></td>
+            <td><input type="text" class="contract-cell-input cell-center qty-input" value="1 SET" aria-label="QUANTITY"></td>
+            <td><input type="text" class="contract-cell-input cell-right price-input" value="CNY230,000" aria-label="PRICE"></td>
+            <td class="no-print" style="border: none; text-align: center;">
+              <button type="button" class="contract-row-del-btn" title="ลบรายการนี้">✕</button>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="3" style="text-align: center; font-weight: 900; font-family: Arial, sans-serif;">TOTAL PRICE</td>
+            <td class="cell-right" id="contractTotalPriceCell" style="font-weight: 900; font-family: 'Times New Roman', serif;">CNY5,433,000</td>
+            <td class="no-print" style="border: none;"></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="contract-table-actions no-print">
+        <button type="button" class="contract-add-row-btn" id="btnAddContractRow">
+          <span>+ เพิ่มรายการสินค้า (Add Item)</span>
+        </button>
+      </div>
+
+      <!-- Static Read-only NOTE: (Task 2) -->
+      <div class="contract-static-box">
+        <strong>NOTE:</strong>
+        <div style="padding-left: 24px;">
+          1. Excluding the filler elevator, but including the filler weighing and filler control system.<br>
+          2. Excluding automatic lubrication pump for mixer and dryer and elevator.<br>
+          3. Adopt China brand inverter for fan of bag filter.<br>
+          4. Add additional control panel with manual control, Including Cold RAP system<br>
+          5. Excluding 2 units hot RAP hopper and 1 unit cold RAP hopper
+        </div>
+      </div>
+
+      <!-- Static Read-only Bank Info (Task 2) -->
+      <div class="contract-bank-grid">
+        <div class="contract-bank-label">
+          BANK<br>INFO for CNY
+        </div>
+        <div class="contract-bank-content">
+          <strong>Beneficiary:</strong> AMMA CONSTRUCTION MACHINERY CO., LTD.<br>
+          <strong>CNY ACCOUNT No.:</strong> 252088504423<br>
+          <strong>CNAPS:</strong> 104491062491<br>
+          <strong>SWIFT CODE:</strong> BKCHCNBJ530<br>
+          <strong>Beneficiary Bank:</strong> BANK OF CHINA HUAYUAN SUB- BRANCH ZHENGZHOU<br>
+          <strong>Bank Address:</strong> 40TH HUAYUAN RD ZHENGZHOU HENAN CHINA
+        </div>
+      </div>
+
+      <!-- Static Read-only Payment, Manufacturing, Warranty -->
+      <div class="contract-static-box">
+        <strong>Payment Items:</strong> CNY1,151,400 as down payment by T/T, CNY1,727,100 by T/T after finished fabrication, CNY2,000,000 by T/T and CNY554,500 as balance payment by T/T before shipping.
+      </div>
+      <div class="contract-static-box">
+        <strong>Manufacturing Time:</strong> 55 days after received down payment by T/T.
+      </div>
+      <div class="contract-static-box">
+        <strong>Warranty:</strong> 15 months after erecting the whole batching plant.
+      </div>
+
+      <!-- Static Read-only Erection / Commissioning / Training -->
+      <div class="contract-static-box" style="text-align: center; font-weight: 900; font-family: Arial, sans-serif; background: #F8FAFC;">
+        ERECTION/COMMISSIONING/TRAINING
+      </div>
+      <div class="contract-static-box">
+        1. The buyer should prepare the earthwork , electrical power supply etc based on the seller's technical drawings,the buyer should prepare professional worker-team, including: electrical workers, welding workers, maintain workers, operators;<br>
+        2. The seller should send 2 engineers to guiding erection in the buyer's working site. And training operators for the buyer.<br>
+        3. Free erection & commissioning time is 15 days. The buyer should bear accommodation, round-trip flight ticket, local transportation fees, medical care; and allowance USD100/day for each engineer after 15 days..
+      </div>
+
+      <!-- Static Signatures & Red Seal Stamp -->
+      <div class="contract-signatures-row">
+        <div>
+          <div>The Buyer:</div>
+          <div style="margin-top: 36px; border-bottom: 1px dotted #000; width: 180px;"></div>
+        </div>
+        <div class="contract-seller-stamp-zone">
+          <div style="margin-bottom: 4px;">The Seller:</div>
+          <div class="contract-signature-img">Manuel chan</div>
+          <div class="contract-red-seal">
+            安玛工程设备 (河南) 有限公司<br>
+            <span style="font-size: 7pt; font-weight: 700;">AMMA CONSTRUCTION MACHINERY CO.,LTD.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Machinery Silhouettes Banner -->
+      <div class="contract-machinery-banner" aria-hidden="true">
+        <svg viewBox="0 0 1000 40" fill="#000000" width="100%" height="32" opacity="0.75" preserveAspectRatio="none">
+          <path d="M10 35h980v4H10zM30 35l10-18h25l8 18zM80 35l5-12h18l4 12zM120 35l8-22h30l12 22zM190 35l14-16h24l6 16zM250 35l6-25h40l8 25zM330 35l12-14h20l8 14zM390 35l10-20h35l10 20zM470 35l8-15h25l6 15zM530 35l15-24h45l10 24zM630 35l8-18h30l8 18zM700 35l12-22h35l10 22zM780 35l10-15h25l6 15zM850 35l12-20h40l10 20zM930 35l8-14h25l8 14z"></path>
+        </svg>
+      </div>
+    </article>
+  </main>
+
+  <div class="toast-container no-print" id="toastContainer" aria-live="polite"></div>
+
+</body>
+
+</html>

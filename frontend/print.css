@@ -550,4 +550,22 @@
     font-size: 9pt !important;
     width: 200px !important;
   }
+
+  /* Sales Contract Print Adjustments */
+  .contract-search-container,
+  .contract-table-actions,
+  .contract-row-del-btn,
+  .circular-menu-wrapper,
+  .topbar-center-menu {
+    display: none !important;
+  }
+
+  .contract-paper-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-height: auto !important;
+    border: none !important;
+  }
 }

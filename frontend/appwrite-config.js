@@ -14,7 +14,52 @@
     databaseId: env.VITE_APPWRITE_DATABASE_ID || 'YOUR_DATABASE_ID',    // <-- ใส่ Database ID ของ ProtexNewsDB
     collectionId: env.VITE_APPWRITE_COLLECTION_ID || 'user_drafts',     // <-- ชื่อ Collection สำหรับเก็บ Draft
     employeesCollectionId: env.VITE_APPWRITE_EMPLOYEES_COLLECTION_ID || '6af2e9c6003dafa5b692', // <-- ตาราง Employees
+    contractsCollectionId: env.VITE_APPWRITE_CONTRACTS_COLLECTION_ID || 'contracts',
   };
+
+  const DEFAULT_CONTRACTS = [
+    {
+      id: 'AM251202',
+      contractNo: 'AM251202',
+      customerName: 'AMMA CONSTRUCTION MACHINERY CO., LTD.',
+      buyerName: 'PROTEX ACCESSORY INDUSTRIAL LTD.,PART.',
+      date: '(China)May 14th, 2026',
+      totalPrice: 'CNY5,433,000',
+      items: [
+        { hsCode: '8474320000', item: 'PT2010RAP Asphalt Mixing Plant', qty: '1 SET', price: 'CNY4,523,000' },
+        { hsCode: '8474201000', item: 'RC80 RAP Crusher', qty: '1 SET', price: 'CNY680,000' },
+        { hsCode: '8417809090', item: 'Asphalt smoke treatment system', qty: '1 SET', price: 'CNY230,000' },
+      ],
+      note: '1. Excluding the filler elevator, but including the filler weighing and filler control system.\n2. Excluding automatic lubrication pump for mixer and dryer and elevator.\n3. Adopt China brand inverter for fan of bag filter.\n4. Add additional control panel with manual control, Including Cold RAP system\n5. Excluding 2 units hot RAP hopper and 1 unit cold RAP hopper',
+    },
+    {
+      id: 'PC202605-01',
+      contractNo: 'PC202605-01',
+      customerName: 'บริษัท ยูโรเปียน แอสฟัลต์ คอนสตรัคชั่น จำกัด',
+      buyerName: 'PROTEX ACCESSORY INDUSTRIAL LTD.,PART.',
+      date: '12 พฤษภาคม 2569',
+      totalPrice: 'THB68,418.84',
+      items: [
+        { hsCode: '841989', item: 'ถังพรีฮีต 300 ลิตร (Preheat Tank 300L)', qty: '1 ชุด', price: '51,568.84' },
+        { hsCode: '853710', item: 'ตู้คอนโทรลไฟฟ้า ถังพรีฮีต (Control Box)', qty: '1 ตู้', price: '16,850.00' },
+      ],
+      note: '1. รับประกันอุปกรณ์ไฟฟ้าและมอเตอร์ 1 ปี\n2. ส่งมอบพร้อมทีมงานติดตั้งและทดสอบระบบหน้างาน',
+    },
+    {
+      id: 'PC202604-09',
+      contractNo: 'PC202604-09',
+      customerName: 'บริษัท เอสพีที โพรเทคส์ อินดัสตรี จำกัด',
+      buyerName: 'PROTEX ACCESSORY INDUSTRIAL LTD.,PART.',
+      date: '28 เมษายน 2569',
+      totalPrice: 'THB8,809.34',
+      items: [
+        { hsCode: '730890', item: "เหล็กแผ่น 4'x8' หนา 3มม.", qty: '2 แผ่น', price: '5,383.18' },
+        { hsCode: '721621', item: 'เหล็กฉาก 50x50x4mm (2")', qty: '4 เส้น', price: '1,626.16' },
+        { hsCode: '848180', item: 'บอลวาล์วทองเหลือง 1 นิ้ว', qty: '6 ตัว', price: '1,800.00' },
+      ],
+      note: '1. จัดส่งภายใน 3 วันทำการหลังยืนยันคำสั่งซื้อ\n2. ชำระเงินเมื่อส่งมอบสินค้าครบถ้วน',
+    },
+  ];
 
   let client = null;
   let databases = null;
@@ -168,6 +213,134 @@
     return null;
   }
 
+  /**
+   * บันทึกข้อมูลสัญญาซื้อขาย (Sales Contract) ลง Appwrite + LocalStorage
+   * @param {Object} contract ข้อมูลสัญญา
+   */
+  async function saveContract(contract) {
+    if (!contract || !contract.contractNo) return null;
+    const key = contract.contractNo.trim();
+
+    // 1. LocalStorage Offline-first
+    let storedList = [];
+    try {
+      const raw = localStorage.getItem('pc_appwrite_contracts');
+      storedList = raw ? JSON.parse(raw) : [];
+    } catch {
+      storedList = [];
+    }
+
+    const existIdx = storedList.findIndex((c) => c.contractNo === key);
+    if (existIdx >= 0) {
+      storedList[existIdx] = { ...storedList[existIdx], ...contract, updated_at: new Date().toISOString() };
+    } else {
+      storedList.unshift({ ...contract, updated_at: new Date().toISOString() });
+    }
+
+    try {
+      localStorage.setItem('pc_appwrite_contracts', JSON.stringify(storedList));
+    } catch (e) {
+      console.warn('LocalStorage quota warning:', e);
+    }
+
+    // 2. Appwrite Cloud
+    if (databases && global.Appwrite && APPWRITE_CONFIG.projectId !== 'YOUR_PROJECT_ID') {
+      try {
+        const { Query, ID } = global.Appwrite;
+        const payload = {
+          contract_no: key,
+          customer_name: contract.customerName || '',
+          contract_json: JSON.stringify(contract),
+          updated_at: new Date().toISOString(),
+        };
+
+        const existing = await databases.listDocuments(
+          APPWRITE_CONFIG.databaseId,
+          APPWRITE_CONFIG.contractsCollectionId,
+          [Query.equal('contract_no', key), Query.limit(1)]
+        );
+
+        if (existing.documents && existing.documents.length > 0) {
+          return await databases.updateDocument(
+            APPWRITE_CONFIG.databaseId,
+            APPWRITE_CONFIG.contractsCollectionId,
+            existing.documents[0].$id,
+            payload
+          );
+        }
+
+        return await databases.createDocument(
+          APPWRITE_CONFIG.databaseId,
+          APPWRITE_CONFIG.contractsCollectionId,
+          ID.unique(),
+          payload
+        );
+      } catch (err) {
+        console.warn('[Appwrite saveContract fallback to local]:', err.message);
+      }
+    }
+
+    return contract;
+  }
+
+  /**
+   * ค้นหาสัญญาซื้อขายและประวัติลูกค้าจาก Appwrite หรือ Local Database
+   * @param {string} query คำค้นหา (ชื่อลูกค้า หรือ ชื่อสินค้า/อุปกรณ์)
+   * @returns {Promise<Array>} รายการสัญญาที่ตรงกับคำค้นหา
+   */
+  async function searchContracts(query) {
+    const q = String(query || '').trim().toLowerCase();
+
+    // รวมข้อมูล LocalStorage + Default Demo Contracts
+    let localContracts = [];
+    try {
+      const raw = localStorage.getItem('pc_appwrite_contracts');
+      localContracts = raw ? JSON.parse(raw) : [];
+    } catch {
+      localContracts = [];
+    }
+
+    const combinedMap = new Map();
+    DEFAULT_CONTRACTS.forEach((c) => combinedMap.set(c.contractNo, c));
+    localContracts.forEach((c) => combinedMap.set(c.contractNo, c));
+
+    // ค้นหาใน Appwrite หากเชื่อมต่อแล้ว
+    if (q && databases && global.Appwrite && APPWRITE_CONFIG.projectId !== 'YOUR_PROJECT_ID') {
+      try {
+        const { Query } = global.Appwrite;
+        const res = await databases.listDocuments(
+          APPWRITE_CONFIG.databaseId,
+          APPWRITE_CONFIG.contractsCollectionId,
+          [Query.search('customer_name', q), Query.limit(20)]
+        );
+        if (res && res.documents) {
+          res.documents.forEach((doc) => {
+            try {
+              const parsed = typeof doc.contract_json === 'string' ? JSON.parse(doc.contract_json) : doc;
+              combinedMap.set(doc.contract_no, parsed);
+            } catch {
+              // Ignore parse error
+            }
+          });
+        }
+      } catch {
+        // Fallback to local filtering
+      }
+    }
+
+    const all = Array.from(combinedMap.values());
+    if (!q) return all;
+
+    return all.filter((c) => {
+      const cust = (c.customerName || '').toLowerCase();
+      const num = (c.contractNo || '').toLowerCase();
+      const itemsMatch = (c.items || []).some(
+        (it) => (it.item || '').toLowerCase().includes(q) || (it.hsCode || '').toLowerCase().includes(q)
+      );
+      return cust.includes(q) || num.includes(q) || itemsMatch;
+    });
+  }
+
   global.PricecraftAppwrite = {
     config: APPWRITE_CONFIG,
     client,
@@ -175,8 +348,13 @@
     saveData,
     loadData,
     verifyEmployee,
+    saveContract,
+    searchContracts,
+    DEFAULT_CONTRACTS,
   };
   global.saveData = saveData;
   global.loadData = loadData;
+  global.saveContract = saveContract;
+  global.searchContracts = searchContracts;
 })(window);
 

@@ -33,6 +33,36 @@
       </div>
     </div>
 
+    <!-- Center Circular Hover Menu (Task 1) -->
+    <div class="topbar-center-menu" aria-label="เมนูลัดระบบ">
+      <div class="circular-menu-wrapper">
+        <button type="button" class="circular-menu-btn" aria-label="เมนูระบบ Pricecraft" title="เมนูลัดสลับหน้าต่าง (ชี้เพื่อเปิดเมนู)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" width="22" height="22" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"></circle>
+            <line x1="12" y1="3" x2="12" y2="21"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+          </svg>
+        </button>
+        <div class="circular-dropdown-menu" role="menu">
+          <a href="customer-contract.html" target="_blank" class="circular-dropdown-item" role="menuitem">
+            <span class="dropdown-item-icon">👥</span>
+            <div class="dropdown-item-info">
+              <span class="dropdown-item-title">รายชื่อลูกค้า / สัญญาซื้อขาย</span>
+              <span class="dropdown-item-sub">A4 Sales Contract & ข้อมูลคำสั่งซื้อ</span>
+            </div>
+            <span class="dropdown-badge">ใหม่</span>
+          </a>
+          <a href="dashboard.html" class="circular-dropdown-item active" role="menuitem">
+            <span class="dropdown-item-icon">📊</span>
+            <div class="dropdown-item-info">
+              <span class="dropdown-item-title">ใบขอราคาต้นทุน (หน้าปัจจุบัน)</span>
+              <span class="dropdown-item-sub">Pricecraft Cost Estimation Table</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
     <div class="topbar-actions-toolbar">
       <input type="file" id="importExcelFileInput" class="is-hidden" accept=".xlsx,.xls,.csv"
         aria-label="เลือกไฟล์ Excel หรือ CSV เพื่อนำเข้า" title="เลือกไฟล์ Excel หรือ CSV เพื่อนำเข้า">

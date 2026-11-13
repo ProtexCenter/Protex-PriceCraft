@@ -1876,3 +1876,560 @@ input[type="number"],
   color: #334155;
   min-height: 18px;
 }
+
+/* ==========================================================================
+   PART 3: CIRCULAR HOVER MENU & A4 SALES CONTRACT PAGE
+   ========================================================================== */
+
+/* Center Circular Hover Menu (Task 1) */
+.topbar-center-menu {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 105;
+}
+
+.circular-menu-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circular-menu-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #27272A 0%, #18181B 100%);
+  border: 1.5px solid rgba(225, 29, 36, 0.6);
+  color: #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(225, 29, 36, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  transition: all 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.circular-menu-btn:hover,
+.circular-menu-wrapper:hover .circular-menu-btn {
+  transform: scale(1.1) rotate(90deg);
+  border-color: #E11D24;
+  box-shadow: 0 0 24px rgba(225, 29, 36, 0.65), 0 0 8px #E11D24;
+  background: linear-gradient(135deg, #E11D24 0%, #991B1B 100%);
+}
+
+.circular-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px) scale(0.95);
+  background: rgba(24, 24, 27, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 8px;
+  min-width: 275px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(225, 29, 36, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 200;
+}
+
+.circular-dropdown-menu::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: rgba(24, 24, 27, 0.95);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.circular-menu-wrapper:hover .circular-dropdown-menu,
+.circular-dropdown-menu:hover {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.circular-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #F1F5F9;
+  text-decoration: none;
+  font-size: 9.5pt;
+  font-weight: 500;
+  transition: all 180ms ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.circular-dropdown-item:hover {
+  background: rgba(225, 29, 36, 0.15);
+  color: #FFFFFF;
+  border-left: 3px solid #E11D24;
+  padding-left: 16px;
+}
+
+.circular-dropdown-item.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #E11D24;
+  font-weight: 700;
+}
+
+.dropdown-item-icon {
+  font-size: 16pt;
+  line-height: 1;
+}
+
+.dropdown-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropdown-item-title {
+  font-weight: 700;
+  font-size: 9.8pt;
+}
+
+.dropdown-item-sub {
+  font-size: 7.8pt;
+  color: #94A3B8;
+}
+
+.dropdown-badge {
+  margin-left: auto;
+  background: #E11D24;
+  color: #FFFFFF;
+  font-size: 7pt;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 980px) {
+  .topbar-center-menu {
+    position: static;
+    transform: none;
+    order: 3;
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
+/* Contract Smart Search Bar Container (Task 4) */
+.contract-search-container {
+  max-width: 210mm;
+  width: 100%;
+  margin: 16px auto 16px auto;
+  position: relative;
+  z-index: 20;
+}
+
+.contract-search-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid #CBD5E1;
+  border-radius: 14px;
+  padding: 10px 18px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  transition: all 200ms ease;
+}
+
+.contract-search-box:focus-within {
+  border-color: #E11D24;
+  box-shadow: 0 12px 30px -4px rgba(225, 29, 36, 0.2);
+  background: #FFFFFF;
+}
+
+.contract-search-icon {
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.contract-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 10.5pt;
+  font-family: inherit;
+  color: #0F172A;
+}
+
+.contract-search-badge {
+  font-size: 8pt;
+  font-weight: 600;
+  color: #475569;
+  background: #F1F5F9;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.contract-search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
+  max-height: 320px;
+  overflow-y: auto;
+  display: none;
+  z-index: 50;
+}
+
+.contract-search-dropdown.is-open {
+  display: block;
+}
+
+.contract-search-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid #F1F5F9;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.contract-search-result-item:hover {
+  background: #F8FAFC;
+}
+
+.contract-search-result-title {
+  font-weight: 700;
+  font-size: 9.8pt;
+  color: #0F172A;
+}
+
+.contract-search-result-meta {
+  font-size: 8.2pt;
+  color: #64748B;
+  margin-top: 2px;
+}
+
+.contract-search-result-price {
+  font-weight: 800;
+  font-size: 10.5pt;
+  color: #E11D24;
+}
+
+/* Sales Contract A4 Paper Sheet (Task 2 & 3) */
+.contract-paper-sheet {
+  font-family: 'Times New Roman', 'Sarabun', 'Prompt', serif;
+  width: 210mm;
+  min-height: 297mm;
+  background: #FFFFFF;
+  color: #000000;
+  padding: 12mm 14mm;
+  margin: 0 auto 40px auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  position: relative;
+  box-sizing: border-box;
+}
+
+.contract-paper-sheet::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 440px;
+  height: 200px;
+  background-image: url("ChatGPT Image 9 พ.ย. 2569 21_02_33.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.contract-paper-sheet > * {
+  position: relative;
+  z-index: 1;
+}
+
+.contract-header-logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.contract-company-name-bold {
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-size: 13.5pt;
+  font-weight: 900;
+  color: #000000;
+  letter-spacing: 0.5px;
+}
+
+.contract-title-banner {
+  text-align: center;
+  font-size: 18pt;
+  font-weight: 900;
+  font-family: 'Arial Black', Arial, sans-serif;
+  letter-spacing: 1.5px;
+  margin: 10px 0 8px 0;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+.contract-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1.5pt solid #000000;
+  border-bottom: 1.5pt solid #000000;
+  padding: 4px 8px;
+  font-weight: 700;
+  font-size: 9.5pt;
+  margin-bottom: 0;
+}
+
+.contract-two-col-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-left: 1.5pt solid #000000;
+  border-right: 1.5pt solid #000000;
+  border-bottom: 1.5pt solid #000000;
+  font-size: 8.5pt;
+  line-height: 1.35;
+}
+
+.contract-col-side {
+  padding: 6px 10px;
+}
+
+.contract-col-side:first-child {
+  border-right: 1.5pt solid #000000;
+}
+
+.contract-col-label {
+  font-weight: 900;
+  font-family: Arial, sans-serif;
+  margin-bottom: 2px;
+}
+
+.contract-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-left: 1.5pt solid #000000;
+  border-right: 1.5pt solid #000000;
+  border-bottom: 1.5pt solid #000000;
+  margin-bottom: 0;
+  table-layout: fixed;
+}
+
+.contract-table th {
+  background: #FFFFFF;
+  color: #000000;
+  border: 1pt solid #000000;
+  padding: 6px 6px;
+  font-size: 9pt;
+  font-weight: 900;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.contract-table td {
+  border: 1pt solid #000000;
+  padding: 4px 6px;
+  font-size: 8.8pt;
+  vertical-align: middle;
+}
+
+.contract-table input.contract-cell-input {
+  width: 100%;
+  border: 1px dashed transparent;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  padding: 3px 4px;
+  border-radius: 4px;
+  transition: all 150ms ease;
+  box-sizing: border-box;
+}
+
+.contract-table input.contract-cell-input:hover {
+  border-color: #CBD5E1;
+  background: rgba(248, 250, 252, 0.7);
+}
+
+.contract-table input.contract-cell-input:focus {
+  border-color: #E11D24;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 2px rgba(225, 29, 36, 0.15);
+}
+
+.contract-table .cell-center {
+  text-align: center;
+}
+
+.contract-table .cell-right {
+  text-align: right;
+  font-family: 'Times New Roman', serif;
+  font-weight: 700;
+}
+
+.contract-table tr.total-row td {
+  font-weight: 900;
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.contract-row-del-btn {
+  background: transparent;
+  border: none;
+  color: #EF4444;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms;
+}
+
+.contract-row-del-btn:hover {
+  background: #FEE2E2;
+}
+
+.contract-table-actions {
+  display: flex;
+  justify-content: flex-start;
+  padding: 8px 0;
+  gap: 12px;
+}
+
+.contract-add-row-btn {
+  background: #F1F5F9;
+  border: 1px dashed #94A3B8;
+  color: #1E293B;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 8.8pt;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 150ms ease;
+}
+
+.contract-add-row-btn:hover {
+  background: #E2E8F0;
+  border-color: #64748B;
+  color: #0F172A;
+}
+
+.contract-static-box {
+  border-left: 1.5pt solid #000000;
+  border-right: 1.5pt solid #000000;
+  border-bottom: 1.5pt solid #000000;
+  padding: 6px 10px;
+  font-size: 8pt;
+  line-height: 1.35;
+}
+
+.contract-bank-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  border-left: 1.5pt solid #000000;
+  border-right: 1.5pt solid #000000;
+  border-bottom: 1.5pt solid #000000;
+  font-size: 8pt;
+}
+
+.contract-bank-label {
+  border-right: 1.5pt solid #000000;
+  padding: 6px 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+}
+
+.contract-bank-content {
+  padding: 6px 10px;
+  line-height: 1.4;
+}
+
+.contract-signatures-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 16px 20px 8px 20px;
+  font-size: 9.5pt;
+  font-weight: 700;
+  align-items: flex-end;
+}
+
+.contract-seller-stamp-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  min-height: 60px;
+}
+
+.contract-signature-img {
+  font-family: 'Brush Script MT', cursive, sans-serif;
+  font-size: 20pt;
+  color: #1E293B;
+  display: inline-block;
+  margin-bottom: 2px;
+}
+
+.contract-red-seal {
+  display: inline-block;
+  border: 2px solid #DC2626;
+  color: #DC2626;
+  padding: 3px 8px;
+  font-size: 8.5pt;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+  background: rgba(220, 38, 38, 0.04);
+}
+
+.contract-machinery-banner {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0.8;
+  margin-top: 14px;
+  border-top: 1px dashed #CBD5E1;
+  padding-top: 6px;
+}
