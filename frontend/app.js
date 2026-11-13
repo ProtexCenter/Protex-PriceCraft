@@ -1284,16 +1284,59 @@
     // Ensure elements with break-inside: avoid never split across A4 page boundaries (297mm)
     const pxPerMm = sheet.offsetWidth / 210;
     const pageHeightPx = 297 * pxPerMm;
+
+    // 1. Table Rows Smart Page-Break Avoidance with Repeated Header
+    const theadThs = sheet.querySelectorAll('.a4-sheet-table thead tr th');
+    let theadRowHtml = '';
+    if (theadThs.length > 0) {
+      theadRowHtml = Array.from(theadThs)
+        .map(
+          (th) =>
+            `<th style="background:#111114;color:#FFFFFF;border:0.75pt solid #111114;border-bottom:2.5pt solid #E11D24;padding:6px 4px;font-size:8.2pt;text-align:center;">${th.innerHTML}</th>`
+        )
+        .join('');
+    }
+
+    const tbodyRows = Array.from(sheet.querySelectorAll('.a4-sheet-table tbody tr'));
+    let currentPage = 1;
+
+    tbodyRows.forEach((tr) => {
+      const pageBoundary = currentPage * pageHeightPx;
+      const elTop = tr.offsetTop;
+      const elBottom = elTop + tr.offsetHeight;
+
+      // If this row crosses the A4 page boundary (splits across pages)
+      if (elTop < pageBoundary && elBottom > pageBoundary) {
+        const spacerTr = document.createElement('tr');
+        spacerTr.className = 'page-break-spacer-row';
+        const neededGap = Math.ceil(pageBoundary - elTop + 14);
+        spacerTr.innerHTML = `<td colspan="9" style="height:${neededGap}px;padding:0!important;margin:0!important;border:none!important;background:transparent!important;"></td>`;
+        tr.parentNode.insertBefore(spacerTr, tr);
+
+        // Repeat table header at the top of the next page so customer can read columns
+        if (theadRowHtml) {
+          const repeatHeaderTr = document.createElement('tr');
+          repeatHeaderTr.className = 'page-break-header-repeat';
+          repeatHeaderTr.innerHTML = theadRowHtml;
+          tr.parentNode.insertBefore(repeatHeaderTr, tr);
+        }
+
+        currentPage += 1;
+      } else if (elTop >= pageBoundary) {
+        currentPage = Math.floor(elTop / pageHeightPx) + 1;
+      }
+    });
+
+    // 2. Bottom Grid & Signatures Page-Break Avoidance
     const breakAvoidElements = sheet.querySelectorAll(
       '.a4-sheet-signatures, .a4-sheet-bottom-grid, .signatures-section, .doc-bottom-grid'
     );
     breakAvoidElements.forEach((el) => {
       const elTop = el.offsetTop;
       const elBottom = elTop + el.offsetHeight;
-      const pageNum = Math.floor(elTop / pageHeightPx) + 1;
-      const pageBoundary = pageNum * pageHeightPx;
-      if (elTop < pageBoundary && elBottom > pageBoundary) {
-        const pushGap = pageBoundary - elTop + 24;
+      const currentBoundary = Math.floor(elTop / pageHeightPx + 1) * pageHeightPx;
+      if (elTop < currentBoundary && elBottom > currentBoundary) {
+        const pushGap = currentBoundary - elTop + 24;
         el.style.marginTop = `${pushGap}px`;
       }
     });

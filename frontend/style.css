@@ -1754,6 +1754,17 @@ input[type="number"],
   table-layout: fixed;
 }
 
+.a4-sheet-table thead {
+  display: table-header-group;
+}
+
+.a4-sheet-table tr,
+.a4-sheet-table tbody tr {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  break-inside: avoid-page !important;
+}
+
 .a4-sheet-table th {
   background: linear-gradient(180deg, #18181B 0%, #09090B 100%);
   color: #FFFFFF;
