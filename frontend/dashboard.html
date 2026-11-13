@@ -38,7 +38,7 @@
           </svg>
         </button>
         <button type="button" class="sidebar-icon-btn" id="btnNavContract" data-view="contract"
-          data-tooltip="สัญญาซื้อขาย / รายชื่อลูกค้า (Sales Contract)" aria-label="สัญญาซื้อขาย / รายชื่อลูกค้า">
+          data-tooltip="สัญญาซื้อขาย (Sales Contract Dashboard)" aria-label="สัญญาซื้อขาย">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="22" height="22" aria-hidden="true">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
@@ -46,6 +46,14 @@
             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
           </svg>
         </button>
+        <a href="customer-contract.html" class="sidebar-icon-btn" id="btnNavCustomer"
+          data-tooltip="รายชื่อลูกค้า / สัญญา Appwrite" aria-label="รายชื่อลูกค้าและสัญญา Appwrite">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="22" height="22" aria-hidden="true">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+          </svg>
+        </a>
       </nav>
     </aside>
 
@@ -63,6 +71,43 @@
           </div>
         </div>
 
+        <!-- Center Circular Hover Menu -->
+        <nav class="topbar-center-menu" aria-label="เมนูลัดระบบ">
+          <div class="circular-menu-wrapper">
+            <button type="button" class="circular-menu-btn" aria-label="เมนูระบบ Pricecraft" title="เมนูลัดสลับหน้าต่าง (ชี้เพื่อเปิดเมนู)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" width="22" height="22" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"></circle>
+                <line x1="12" y1="3" x2="12" y2="21"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+              </svg>
+            </button>
+            <div class="circular-dropdown-menu" role="menu">
+              <button type="button" class="circular-dropdown-item active" id="btnMenuCost" role="menuitem">
+                <span class="dropdown-item-icon">📊</span>
+                <div class="dropdown-item-info">
+                  <span class="dropdown-item-title">ใบขอราคาต้นทุน (Cost Sheet)</span>
+                  <span class="dropdown-item-sub">Pricecraft Cost Estimation Table</span>
+                </div>
+              </button>
+              <button type="button" class="circular-dropdown-item" id="btnMenuContract" role="menuitem">
+                <span class="dropdown-item-icon">📝</span>
+                <div class="dropdown-item-info">
+                  <span class="dropdown-item-title">สัญญาซื้อขาย (Sales Contract Dashboard)</span>
+                  <span class="dropdown-item-sub">ระบบกรอกสัญญา &amp; เรทเงินหยวน CNY</span>
+                </div>
+                <span class="dropdown-badge">ใหม่</span>
+              </button>
+              <a href="customer-contract.html" class="circular-dropdown-item" role="menuitem">
+                <span class="dropdown-item-icon">👥</span>
+                <div class="dropdown-item-info">
+                  <span class="dropdown-item-title">รายชื่อลูกค้า / สัญญา Appwrite</span>
+                  <span class="dropdown-item-sub">ประวัติคำสั่งซื้อ &amp; จัดการข้อมูลลูกค้า</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </nav>
+
         <!-- Task 3: CNY Real-Time Widget & Live Line Chart (Top-Right) -->
         <div class="cny-rate-widget" id="cnyRateWidget" title="เรทเงินหยวน (CNY / THB) อัปเดตแบบเรียลไทม์">
           <div class="cny-rate-info">
@@ -70,7 +115,7 @@
               <span class="cny-badge"><span class="cny-live-dot" aria-hidden="true"></span>CNY / THB</span>
               <span class="cny-date-label" id="cnyRateDateLabel">วันนี้</span>
             </div>
-            <span class="cny-current-rate" id="cnyLiveRateText">กำลังโหลด...</span>
+            <span class="cny-current-rate" id="cnyLiveRateText">1 CNY ≈ 5.0450 ฿</span>
           </div>
           <div class="cny-chart-box">
             <canvas id="cnyMiniChart" width="100" height="32" aria-label="กราฟเรทเงิน CNY"></canvas>
@@ -217,7 +262,7 @@
 
               <!-- Smart Search & Auto-Fill Dropdown -->
               <div class="smart-search-wrapper" id="smartSearchWrapper">
-                <div class="smart-search-box">
+                <div class="smart-search-box" id="smartSearchBox">
                   <svg class="smart-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                     aria-hidden="true">
                     <circle cx="11" cy="11" r="8"></circle>
@@ -255,7 +300,7 @@
                     <th class="col-action-header no-print col-w-44">ลบ</th>
                   </tr>
                 </thead>
-                <tbody id="tableBody">
+                <tbody id="excelTableBody">
                   <!-- Row 1 Main Item -->
                   <tr data-row-id="row-1" data-is-sub="false">
                     <td class="col-seq cell-seq text-center tabular-nums">1</td>

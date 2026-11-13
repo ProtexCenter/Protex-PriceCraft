@@ -444,11 +444,11 @@ input[type="number"],
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   color: #FFFFFF;
-  padding: 12px 36px;
+  padding: 10px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
   border-bottom: 3px solid var(--protex-red-bright);
   box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.42);
   flex-wrap: wrap;
@@ -616,8 +616,11 @@ input[type="number"],
    ========================================================================== */
 .workspace-stage {
   max-width: 1380px;
-  margin: 34px auto 72px;
-  padding: 0 28px;
+  width: 100%;
+  margin: 28px auto 72px;
+  padding: 0 24px;
+  display: flex;
+  justify-content: center;
 }
 
 .document-paper {
@@ -625,9 +628,10 @@ input[type="number"],
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-luxury-card);
-  border: none;
-  border-top: none;
-  padding: 44px 48px;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  padding: 38px 44px;
+  width: 100%;
+  max-width: 1260px;
   position: relative;
   isolation: isolate;
 }

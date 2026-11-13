@@ -1747,8 +1747,15 @@
      9. INITIALIZE WORKSPACE (dashboard.html)
      ========================================================================== */
   function initWorkspacePage() {
-    const tbody = document.getElementById('excelTableBody');
-    if (!tbody) return;
+    const tbody = document.getElementById('excelTableBody') || document.getElementById('tableBody');
+    if (!tbody) {
+      console.warn('[Pricecraft] Table body not found, initializing SPA and widgets only.');
+      initSpaNavigation();
+      initDashboardContractForm();
+      initCnyLiveChart();
+      fetchCnyRates();
+      return;
+    }
 
     let currentEmpId = '1234';
     try {
@@ -1762,7 +1769,7 @@
       // Ignore storage access errors in strict privacy mode
     }
 
-    const issuedEl = document.getElementById('issuedDateTimeDisplay');
+    const issuedEl = document.getElementById('issuedDateTimeDisplay') || document.getElementById('issueDateTime');
     const updateClock = () => {
       if (issuedEl) issuedEl.textContent = formatCurrentDateTimeTh();
     };
@@ -1834,7 +1841,7 @@
     }
 
     // Bind Auto-Save on Header & Footer Inputs (Customer, Seller, Notes, Signatures)
-    ['customerNameInput', 'sellerNameInput', 'docGeneralNotes', 'approverSignName', 'preparerSignName'].forEach(
+    ['customerNameInput', 'sellerNameInput', 'docGeneralNotes', 'documentNotesInput', 'approverSignName', 'preparerSignName'].forEach(
       (inputId) => {
         const el = document.getElementById(inputId);
         if (el) {
@@ -1989,6 +1996,8 @@
   function initSpaNavigation() {
     const btnNavCost = document.getElementById('btnNavCost');
     const btnNavContract = document.getElementById('btnNavContract');
+    const btnMenuCost = document.getElementById('btnMenuCost');
+    const btnMenuContract = document.getElementById('btnMenuContract');
     const viewCost = document.getElementById('viewCost');
     const viewContract = document.getElementById('viewContract');
     const appTitle = document.getElementById('topbarAppTitle');
@@ -1997,12 +2006,16 @@
       if (viewName === 'cost') {
         btnNavCost?.classList.add('active');
         btnNavContract?.classList.remove('active');
+        btnMenuCost?.classList.add('active');
+        btnMenuContract?.classList.remove('active');
         viewCost?.classList.add('active');
         viewContract?.classList.remove('active');
         if (appTitle) appTitle.textContent = 'PRICECRAFT • ใบขอราคาต้นทุน';
       } else if (viewName === 'contract') {
         btnNavContract?.classList.add('active');
         btnNavCost?.classList.remove('active');
+        btnMenuContract?.classList.add('active');
+        btnMenuCost?.classList.remove('active');
         viewContract?.classList.add('active');
         viewCost?.classList.remove('active');
         if (appTitle) appTitle.textContent = 'PRICECRAFT • สัญญาซื้อขาย (Sales Contract Dashboard)';
@@ -2011,6 +2024,17 @@
 
     btnNavCost?.addEventListener('click', () => switchView('cost'));
     btnNavContract?.addEventListener('click', () => switchView('contract'));
+    btnMenuCost?.addEventListener('click', () => switchView('cost'));
+    btnMenuContract?.addEventListener('click', () => switchView('contract'));
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'contract') {
+        switchView('contract');
+      }
+    } catch {
+      // Ignore
+    }
   }
 
   async function fetchCnyRates(dateStr = null) {
