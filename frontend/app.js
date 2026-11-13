@@ -2087,6 +2087,10 @@
     }
 
     const ctx = canvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 0, 32);
+    grad.addColorStop(0, 'rgba(225, 29, 36, 0.38)');
+    grad.addColorStop(1, 'rgba(225, 29, 36, 0.0)');
+
     cnyChartInstance = new window.Chart(ctx, {
       type: 'line',
       data: {
@@ -2095,28 +2099,51 @@
           {
             data: dataPoints,
             borderColor: '#E11D24',
-            borderWidth: 2,
-            fill: false,
-            tension: 0.35,
+            borderWidth: 1.8,
+            fill: true,
+            backgroundColor: grad,
+            tension: 0.45,
             pointRadius: 0,
             pointHoverRadius: 3,
+            pointHoverBackgroundColor: '#FFFFFF',
+            pointHoverBorderColor: '#E11D24',
+            pointHoverBorderWidth: 2,
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: {
+          duration: 800,
+          easing: 'easeOutQuart',
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
+            enabled: true,
+            displayColors: false,
+            padding: 6,
+            cornerRadius: 6,
             callbacks: {
+              title: () => '',
               label: (c) => `1 CNY = ${parseFloat(c.raw).toFixed(4)} THB`,
             },
           },
         },
         scales: {
-          x: { display: false },
-          y: { display: false },
+          x: {
+            display: false,
+            grid: { display: false, drawBorder: false },
+            ticks: { display: false },
+            border: { display: false },
+          },
+          y: {
+            display: false,
+            grid: { display: false, drawBorder: false },
+            ticks: { display: false },
+            border: { display: false },
+          },
         },
       },
     });
