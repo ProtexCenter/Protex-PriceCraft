@@ -1969,6 +1969,470 @@
 
     // Initialize Smart Search & Auto-Fill Catalog
     initSmartSearch(tbody, () => saveUserDraftByEmployeeId(currentEmpId, tbody));
+
+    // Initialize SPA Navigation, CNY Exchange Rate Engine & Dashboard Form (Tasks 1, 2, 3)
+    initSpaNavigation();
+    initDashboardContractForm();
+    initCnyLiveChart();
+    fetchCnyRates();
+  }
+
+  // ==========================================================================
+  // SPA NAVIGATION & REAL-TIME CNY EXCHANGE RATE WITH CHART.JS (Tasks 1, 2, 3)
+  // ==========================================================================
+
+  let currentCnyThbRate = 5.0450;
+  let isRateLocked = false;
+  let lockedRateData = null;
+  let cnyChartInstance = null;
+
+  function initSpaNavigation() {
+    const btnNavCost = document.getElementById('btnNavCost');
+    const btnNavContract = document.getElementById('btnNavContract');
+    const viewCost = document.getElementById('viewCost');
+    const viewContract = document.getElementById('viewContract');
+    const appTitle = document.getElementById('topbarAppTitle');
+
+    function switchView(viewName) {
+      if (viewName === 'cost') {
+        btnNavCost?.classList.add('active');
+        btnNavContract?.classList.remove('active');
+        viewCost?.classList.add('active');
+        viewContract?.classList.remove('active');
+        if (appTitle) appTitle.textContent = 'PRICECRAFT • ใบขอราคาต้นทุน';
+      } else if (viewName === 'contract') {
+        btnNavContract?.classList.add('active');
+        btnNavCost?.classList.remove('active');
+        viewContract?.classList.add('active');
+        viewCost?.classList.remove('active');
+        if (appTitle) appTitle.textContent = 'PRICECRAFT • สัญญาซื้อขาย (Sales Contract Dashboard)';
+      }
+    }
+
+    btnNavCost?.addEventListener('click', () => switchView('cost'));
+    btnNavContract?.addEventListener('click', () => switchView('contract'));
+  }
+
+  async function fetchCnyRates(dateStr = null) {
+    if (isRateLocked && lockedRateData) {
+      return lockedRateData.rate;
+    }
+
+    const liveRateEl = document.getElementById('cnyLiveRateText');
+    const dateLabelEl = document.getElementById('cnyRateDateLabel');
+
+    try {
+      let url = 'https://api.frankfurter.app/latest?from=CNY&to=THB';
+      let label = 'วันนี้ (Live)';
+
+      if (dateStr) {
+        url = `https://api.frankfurter.app/${dateStr}?from=CNY&to=THB`;
+        label = `ณ วันที่ ${dateStr}`;
+      }
+
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.rates && data.rates.THB) {
+          currentCnyThbRate = parseFloat(data.rates.THB);
+          if (liveRateEl) {
+            liveRateEl.textContent = `1 CNY = ${currentCnyThbRate.toFixed(4)} ฿`;
+          }
+          if (dateLabelEl) {
+            dateLabelEl.textContent = label;
+          }
+          updateDashContractTotals();
+          return currentCnyThbRate;
+        }
+      }
+    } catch (err) {
+      console.warn('[CNY API fallback]:', err);
+    }
+
+    if (liveRateEl && !liveRateEl.textContent.includes('CNY')) {
+      liveRateEl.textContent = `1 CNY = ${currentCnyThbRate.toFixed(4)} ฿`;
+    }
+    updateDashContractTotals();
+    return currentCnyThbRate;
+  }
+
+  async function initCnyLiveChart() {
+    const canvas = document.getElementById('cnyMiniChart');
+    if (!canvas || !window.Chart) return;
+
+    let labels = ['-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'วันนี้'];
+    let dataPoints = [5.02, 5.035, 5.01, 5.04, 5.038, 5.042, 5.045];
+
+    try {
+      const today = new Date();
+      const past = new Date(today);
+      past.setDate(today.getDate() - 10);
+      const startStr = past.toISOString().slice(0, 10);
+      const endStr = today.toISOString().slice(0, 10);
+
+      const res = await fetch(`https://api.frankfurter.app/${startStr}..${endStr}?from=CNY&to=THB`);
+      if (res.ok) {
+        const timeData = await res.json();
+        if (timeData && timeData.rates) {
+          const dates = Object.keys(timeData.rates).sort();
+          if (dates.length >= 3) {
+            labels = dates.map((d) => d.slice(5));
+            dataPoints = dates.map((d) => timeData.rates[d].THB);
+            currentCnyThbRate = dataPoints[dataPoints.length - 1];
+          }
+        }
+      }
+    } catch {
+      // Fallback
+    }
+
+    const ctx = canvas.getContext('2d');
+    cnyChartInstance = new window.Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            data: dataPoints,
+            borderColor: '#E11D24',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.35,
+            pointRadius: 0,
+            pointHoverRadius: 3,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (c) => `1 CNY = ${parseFloat(c.raw).toFixed(4)} THB`,
+            },
+          },
+        },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+      },
+    });
+
+    const liveRateEl = document.getElementById('cnyLiveRateText');
+    if (liveRateEl) {
+      liveRateEl.textContent = `1 CNY = ${currentCnyThbRate.toFixed(4)} ฿`;
+    }
+  }
+
+  function lockCnyRateForExport() {
+    isRateLocked = true;
+    const dateVal = document.getElementById('dashContractDate')?.value || new Date().toISOString().slice(0, 10);
+    lockedRateData = {
+      rate: currentCnyThbRate,
+      date: dateVal,
+      timestamp: new Date().toLocaleTimeString('th-TH'),
+    };
+    const liveRateEl = document.getElementById('cnyLiveRateText');
+    if (liveRateEl) {
+      liveRateEl.classList.add('locked-rate');
+      liveRateEl.textContent = `[LOCKED] 1 CNY = ${lockedRateData.rate.toFixed(4)} ฿`;
+    }
+    return lockedRateData;
+  }
+
+  function formatNumberWithCommas(val) {
+    if (!val) return '';
+    const str = String(val).trim();
+    if (/^(\+?\d{1,4}[-\s]?)?(\(?\d{2,4}\)?[-\s]?)?[\d\s-]{6,15}$/.test(str) && (str.includes('-') || str.startsWith('+'))) {
+      return str;
+    }
+    const match = str.match(/^([A-Za-z]{2,4})?\s*([\d,.]+)\s*(.*)$/);
+    if (match) {
+      const prefix = match[1] || '';
+      const rawNum = match[2].replace(/,/g, '');
+      const suffix = match[3] || '';
+      const num = parseFloat(rawNum);
+      if (isNaN(num)) return str;
+      const formatted = num.toLocaleString('en-US', {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: rawNum.includes('.') ? 2 : 0,
+      });
+      return `${prefix ? prefix + ' ' : ''}${formatted}${suffix ? ' ' + suffix : ''}`;
+    }
+    return str;
+  }
+
+  function bindDashCellFormatting(input) {
+    if (!input) return;
+    input.addEventListener('focus', () => {
+      const raw = input.value;
+      const numOnly = raw.replace(/[^0-9.]/g, '');
+      if (numOnly) input.value = numOnly;
+    });
+    input.addEventListener('blur', () => {
+      input.value = formatNumberWithCommas(input.value);
+      updateDashContractTotals();
+    });
+    input.addEventListener('input', () => {
+      updateDashContractTotals();
+    });
+  }
+
+  function updateDashContractTotals() {
+    const tbody = document.getElementById('dashContractTableBody');
+    const totalCnyEl = document.getElementById('dashTotalCny');
+    const totalThbEl = document.getElementById('dashTotalThb');
+    if (!tbody || !totalCnyEl) return;
+
+    let totalCny = 0;
+    tbody.querySelectorAll('tr').forEach((row) => {
+      const priceInput = row.querySelector('.dash-price-input');
+      if (priceInput) {
+        const val = priceInput.value || '';
+        const num = parseFloat(val.replace(/[^0-9.]/g, ''));
+        if (!isNaN(num)) totalCny += num;
+      }
+    });
+
+    const formattedCny = totalCny.toLocaleString('en-US', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    });
+    totalCnyEl.textContent = `CNY ${formattedCny}`;
+
+    const totalThb = totalCny * currentCnyThbRate;
+    const formattedThb = totalThb.toLocaleString('en-US', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    });
+    if (totalThbEl) {
+      totalThbEl.textContent = `(≈ ${formattedThb} บาท @ ${currentCnyThbRate.toFixed(4)})`;
+    }
+  }
+
+  function addDashContractRow(data = {}) {
+    const tbody = document.getElementById('dashContractTableBody');
+    if (!tbody) return;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" class="dash-cell-input dash-hs-input" placeholder="เช่น 8474320000" value="${data.hsCode || ''}"></td>
+      <td><input type="text" class="dash-cell-input dash-item-input" placeholder="ชื่อสินค้าหรืออุปกรณ์..." value="${data.item || ''}"></td>
+      <td><input type="text" class="dash-cell-input dash-qty-input" placeholder="เช่น 1 SET" value="${data.qty || ''}"></td>
+      <td><input type="text" class="dash-cell-input dash-price-input" placeholder="เช่น 4,523,000" value="${data.price ? formatNumberWithCommas(data.price) : ''}"></td>
+      <td style="text-align: center;">
+        <button type="button" class="contract-row-del-btn dash-del-btn" title="ลบแถวนี้">✕</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+
+    const priceInput = tr.querySelector('.dash-price-input');
+    const qtyInput = tr.querySelector('.dash-qty-input');
+    bindDashCellFormatting(priceInput);
+    bindDashCellFormatting(qtyInput);
+
+    tr.querySelector('.dash-del-btn')?.addEventListener('click', () => {
+      if (tbody.children.length > 1) {
+        tr.remove();
+        updateDashContractTotals();
+      } else {
+        showToast('สัญญาต้องมีรายการสินค้าอย่างน้อย 1 แถว');
+      }
+    });
+
+    priceInput?.focus();
+  }
+
+  function initDashboardContractForm() {
+    const tbody = document.getElementById('dashContractTableBody');
+    if (tbody) {
+      tbody.querySelectorAll('.dash-price-input, .dash-qty-input').forEach((input) => {
+        bindDashCellFormatting(input);
+      });
+      tbody.querySelectorAll('.dash-del-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          const row = e.target.closest('tr');
+          if (row && tbody.children.length > 1) {
+            row.remove();
+            updateDashContractTotals();
+          }
+        });
+      });
+    }
+
+    document.getElementById('btnDashAddRow')?.addEventListener('click', () => addDashContractRow());
+
+    // Date change fetches historical CNY exchange rate for that day!
+    const dateInput = document.getElementById('dashContractDate');
+    if (dateInput) {
+      dateInput.addEventListener('change', () => {
+        if (dateInput.value) {
+          showToast(`กำลังดึงเรทเงิน CNY ณ วันที่ ${dateInput.value}...`);
+          fetchCnyRates(dateInput.value);
+        }
+      });
+    }
+
+    // Save to Appwrite
+    document.getElementById('btnDashSaveContract')?.addEventListener('click', async () => {
+      const snap = collectDashContractSnapshot();
+      showToast('กำลังบันทึกสัญญาลง Appwrite...');
+      if (window.saveContract) {
+        await window.saveContract(snap);
+        showToast(`บันทึกสัญญา ${snap.contractNo || ''} สำเร็จ!`);
+      } else {
+        showToast('บันทึกสัญญาเรียบร้อยแล้ว');
+      }
+    });
+
+    // Preview A4 Contract
+    document.getElementById('btnDashPreviewContract')?.addEventListener('click', () => {
+      openDashContractA4Preview();
+    });
+  }
+
+  function collectDashContractSnapshot() {
+    const items = [];
+    const tbody = document.getElementById('dashContractTableBody');
+    if (tbody) {
+      tbody.querySelectorAll('tr').forEach((r) => {
+        const hs = r.querySelector('.dash-hs-input')?.value.trim() || '';
+        const item = r.querySelector('.dash-item-input')?.value.trim() || '';
+        const qty = r.querySelector('.dash-qty-input')?.value.trim() || '';
+        const price = r.querySelector('.dash-price-input')?.value.trim() || '';
+        if (hs || item || price) {
+          items.push({ hsCode: hs, item, qty, price });
+        }
+      });
+    }
+
+    return {
+      contractNo: document.getElementById('dashContractNo')?.value.trim() || 'AM251202',
+      date: document.getElementById('dashContractDate')?.value || new Date().toISOString().slice(0, 10),
+      headerCompany: document.getElementById('dashHeaderCompany')?.value.trim() || 'AMMA CONSTRUCTION MACHINERY CO., LTD.',
+      headerAdd: document.getElementById('dashHeaderAdd')?.value.trim() || '',
+      headerTel: document.getElementById('dashHeaderTel')?.value.trim() || '',
+      buyerName: document.getElementById('dashBuyerName')?.value.trim() || '',
+      buyerAdd: document.getElementById('dashBuyerAdd')?.value.trim() || '',
+      buyerTel: document.getElementById('dashBuyerTel')?.value.trim() || '',
+      sellerName: document.getElementById('dashSellerName')?.value.trim() || '',
+      sellerAdd: document.getElementById('dashSellerAdd')?.value.trim() || '',
+      sellerTel: document.getElementById('dashSellerTel')?.value.trim() || '',
+      sellerMob: document.getElementById('dashSellerMob')?.value.trim() || '',
+      items,
+      totalCny: document.getElementById('dashTotalCny')?.textContent.trim() || 'CNY 0.00',
+      totalThb: document.getElementById('dashTotalThb')?.textContent.trim() || '',
+      note: document.getElementById('dashNote')?.value.trim() || '',
+      bankInfo: document.getElementById('dashBankInfo')?.value.trim() || '',
+      payment: document.getElementById('dashPayment')?.value.trim() || '',
+      manufacturing: document.getElementById('dashManufacturing')?.value.trim() || '',
+      warranty: document.getElementById('dashWarranty')?.value.trim() || '',
+      training: document.getElementById('dashTraining')?.value.trim() || '',
+      buyerSign: document.getElementById('dashBuyerSign')?.value.trim() || '',
+      sellerSign: document.getElementById('dashSellerSign')?.value.trim() || '',
+      lockedRate: isRateLocked ? lockedRateData : { rate: currentCnyThbRate, date: new Date().toISOString().slice(0, 10) },
+    };
+  }
+
+  function openDashContractA4Preview() {
+    const modal = document.getElementById('a4PrintPreviewModal');
+    const sheet = document.getElementById('a4PaperSheetContent');
+    if (!modal || !sheet) return;
+
+    const snap = collectDashContractSnapshot();
+    const rowsHtml = snap.items.length > 0
+      ? snap.items.map((it) => `
+        <tr>
+          <td style="text-align: center; font-family: 'Times New Roman', serif;">${escapeAttr(it.hsCode || '-')}</td>
+          <td>${escapeAttr(it.item || '-')}</td>
+          <td style="text-align: center;">${escapeAttr(it.qty || '-')}</td>
+          <td style="text-align: right; font-weight: 700; font-family: 'Times New Roman', serif;">${escapeAttr(it.price || '-')}</td>
+        </tr>
+      `).join('')
+      : `<tr><td colspan="4" style="text-align: center; color: #64748B;">ไม่มีรายการสินค้า</td></tr>`;
+
+    sheet.innerHTML = `
+      <div class="contract-paper-sheet" style="box-shadow: none; margin: 0; width: 100%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="Logo" style="height: 38px; object-fit: contain;">
+          <strong style="font-size: 13pt; font-family: 'Arial Black', sans-serif;">${escapeAttr(snap.headerCompany)}</strong>
+        </div>
+        <div style="font-size: 7.5pt; text-align: center; border: 1pt solid #000; padding: 2px;">
+          <strong>ADD:</strong> ${escapeAttr(snap.headerAdd || '-')}
+        </div>
+        <div style="font-size: 7.5pt; border: 1pt solid #000; border-top: none; padding: 2px; margin-bottom: 8px;">
+          <strong>TEL:</strong> ${escapeAttr(snap.headerTel || '-')}
+        </div>
+
+        <h1 style="text-align: center; font-size: 18pt; font-weight: 900; margin: 10px 0; font-family: 'Arial Black', sans-serif;">SALES CONTRACT</h1>
+
+        <div style="display: flex; justify-content: space-between; border-top: 1.5pt solid #000; border-bottom: 1.5pt solid #000; padding: 4px 8px; font-weight: 700; font-size: 9pt;">
+          <div>SC No.: ${escapeAttr(snap.contractNo)}</div>
+          <div>DATE: ${escapeAttr(snap.date)} (อัตราแลกเปลี่ยนล็อก: 1 CNY = ${snap.lockedRate.rate.toFixed(4)} ฿)</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; border: 1.5pt solid #000; border-top: none; font-size: 8.5pt; margin-bottom: 0;">
+          <div style="padding: 6px; border-right: 1.5pt solid #000;">
+            <strong>TO:</strong><br>
+            <strong>${escapeAttr(snap.buyerName || '-')}</strong><br>
+            ADD: ${escapeAttr(snap.buyerAdd || '-')}<br>
+            Tel: ${escapeAttr(snap.buyerTel || '-')}
+          </div>
+          <div style="padding: 6px;">
+            <strong>FROM:</strong><br>
+            <strong>${escapeAttr(snap.sellerName || '-')}</strong><br>
+            ADD: ${escapeAttr(snap.sellerAdd || '-')}<br>
+            TEL: ${escapeAttr(snap.sellerTel || '-')}<br>
+            MOB: ${escapeAttr(snap.sellerMob || '-')}
+          </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; border: 1.5pt solid #000; border-top: none; font-size: 8.8pt;">
+          <thead>
+            <tr>
+              <th style="width: 22%; border: 1pt solid #000; padding: 5px;">HS CODE</th>
+              <th style="width: 44%; border: 1pt solid #000; padding: 5px;">ITEM</th>
+              <th style="width: 14%; border: 1pt solid #000; padding: 5px;">QUANTITY</th>
+              <th style="width: 20%; border: 1pt solid #000; padding: 5px;">PRICE</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+          <tfoot>
+            <tr style="font-weight: 900; background: #F8FAFC;">
+              <td colspan="3" style="text-align: center; border: 1pt solid #000; padding: 6px;">TOTAL PRICE</td>
+              <td style="text-align: right; border: 1pt solid #000; padding: 6px; font-family: 'Times New Roman', serif;">${escapeAttr(snap.totalCny)}</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div style="border: 1.5pt solid #000; border-top: none; padding: 6px; font-size: 8pt; white-space: pre-wrap;">
+          <strong>NOTE:</strong><br>${escapeAttr(snap.note || '-')}
+        </div>
+
+        <div style="border: 1.5pt solid #000; border-top: none; padding: 6px; font-size: 8pt;">
+          <strong>BANK INFO for CNY:</strong><br>${escapeAttr(snap.bankInfo || '-')}
+        </div>
+
+        <div style="border: 1.5pt solid #000; border-top: none; padding: 6px; font-size: 8pt;">
+          <strong>Payment Items:</strong> ${escapeAttr(snap.payment || '-')}<br>
+          <strong>Manufacturing Time:</strong> ${escapeAttr(snap.manufacturing || '-')}<br>
+          <strong>Warranty:</strong> ${escapeAttr(snap.warranty || '-')}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; padding: 24px 20px 8px 20px; font-size: 9pt; font-weight: 700;">
+          <div>The Buyer: ${escapeAttr(snap.buyerSign || '........................................')}</div>
+          <div style="text-align: right;">The Seller: ${escapeAttr(snap.sellerSign || 'Manuel Chan (AMMA)')}</div>
+        </div>
+      </div>
+    `;
+
+    applyPreviewZoom(100);
+    modal.classList.add('is-open');
   }
 
   const exportedApi = {

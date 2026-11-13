@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ใบรายการขอราคาต้นทุน | Pricecraft — PROTEX GROUP</title>
+  <title>ใบรายการขอราคาต้นทุนและสัญญาซื้อขาย | Pricecraft</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,304 +14,584 @@
   <script src="appwrite-config.js" defer></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
 </head>
 
 <body>
 
-  <header class="workspace-topbar no-print" aria-label="แถบเครื่องมือหลัก">
-    <div class="topbar-brand-group">
-      <div class="topbar-logo-badge">
-        <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="PROTEX GROUP Logo" class="topbar-brand-logo" width="112"
-          height="38">
+  <div class="spa-layout">
+    <!-- Task 1: Vertical Left Sidebar (Icon-Only, Glow on Hover) -->
+    <aside class="spa-sidebar no-print" aria-label="แถบเมนูนำทางหลัก">
+      <div class="sidebar-brand-icon" title="Pricecraft PROTEX">
+        <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="Protex Logo" class="sidebar-mini-logo">
       </div>
-      <div class="topbar-brand-text">
-        <span class="topbar-app-name">PRICECRAFT • Protex Center</span>
-        <span class="topbar-app-sub" id="loggedInUserBanner">ผู้ใช้งาน: พนักงานโพรเทคส์ (ID: 1234) • ผู้จัดทำใบขอราคาต้นทุน</span>
-      </div>
-    </div>
-
-    <!-- Center Circular Hover Menu (Task 1) -->
-    <nav class="topbar-center-menu" aria-label="เมนูลัดระบบ">
-      <div class="circular-menu-wrapper">
-        <button type="button" class="circular-menu-btn" aria-label="เมนูระบบ Pricecraft" title="เมนูลัดสลับหน้าต่าง (ชี้เพื่อเปิดเมนู)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" width="22" height="22" aria-hidden="true">
-            <circle cx="12" cy="12" r="9"></circle>
-            <line x1="12" y1="3" x2="12" y2="21"></line>
-            <line x1="3" y1="12" x2="21" y2="12"></line>
+      <nav class="sidebar-nav">
+        <button type="button" class="sidebar-icon-btn active" id="btnNavCost" data-view="cost"
+          data-tooltip="ใบขอราคาต้นทุน (Cost Estimation)" aria-label="ใบขอราคาต้นทุน">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="22" height="22" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="8" y1="13" x2="16" y2="13"></line>
+            <line x1="8" y1="17" x2="16" y2="17"></line>
           </svg>
         </button>
-        <div class="circular-dropdown-menu" role="menu">
-          <a href="customer-contract.html" target="_blank" class="circular-dropdown-item" role="menuitem">
-            <span class="dropdown-item-icon">👥</span>
-            <div class="dropdown-item-info">
-              <span class="dropdown-item-title">รายชื่อลูกค้า / สัญญาซื้อขาย</span>
-              <span class="dropdown-item-sub">A4 Sales Contract &amp; ข้อมูลคำสั่งซื้อ</span>
-            </div>
-            <span class="dropdown-badge">ใหม่</span>
-          </a>
-          <a href="dashboard.html" class="circular-dropdown-item active" role="menuitem">
-            <span class="dropdown-item-icon">📊</span>
-            <div class="dropdown-item-info">
-              <span class="dropdown-item-title">ใบขอราคาต้นทุน (หน้าปัจจุบัน)</span>
-              <span class="dropdown-item-sub">Pricecraft Cost Estimation Table</span>
-            </div>
-          </a>
-        </div>
-      </div>
-    </nav>
+        <button type="button" class="sidebar-icon-btn" id="btnNavContract" data-view="contract"
+          data-tooltip="สัญญาซื้อขาย / รายชื่อลูกค้า (Sales Contract)" aria-label="สัญญาซื้อขาย / รายชื่อลูกค้า">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="22" height="22" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </button>
+      </nav>
+    </aside>
 
-    <div class="topbar-actions-toolbar">
-      <input type="file" id="importExcelFileInput" class="is-hidden" accept=".xlsx,.xls,.csv"
-        aria-label="เลือกไฟล์ Excel หรือ CSV เพื่อนำเข้า" title="เลือกไฟล์ Excel หรือ CSV เพื่อนำเข้า">
-
-      <button type="button" class="cmd-btn cmd-btn-import" id="btnImportExcel"
-        title="นำเข้าข้อมูลจากไฟล์ Excel หรือ CSV">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="17 8 12 3 7 8"></polyline>
-          <line x1="12" y1="3" x2="12" y2="15"></line>
-        </svg>
-        <span>นำเข้า Excel</span>
-      </button>
-
-      <button type="button" class="cmd-btn cmd-btn-excel" id="btnExportExcel"
-        title="ส่งออกเป็นไฟล์ Microsoft Excel (.xlsx)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="8" y1="13" x2="16" y2="17"></line>
-          <line x1="16" y1="13" x2="8" y2="17"></line>
-        </svg>
-        <span>ส่งออก Excel</span>
-      </button>
-
-      <button type="button" class="cmd-btn cmd-btn-word" id="btnExportWord"
-        title="ส่งออกเป็นไฟล์ Microsoft Word (.docx)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="16" y1="13" x2="8" y2="13"></line>
-          <line x1="16" y1="17" x2="8" y2="17"></line>
-        </svg>
-        <span>ส่งออก Word</span>
-      </button>
-
-      <button type="button" class="cmd-btn cmd-btn-pdf" id="btnExportPdf"
-        title="ดาวน์โหลดเป็นไฟล์ PDF ขนาด A4">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <path d="M12 18v-6"></path>
-          <path d="M9 15l3 3 3-3"></path>
-        </svg>
-        <span>ส่งออก PDF</span>
-      </button>
-
-      <button type="button" class="cmd-btn cmd-btn-preview" id="btnPrintPreview"
-        title="ดูตัวอย่างกระดาษ A4 ก่อนสั่งพิมพ์ (Print Preview)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        <span>ดูตัวอย่างก่อนพิมพ์ (A4)</span>
-      </button>
-
-      <button type="button" class="cmd-btn cmd-btn-print" id="btnPrintDoc" title="สั่งพิมพ์เอกสารลงกระดาษ A4">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-          <polyline points="6 9 6 2 18 2 18 9"></polyline>
-          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-          <rect x="6" y="14" width="12" height="8"></rect>
-        </svg>
-        <span>สั่งพิมพ์ (Print)</span>
-      </button>
-
-      <button type="button" class="cmd-btn cmd-btn-logout" id="btnLogout" title="ออกจากระบบกลับสู่หน้า Login">
-        <span>ออกจากระบบ</span>
-      </button>
-    </div>
-  </header>
-
-  <main class="workspace-stage">
-    <article class="document-paper" id="printableDocument">
-      <header class="official-doc-header header-section">
-        <div class="letterhead-top-brand">
-          <img id="companyLogoImg" class="company-brand-logo" src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png"
-            alt="PROTEX GROUP Logo" width="190" height="68">
+    <!-- Main SPA Content Area -->
+    <div class="spa-main-wrapper">
+      <header class="workspace-topbar no-print" aria-label="แถบเครื่องมือหลัก">
+        <div class="topbar-brand-group">
+          <div class="topbar-logo-badge">
+            <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="PROTEX GROUP Logo" class="topbar-brand-logo" width="112"
+              height="38">
+          </div>
+          <div class="topbar-brand-text">
+            <span class="topbar-app-name" id="topbarAppTitle">PRICECRAFT • Protex Center</span>
+            <span class="topbar-app-sub" id="loggedInUserBanner">ผู้ใช้งาน: พนักงานโพรเทคส์ (ID: 1234)</span>
+          </div>
         </div>
 
-        <div class="letterhead-main-grid">
-          <div class="company-info-block">
-            <h1 class="company-name-th">หจก.โพรเทคส์ แอคเซสโซรี อินดัสเตรียล</h1>
-            <p class="company-address-th">
-              56/360 ม.1 ซ.วัดไตรสามัคคี3 ถ.สุขุมวิท ต.บางเมืองใหม่ อ.เมืองสมุทรปราการ จ.สมุทรปราการ 10270
-            </p>
-
-            <div class="vendor-inline-row">
-              <label class="vendor-label" for="customerNameInput">ชื่อลูกค้า :</label>
-              <input type="text" id="customerNameInput" class="vendor-input"
-                placeholder="กรอกชื่อลูกค้า / บริษัท / หน่วยงาน..." title="ชื่อลูกค้า" value="">
+        <!-- Task 3: CNY Real-Time Widget & Live Line Chart (Top-Right) -->
+        <div class="cny-rate-widget" id="cnyRateWidget" title="เรทเงินหยวน (CNY / THB) อัปเดตแบบเรียลไทม์">
+          <div class="cny-rate-info">
+            <div class="cny-rate-header">
+              <span class="cny-badge">CNY / THB</span>
+              <span class="cny-date-label" id="cnyRateDateLabel">วันนี้</span>
             </div>
+            <span class="cny-current-rate" id="cnyLiveRateText">กำลังโหลด...</span>
           </div>
-
-          <div class="doc-title-meta-box">
-            <h2 class="doc-main-heading">รายการขอราคาต้นทุน</h2>
-            <div class="doc-meta-line">
-              <span class="doc-meta-label">เลขที่เอกสาร :</span>
-              <strong class="tabular-nums doc-meta-value" id="docNumberDisplay">PC-202611-0001</strong>
-            </div>
-            <div class="doc-meta-line">
-              <span class="doc-meta-label">วันที่และเวลาที่ออก :</span>
-              <strong class="tabular-nums doc-meta-value" id="issuedDateTimeDisplay">-</strong>
-            </div>
-            <div class="doc-meta-line doc-meta-seller-row">
-              <label class="doc-meta-label" for="sellerNameInput">ชื่อผู้ขาย :</label>
-              <input type="text" id="sellerNameInput" class="seller-meta-input"
-                placeholder="ระบุชื่อผู้ขาย / ซัพพลายเออร์..." title="ชื่อผู้ขาย" value="">
-            </div>
+          <div class="cny-chart-box">
+            <canvas id="cnyMiniChart" width="100" height="32" aria-label="กราฟเรทเงิน CNY"></canvas>
           </div>
+        </div>
+
+        <div class="topbar-actions-toolbar">
+          <input type="file" id="importExcelFileInput" class="is-hidden" accept=".xlsx,.xls,.csv"
+            aria-label="เลือกไฟล์ Excel หรือ CSV เพื่อนำเข้า" title="เลือกไฟล์ Excel หรือ CSV เพื่อนำเข้า">
+
+          <button type="button" class="cmd-btn cmd-btn-import" id="btnImportExcel"
+            title="นำเข้าข้อมูลจากไฟล์ Excel หรือ CSV">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>นำเข้า Excel</span>
+          </button>
+
+          <button type="button" class="cmd-btn cmd-btn-excel" id="btnExportExcel"
+            title="ส่งออกเป็นไฟล์ Microsoft Excel (.xlsx)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="8" y1="13" x2="16" y2="17"></line>
+              <line x1="16" y1="13" x2="8" y2="17"></line>
+            </svg>
+            <span>ส่งออก Excel</span>
+          </button>
+
+          <button type="button" class="cmd-btn cmd-btn-word" id="btnExportWord"
+            title="ส่งออกเป็นไฟล์ Microsoft Word (.docx)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>ส่งออก Word</span>
+          </button>
+
+          <button type="button" class="cmd-btn cmd-btn-pdf" id="btnExportPdf"
+            title="ดาวน์โหลดเป็นไฟล์ PDF ขนาด A4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <path d="M12 18v-6"></path>
+              <path d="M9 15l3 3 3-3"></path>
+            </svg>
+            <span>ส่งออก PDF</span>
+          </button>
+
+          <button type="button" class="cmd-btn cmd-btn-preview" id="btnPrintPreview"
+            title="ดูตัวอย่างกระดาษ A4 ก่อนสั่งพิมพ์ (Print Preview)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span>ดูตัวอย่างก่อนพิมพ์ (A4)</span>
+          </button>
+
+          <button type="button" class="cmd-btn cmd-btn-print" id="btnPrintDoc" title="สั่งพิมพ์เอกสารลงกระดาษ A4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>สั่งพิมพ์ (Print)</span>
+          </button>
+
+          <button type="button" class="cmd-btn cmd-btn-logout" id="btnLogout" title="ออกจากระบบกลับสู่หน้า Login">
+            <span>ออกจากระบบ</span>
+          </button>
         </div>
       </header>
 
-      <div class="excel-toolbar no-print">
-        <div class="excel-toolbar-left">
-          <button type="button" class="excel-btn primary" id="btnAddRow">
-            <span>+ เพิ่มบรรทัดใหม่</span>
-          </button>
-          <button type="button" class="excel-btn sub-item-btn" id="btnAddSubItem"
-            title="เพิ่มรายการย่อยโดยไม่รันเลขลำดับใหม่">
-            <span>↳ + เพิ่มรายการย่อย</span>
-          </button>
-          <button type="button" class="excel-btn" id="btnAddFiveRows">
-            <span>+ เพิ่ม 5 บรรทัด</span>
-          </button>
-          <button type="button" class="excel-btn" id="btnLoadSampleData">
-            <span>โหลดข้อมูลตัวอย่าง</span>
-          </button>
-          <button type="button" class="excel-btn" id="btnClearRows">
-            <span>ล้างตาราง</span>
-          </button>
-        </div>
+      <!-- ================================================================== -->
+      <!-- VIEW 1: COST ESTIMATION SPREADSHEET (Active View) -->
+      <!-- ================================================================== -->
+      <section id="viewCost" class="spa-view active" aria-label="ใบขอราคาต้นทุน">
+        <main class="workspace-stage">
+          <article class="document-paper" id="printableDocument">
+            <header class="official-doc-header header-section">
+              <div class="letterhead-top-brand">
+                <img id="companyLogoImg" class="company-brand-logo" src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png"
+                  alt="PROTEX GROUP Logo" width="190" height="68">
+              </div>
 
-        <div class="smart-search-box" id="smartSearchBox">
-          <svg class="smart-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            aria-hidden="true">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" id="smartSearchInput" class="smart-search-input"
-            placeholder="ค้นหาสินค้า / ชุด (เช่น ถังพรีฮีต, ตู้ไฟ, ฮีตเตอร์, เบรกเกอร์)..." autocomplete="off"
-            aria-label="ค้นหารายการสินค้าและชุดอุปกรณ์เพื่อเพิ่มลงตาราง">
-          <div class="smart-search-dropdown" id="smartSearchDropdown"></div>
-        </div>
+              <div class="letterhead-main-grid">
+                <div class="company-info-block">
+                  <h1 class="company-name-th">หจก.โพรเทคส์ แอคเซสโซรี อินดัสเตรียล</h1>
+                  <p class="company-address-th">
+                    56/360 ม.1 ซ.วัดไตรสามัคคี3 ถ.สุขุมวิท ต.บางเมืองใหม่ อ.เมืองสมุทรปราการ จ.สมุทรปราการ 10270
+                  </p>
 
-        <div class="excel-hints">
-          <span><kbd class="kbd-tag">Tab</kbd> เลื่อนช่องถัดไป</span>
-          <span><kbd class="kbd-tag">Enter</kbd> ที่ช่องสุดท้าย = เพิ่มบรรทัดใหม่ทันที</span>
-          <span><kbd class="kbd-tag">↑</kbd> <kbd class="kbd-tag">↓</kbd> เลื่อนขึ้น-ลงเหมือน Excel</span>
-        </div>
-      </div>
+                  <div class="vendor-inline-row">
+                    <label class="vendor-label" for="customerNameInput">ชื่อลูกค้า :</label>
+                    <input type="text" id="customerNameInput" class="vendor-input"
+                      placeholder="กรอกชื่อลูกค้า / บริษัท / หน่วยงาน..." title="ชื่อลูกค้า" value="">
+                  </div>
+                </div>
 
-      <div class="excel-grid-container">
-        <table class="excel-table" id="costExcelTable">
-          <thead>
-            <tr>
-              <th scope="col" class="col-w-52">ลำดับ</th>
-              <th scope="col" class="col-w-270">รายการ</th>
-              <th scope="col" class="col-w-88">จำนวน</th>
-              <th scope="col" class="col-w-82">หน่วย</th>
-              <th scope="col" class="col-w-138">ราคาต้นทุน(ก่อนVAT)</th>
-              <th scope="col" class="col-w-142">ราคารวม (ก่อนVAT)</th>
-              <th scope="col" class="col-w-118">หักภาษี3%</th>
-              <th scope="col" class="col-w-130">การส่งมอบ</th>
-              <th scope="col" class="col-w-155">หมายเหตุ</th>
-              <th scope="col" class="col-action-header no-print col-w-68">จัดการ</th>
-            </tr>
-          </thead>
-          <tbody id="excelTableBody">
-          </tbody>
-        </table>
-      </div>
+                <div class="doc-title-meta-box">
+                  <h2 class="doc-main-heading">รายการขอราคาต้นทุน</h2>
+                  <div class="doc-meta-item">
+                    <label class="doc-meta-label" for="docNumberInput">เลขที่เอกสาร :</label>
+                    <input type="text" id="docNumberInput" class="doc-meta-input-inline tabular-nums fw-700"
+                      value="PC-202611-0001" title="เลขที่เอกสาร">
+                  </div>
+                  <div class="doc-meta-item">
+                    <span class="doc-meta-label">วันที่และเวลาที่ออก :</span>
+                    <strong class="doc-meta-val tabular-nums" id="issueDateTime">12/11/2569 เวลา 00:00:00 น.</strong>
+                  </div>
+                  <div class="doc-meta-item">
+                    <label class="doc-meta-label" for="sellerNameInput">ชื่อผู้ขาย :</label>
+                    <input type="text" id="sellerNameInput" class="doc-meta-input-inline fw-600" value="นายพลอยสัมผย"
+                      title="ชื่อผู้ขาย">
+                  </div>
+                </div>
+              </div>
+            </header>
 
-      <section class="doc-bottom-grid" aria-label="สรุปยอดคำนวณราคาต้นทุน">
-        <div class="doc-notes-box">
-          <label class="doc-notes-label" for="docGeneralNotes">หมายเหตุ / เงื่อนไขประกอบใบขอราคาต้นทุน :</label>
-          <textarea id="docGeneralNotes" class="doc-notes-textarea"
-            placeholder="ระบุเงื่อนไขการชำระเงิน การรับประกันสินค้า หรือรายละเอียดเพิ่มเติม..."
-            title="หมายเหตุและเงื่อนไขประกอบใบขอราคาต้นทุน">1. ราคาต้นทุนข้างต้นยังไม่รวมภาษีมูลค่าเพิ่ม (คำนวณ VAT 7% แยกในสรุปท้ายตาราง)
-2. ค่าขนส่งไม่มี VAT</textarea>
-        </div>
+            <!-- Excel-like Spreadsheet Toolbar & Smart Search -->
+            <div class="excel-toolbar no-print">
+              <div class="toolbar-btn-group">
+                <button type="button" class="excel-btn excel-btn-primary" id="btnAddRow" title="เพิ่มแถวใหม่ (Enter ที่ช่องสุดท้าย)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span>เพิ่มบรรทัดใหม่</span>
+                </button>
 
-        <div class="summary-calc-box">
-          <div class="summary-calc-row">
-            <div>
-              <div class="summary-calc-label">ยอดรวม</div>
-              <div class="summary-calc-sub">ผลรวมของ 'ราคารวม (ก่อนVAT)' ทุกบรรทัด</div>
+                <button type="button" class="excel-btn sub-item-btn" id="btnAddSubItem"
+                  title="เพิ่มรายการย่อยต่อจากแถวหลักที่เลือก (เยื้องเข้าด้านใน)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <polyline points="9 10 4 15 9 20"></polyline>
+                    <path d="M20 4v7a4 4 0 0 1-4 4H4"></path>
+                  </svg>
+                  <span>↳ เพิ่มรายการย่อย</span>
+                </button>
+              </div>
+
+              <!-- Smart Search & Auto-Fill Dropdown -->
+              <div class="smart-search-wrapper" id="smartSearchWrapper">
+                <div class="smart-search-box">
+                  <svg class="smart-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="smartSearchInput" class="smart-search-input"
+                    placeholder="ค้นหา &amp; เติมอัตโนมัติ (เช่น ถังพรีฮีต 300 ลิตร, เหล็กแผ่น, ตู้ไฟ)..."
+                    aria-label="ค้นหารายการสินค้าในแคตตาล็อก" autocomplete="off">
+                  <button type="button" id="smartSearchClearBtn" class="smart-search-clear"
+                    title="ล้างคำค้นหา" aria-label="ล้างคำค้นหา">✕</button>
+                </div>
+                <div class="smart-search-dropdown" id="smartSearchDropdown" aria-label="ผลการค้นหาแคตตาล็อก"></div>
+              </div>
+
+              <div class="keyboard-hints-pill">
+                <span><kbd>Tab</kbd> เลื่อนช่องถัดไป</span>
+                <span><kbd>Enter</kbd> ที่ช่องสุดท้าย = เพิ่มบรรทัด</span>
+              </div>
             </div>
-            <div class="summary-calc-value tabular-nums" id="sumSubtotal">0.00</div>
+
+            <!-- Spreadsheet Grid -->
+            <div class="excel-table-scroll-container">
+              <table class="excel-table" id="costCalculationTable">
+                <thead>
+                  <tr>
+                    <th class="col-seq text-center col-w-44">ลำดับ</th>
+                    <th class="col-item-name">รายการ</th>
+                    <th class="col-qty text-right col-w-72">จำนวน</th>
+                    <th class="col-unit text-center col-w-64">หน่วย</th>
+                    <th class="col-cost text-right col-w-110">ราคาต้นทุน(ก่อนVAT)</th>
+                    <th class="col-total text-right col-w-120">ราคารวม (ก่อนVAT)</th>
+                    <th class="col-wht text-right col-w-90">หักภาษี3%</th>
+                    <th class="col-delivery col-w-90">การส่งมอบ</th>
+                    <th class="col-remark col-w-90">หมายเหตุ</th>
+                    <th class="col-action-header no-print col-w-44">ลบ</th>
+                  </tr>
+                </thead>
+                <tbody id="tableBody">
+                  <!-- Row 1 Main Item -->
+                  <tr data-row-id="row-1" data-is-sub="false">
+                    <td class="col-seq cell-seq text-center tabular-nums">1</td>
+                    <td class="col-item-name cell-item-name">
+                      <input type="text" class="cell-input input-item-name" placeholder="ชื่อรายการหลัก..."
+                        value="ถังพรีฮีต 300 ลิตร" title="ชื่อรายการ">
+                    </td>
+                    <td class="col-qty cell-qty">
+                      <input type="number" step="any" min="0" class="cell-input input-qty text-right tabular-nums"
+                        placeholder="0" value="1" title="จำนวน">
+                    </td>
+                    <td class="col-unit cell-unit">
+                      <input type="text" class="cell-input input-unit text-center" placeholder="ชุด" value="ชุด"
+                        title="หน่วย">
+                    </td>
+                    <td class="col-cost cell-cost">
+                      <input type="number" step="any" min="0" class="cell-input input-cost text-right tabular-nums"
+                        placeholder="0.00" value="0.00" title="ราคาต้นทุนต่อหน่วย">
+                    </td>
+                    <td class="col-total cell-total text-right tabular-nums cell-readonly">0.00</td>
+                    <td class="col-wht cell-wht text-right tabular-nums cell-readonly">0.00</td>
+                    <td class="col-delivery cell-delivery">
+                      <input type="text" class="cell-input input-delivery" placeholder="ระยะเวลา..." value="-"
+                        title="การส่งมอบ">
+                    </td>
+                    <td class="col-remark cell-remark">
+                      <input type="text" class="cell-input input-remark" placeholder="หมายเหตุ..." value="-"
+                        title="หมายเหตุ">
+                    </td>
+                    <td class="col-action-cell no-print text-center">
+                      <button type="button" class="btn-delete-row" title="ลบบรรทัดนี้" aria-label="ลบบรรทัดนี้">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16"
+                          height="16" aria-hidden="true">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Notes & Summary Cards -->
+            <section class="doc-bottom-grid">
+              <div class="notes-conditions-card">
+                <div class="card-head-bar">
+                  <h3 class="card-title-text">หมายเหตุ / เงื่อนไขประกอบใบขอราคาต้นทุน :</h3>
+                </div>
+                <textarea id="documentNotesInput" class="doc-notes-textarea" rows="4"
+                  placeholder="พิมพ์ข้อความหมายเหตุหรือเงื่อนไขการส่งมอบที่นี่...&#10;1. ราคาต้นทุนข้างต้นยังไม่รวมภาษีมูลค่าเพิ่ม (คำนวณ VAT 7% แยกในสรุปท้ายตาราง)&#10;2. ค่าขนส่งไม่มี VAT">1. ราคาต้นทุนข้างต้นยังไม่รวมภาษีมูลค่าเพิ่ม (คำนวณ VAT 7% แยกในสรุปท้ายตาราง)&#10;2. ค่าขนส่งไม่มี VAT</textarea>
+              </div>
+
+              <div class="financial-summary-card">
+                <div class="summary-calc-row">
+                  <div>
+                    <div class="summary-calc-label">ยอดรวม</div>
+                    <div class="summary-calc-sub">ผลรวมราคารวม (ก่อนVAT)</div>
+                  </div>
+                  <div class="summary-calc-value tabular-nums" id="sumSubtotal">0.00</div>
+                </div>
+
+                <div class="summary-calc-row">
+                  <div>
+                    <div class="summary-calc-label">VAT 7%</div>
+                    <div class="summary-calc-sub">ยอดรวม × 0.07</div>
+                  </div>
+                  <div class="summary-calc-value tabular-nums" id="sumVat7">0.00</div>
+                </div>
+
+                <div class="summary-calc-row shipping-edit-row">
+                  <div>
+                    <label class="summary-calc-label" for="shippingCostInput">ค่าขนส่ง</label>
+                    <div class="summary-calc-sub shipping-note-sub">*ค่าขนส่งไม่มี VAT</div>
+                  </div>
+                  <div class="shipping-input-box">
+                    <span class="currency-prefix-sign">฿</span>
+                    <input type="number" step="0.01" min="0" id="shippingCostInput" class="shipping-input-inline tabular-nums"
+                      value="500.00" title="ค่าขนส่ง (ไม่มี VAT)">
+                  </div>
+                </div>
+
+                <div class="summary-calc-row wht-ref-row">
+                  <div>
+                    <div class="summary-calc-label summary-wht-label">รวมหักภาษี 3% (แสดงแยก)</div>
+                  </div>
+                  <div class="tabular-nums fw-700" id="sumWht3">0.00</div>
+                </div>
+
+                <div class="summary-calc-row grand-total-row">
+                  <div>
+                    <div class="summary-calc-label">ยอดรวมสุทธิ</div>
+                    <div class="summary-calc-sub summary-grand-sub">ยอดรวม + VAT 7% + ค่าขนส่ง</div>
+                  </div>
+                  <div class="summary-calc-value tabular-nums" id="sumGrandTotal">0.00</div>
+                </div>
+              </div>
+            </section>
+
+            <footer class="signatures-section">
+              <div class="signature-block">
+                <div class="signature-role-line">
+                  <label for="approverSignName">ผู้อนุมัติ (<span
+                      class="signature-dots">................................................</span>)</label>
+                </div>
+                <input type="text" id="approverSignName" class="signature-name-input"
+                  placeholder="(ลงชื่อ / ตำแหน่งผู้อนุมัติ)" title="ชื่อผู้อนุมัติ" value="">
+              </div>
+
+              <div class="signature-block">
+                <div class="signature-role-line">
+                  <label for="preparerSignName">ผู้จัดทำ (<span
+                      class="signature-dots">................................................</span>)</label>
+                </div>
+                <input type="text" id="preparerSignName" class="signature-name-input" placeholder="(ลงชื่อ / ตำแหน่งผู้จัดทำ)"
+                  title="ชื่อผู้จัดทำ" value="">
+              </div>
+            </footer>
+          </article>
+        </main>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 2: SALES CONTRACT DASHBOARD FORM (Task 2 & 3) -->
+      <!-- ================================================================== -->
+      <section id="viewContract" class="spa-view" aria-label="สัญญาซื้อขายและรายชื่อลูกค้า">
+        <div class="dashboard-form-container">
+          <div class="dashboard-form-header">
+            <div class="dashboard-form-title-group">
+              <h2>ระบบจัดการสัญญาซื้อขาย (Sales Contract Dashboard)</h2>
+              <p>กรอกข้อมูลสัญญาซื้อขายสไตล์ Dashboard กว้างขวาง สบายตา — เชื่อมต่ออัตราแลกเปลี่ยน CNY เรียลไทม์</p>
+            </div>
+            <div class="toolbar-btn-group">
+              <button type="button" class="cmd-btn cmd-btn-excel" id="btnDashSaveContract" title="บันทึกสัญญาลง Appwrite">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                </svg>
+                <span>บันทึกสัญญา</span>
+              </button>
+              <button type="button" class="cmd-btn cmd-btn-preview" id="btnDashPreviewContract" title="ดูตัวอย่างสัญญาบนกระดาษ A4 จริง">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span>ดูตัวอย่างสัญญา A4</span>
+              </button>
+            </div>
           </div>
 
-          <div class="summary-calc-row">
-            <div>
-              <div class="summary-calc-label">VAT 7%</div>
-              <div class="summary-calc-sub">ยอดรวม × 0.07</div>
+          <!-- Card 1: ข้อมูลหัวเอกสารและเลขที่สัญญา (EMPTY INPUTS by default) -->
+          <div class="dashboard-card">
+            <div class="dashboard-card-title">
+              <span class="dashboard-card-icon">📑</span>
+              <span>ข้อมูลหัวสัญญา (Contract Header &amp; Metadata)</span>
             </div>
-            <div class="summary-calc-value tabular-nums" id="sumVat7">0.00</div>
+            <div class="dashboard-grid-3">
+              <div class="form-group">
+                <label class="form-label" for="dashContractNo">เลขที่สัญญา (SC No.)</label>
+                <input type="text" id="dashContractNo" class="form-input" placeholder="เช่น AM251202 หรือ PC-2026-01" value="">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dashContractDate">
+                  <span>วันที่ออกเอกสาร (Date)</span>
+                  <span class="form-label-hint">*เปลี่ยนวันที่เพื่อดึงเรท CNY อัตโนมัติ</span>
+                </label>
+                <input type="date" id="dashContractDate" class="form-input" value="">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dashHeaderCompany">ชื่อบริษัทผู้จัดทำ (Header Company)</label>
+                <input type="text" id="dashHeaderCompany" class="form-input" placeholder="เช่น AMMA CONSTRUCTION MACHINERY CO., LTD." value="">
+              </div>
+            </div>
+            <div class="dashboard-grid-2 dash-mt-14">
+              <div class="form-group">
+                <label class="form-label" for="dashHeaderAdd">ที่อยู่บริษัทผู้จัดทำ (ADD)</label>
+                <input type="text" id="dashHeaderAdd" class="form-input" placeholder="ที่อยู่บริษัท (เช่น No.51, 14th floor, Unit 1...)" value="">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dashHeaderTel">เบอร์โทรศัพท์บริษัท (TEL / ห้ามมีคอมม่า)</label>
+                <input type="text" id="dashHeaderTel" class="form-input" placeholder="+86-371-63386087" value="">
+              </div>
+            </div>
           </div>
 
-          <div class="summary-calc-row">
-            <div>
-              <label class="summary-calc-label" for="shippingCostInput">ค่าขนส่ง</label>
-              <div class="summary-calc-sub">*หมายเหตุ: ค่าขนส่งไม่มี VAT</div>
+          <!-- Card 2: คู่สัญญา (TO / ผู้ซื้อ & FROM / ผู้ขาย) -->
+          <div class="dashboard-card">
+            <div class="dashboard-card-title">
+              <span class="dashboard-card-icon">🤝</span>
+              <span>ข้อมูลคู่สัญญา (Parties: TO / ผู้ซื้อ &amp; FROM / ผู้ขาย)</span>
             </div>
-            <div>
-              <input type="number" step="0.01" min="0" id="shippingCostInput" class="shipping-input-inline tabular-nums"
-                value="500.00" title="ค่าขนส่ง (ไม่มี VAT)">
+            <div class="dashboard-grid-2">
+              <!-- ฝั่งผู้ซื้อ (TO) -->
+              <div class="dashboard-card dash-party-card">
+                <h4 class="dash-party-title">ฝ่ายผู้ซื้อ (The Buyer / TO:)</h4>
+                <div class="form-group dash-mb-10">
+                  <label class="form-label" for="dashBuyerName">ชื่อบริษัทผู้ซื้อ (Buyer Name)</label>
+                  <input type="text" id="dashBuyerName" class="form-input" placeholder="เช่น PROTEX ACCESSORY INDUSTRIAL LTD.,PART." value="">
+                </div>
+                <div class="form-group dash-mb-10">
+                  <label class="form-label" for="dashBuyerAdd">ที่อยู่ผู้ซื้อ (Address)</label>
+                  <textarea id="dashBuyerAdd" class="form-textarea" placeholder="กรอกที่อยู่ผู้ซื้อ..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="dashBuyerTel">เบอร์โทรศัพท์ผู้ซื้อ (Tel)</label>
+                  <input type="text" id="dashBuyerTel" class="form-input" placeholder="เช่น 085-392-4448" value="">
+                </div>
+              </div>
+
+              <!-- ฝั่งผู้ขาย (FROM) -->
+              <div class="dashboard-card dash-party-card">
+                <h4 class="dash-party-title">ฝ่ายผู้ขาย (The Seller / FROM:)</h4>
+                <div class="form-group dash-mb-10">
+                  <label class="form-label" for="dashSellerName">ชื่อบริษัทผู้ขาย (Seller Name)</label>
+                  <input type="text" id="dashSellerName" class="form-input" placeholder="เช่น AMMA CONSTRUCTION MACHINERY CO., LTD." value="">
+                </div>
+                <div class="form-group dash-mb-10">
+                  <label class="form-label" for="dashSellerAdd">ที่อยู่ผู้ขาย (Address)</label>
+                  <textarea id="dashSellerAdd" class="form-textarea" placeholder="กรอกที่อยู่ผู้ขาย..."></textarea>
+                </div>
+                <div class="dashboard-grid-2">
+                  <div class="form-group">
+                    <label class="form-label" for="dashSellerTel">เบอร์โทร (Tel)</label>
+                    <input type="text" id="dashSellerTel" class="form-input" placeholder="+86-371-63386087" value="">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="dashSellerMob">เบอร์มือถือ (Mob)</label>
+                    <input type="text" id="dashSellerMob" class="form-input" placeholder="+86-13598880213" value="">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="summary-calc-row wht-ref-row">
-            <div>
-              <div class="summary-calc-label summary-wht-label">รวมหักภาษี 3% (แสดงแยก)</div>
+          <!-- Card 3: ตารางรายการสินค้าและราคา (Fillable Table with Auto Comma) -->
+          <div class="dashboard-card">
+            <div class="dashboard-card-title">
+              <span class="dashboard-card-icon">📦</span>
+              <span>ตารางรายการสินค้า &amp; มูลค่าสัญญา (Interactive Items &amp; Price)</span>
             </div>
-            <div class="tabular-nums fw-700" id="sumWht3">0.00</div>
+
+            <div class="dashboard-table-wrapper">
+              <table class="dashboard-table" id="dashContractTable">
+                <thead>
+                  <tr>
+                    <th class="th-hs">HS CODE</th>
+                    <th class="th-item">ITEM / รายการสินค้าหรืออุปกรณ์</th>
+                    <th class="th-qty">QUANTITY / จำนวน</th>
+                    <th class="th-price">PRICE (CNY)</th>
+                    <th class="th-action">ลบ</th>
+                  </tr>
+                </thead>
+                <tbody id="dashContractTableBody">
+                  <!-- Row 1: Ready empty inputs for user typing -->
+                  <tr>
+                    <td><input type="text" class="dash-cell-input dash-hs-input" placeholder="เช่น 8474320000" value=""></td>
+                    <td><input type="text" class="dash-cell-input dash-item-input" placeholder="ชื่อสินค้าหรืออุปกรณ์..." value=""></td>
+                    <td><input type="text" class="dash-cell-input dash-qty-input" placeholder="เช่น 1 SET" value=""></td>
+                    <td><input type="text" class="dash-cell-input dash-price-input" placeholder="เช่น 4,523,000" value=""></td>
+                    <td class="td-center">
+                      <button type="button" class="contract-row-del-btn dash-del-btn" title="ลบแถวนี้">✕</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="dash-table-bottom-bar">
+              <button type="button" class="contract-add-row-btn" id="btnDashAddRow">
+                <span>+ เพิ่มรายการสินค้า (Add Item)</span>
+              </button>
+              <div class="dash-total-bar dash-total-bar-compact">
+                <span class="dash-total-title">TOTAL PRICE :</span>
+                <div>
+                  <span class="dash-total-cny" id="dashTotalCny">CNY 0.00</span>
+                  <span class="dash-total-thb" id="dashTotalThb">(≈ 0.00 บาท)</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="summary-calc-row grand-total-row">
-            <div>
-              <div class="summary-calc-label">ยอดรวมสุทธิ</div>
-              <div class="summary-calc-sub summary-grand-sub">ยอดรวม + VAT 7% + ค่าขนส่ง</div>
+          <!-- Card 4: เงื่อนไขสัญญา (NOTE, Bank Info, Warranty, Signatures) -->
+          <div class="dashboard-card">
+            <div class="dashboard-card-title">
+              <span class="dashboard-card-icon">📝</span>
+              <span>เงื่อนไขประกอบสัญญา &amp; ข้อตกลง (Terms &amp; NOTE)</span>
             </div>
-            <div class="summary-calc-value tabular-nums" id="sumGrandTotal">0.00</div>
+
+            <div class="dashboard-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="dashNote">หมายเหตุ / เงื่อนไขประกอบ (NOTE:)</label>
+                <textarea id="dashNote" class="form-textarea" placeholder="กรอกหมายเหตุประกอบสัญญา..."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dashBankInfo">ข้อมูลบัญชีธนาคาร (BANK INFO for CNY)</label>
+                <textarea id="dashBankInfo" class="form-textarea" placeholder="Beneficiary, Account No., SWIFT CODE, Bank Address..."></textarea>
+              </div>
+            </div>
+
+            <div class="dashboard-grid-3 dash-mt-16">
+              <div class="form-group">
+                <label class="form-label" for="dashPayment">เงื่อนไขการชำระเงิน (Payment Items)</label>
+                <input type="text" id="dashPayment" class="form-input" placeholder="เช่น CNY 1,151,400 as down payment..." value="">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dashManufacturing">ระยะเวลาการผลิต (Manufacturing Time)</label>
+                <input type="text" id="dashManufacturing" class="form-input" placeholder="เช่น 55 days after down payment..." value="">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dashWarranty">การรับประกัน (Warranty)</label>
+                <input type="text" id="dashWarranty" class="form-input" placeholder="เช่น 15 months after erecting..." value="">
+              </div>
+            </div>
+
+            <div class="form-group dash-mt-16">
+              <label class="form-label" for="dashTraining">การติดตั้งและการฝึกอบรม (ERECTION / TRAINING)</label>
+              <textarea id="dashTraining" class="form-textarea" placeholder="รายละเอียดการส่งวิศวกรเข้าติดตั้งและอบรม..."></textarea>
+            </div>
+
+            <div class="dashboard-grid-2 dash-mt-16">
+              <div class="form-group">
+                <label class="form-label" for="dashBuyerSign">ผู้ลงนามฝ่ายผู้ซื้อ (The Buyer)</label>
+                <input type="text" id="dashBuyerSign" class="form-input" placeholder="(ลงชื่อ / ตำแหน่งผู้มีอำนาจลงนาม)" value="">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="dashSellerSign">ผู้ลงนามฝ่ายผู้ขาย (The Seller)</label>
+                <input type="text" id="dashSellerSign" class="form-input" placeholder="เช่น Manuel Chan (AMMA CONSTRUCTION)" value="">
+              </div>
+            </div>
           </div>
         </div>
       </section>
+    </div>
+  </div>
 
-      <footer class="signatures-section">
-        <div class="signature-block">
-          <div class="signature-role-line">
-            <label for="approverSignName">ผู้อนุมัติ (<span
-                class="signature-dots">................................................</span>)</label>
-          </div>
-          <input type="text" id="approverSignName" class="signature-name-input"
-            placeholder="(ลงชื่อ / ตำแหน่งผู้อนุมัติ)" title="ชื่อผู้อนุมัติ" value="">
-        </div>
-
-        <!-- ฝั่งขวา: ผู้จัดทำ -->
-        <div class="signature-block">
-          <div class="signature-role-line">
-            <label for="preparerSignName">ผู้จัดทำ (<span
-                class="signature-dots">................................................</span>)</label>
-          </div>
-          <input type="text" id="preparerSignName" class="signature-name-input" placeholder="(ลงชื่อ / ตำแหน่งผู้จัดทำ)"
-            title="ชื่อผู้จัดทำ" value="">
-        </div>
-      </footer>
-    </article>
-  </main>
-
+  <!-- A4 Print Preview Modal -->
   <div class="a4-preview-overlay no-print" id="a4PrintPreviewModal" role="dialog" aria-modal="true"
     aria-labelledby="a4PreviewTitle">
     <header class="a4-preview-topbar" aria-label="แถบเครื่องมือตัวอย่างก่อนพิมพ์">

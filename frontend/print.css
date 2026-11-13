@@ -552,6 +552,9 @@
   }
 
   /* Sales Contract Print Adjustments */
+  .spa-sidebar,
+  .cny-rate-widget,
+  .dashboard-form-container,
   .contract-search-container,
   .contract-table-actions,
   .contract-row-del-btn,
