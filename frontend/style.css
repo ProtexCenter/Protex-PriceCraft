@@ -1373,6 +1373,9 @@ input[type="number"],
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 48px;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  break-inside: avoid-page !important;
 }
 
 .signature-block {
@@ -1780,6 +1783,9 @@ input[type="number"],
   gap: 16px;
   align-items: stretch;
   margin-top: 8px;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  break-inside: avoid-page !important;
 }
 
 .a4-sheet-notes-box {
@@ -1787,7 +1793,7 @@ input[type="number"],
   border: 0.75pt solid #CBD5E1;
   border-radius: 6px;
   padding: 8px 10px;
-  min-height: 92px;
+  min-height: 80px;
   font-size: 8.6pt;
   white-space: pre-wrap;
 }
@@ -1803,6 +1809,8 @@ input[type="number"],
   width: 100%;
   border-collapse: collapse;
   border: 1pt solid #111114;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
 }
 
 .a4-sheet-summary-table td {
@@ -1824,14 +1832,20 @@ input[type="number"],
 }
 
 .a4-sheet-signatures {
-  margin-top: 26px;
-  padding-top: 14px;
+  margin-top: 18px;
+  padding-top: 12px;
   border-top: 1px dashed #94A3B8;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   text-align: center;
   font-size: 9.5pt;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  break-inside: avoid-page !important;
+  page-break-before: auto;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
 }
 
 .a4-sheet-sign-role {

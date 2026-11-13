@@ -1287,13 +1287,45 @@
     sheet.style.boxShadow = 'none';
     sheet.style.margin = '0';
     sheet.style.width = '210mm';
-    sheet.style.minHeight = '296mm';
+    sheet.style.minHeight = '290mm';
     sheet.style.letterSpacing = '0px';
     sheet.style.fontFamily = "'Sarabun', 'Prompt', sans-serif";
     sheet.innerHTML = buildA4PreviewHtml(snap);
 
+    // If 10-15 rows, optimize spacing so everything fits cleanly on 1 page without trailing orphan signatures
+    if (snap.calc.rows.length >= 10 && snap.calc.rows.length <= 15) {
+      sheet.querySelectorAll('.a4-sheet-table th, .a4-sheet-table td').forEach((td) => {
+        td.style.padding = '4px 5px';
+        td.style.fontSize = '8.2pt';
+      });
+      const notesBox = sheet.querySelector('.a4-sheet-notes-box');
+      if (notesBox) notesBox.style.minHeight = '64px';
+      const sigs = sheet.querySelector('.a4-sheet-signatures');
+      if (sigs) {
+        sigs.style.marginTop = '14px';
+        sigs.style.paddingTop = '10px';
+      }
+    }
+
     host.appendChild(sheet);
     document.body.appendChild(host);
+
+    // Ensure elements with break-inside: avoid never split across A4 page boundaries (297mm)
+    const pxPerMm = sheet.offsetWidth / 210;
+    const pageHeightPx = 297 * pxPerMm;
+    const breakAvoidElements = sheet.querySelectorAll(
+      '.a4-sheet-signatures, .a4-sheet-bottom-grid, .signatures-section, .doc-bottom-grid'
+    );
+    breakAvoidElements.forEach((el) => {
+      const elTop = el.offsetTop;
+      const elBottom = elTop + el.offsetHeight;
+      const pageNum = Math.floor(elTop / pageHeightPx) + 1;
+      const pageBoundary = pageNum * pageHeightPx;
+      if (elTop < pageBoundary && elBottom > pageBoundary) {
+        const pushGap = pageBoundary - elTop + 24;
+        el.style.marginTop = `${pushGap}px`;
+      }
+    });
 
     const filename = `Pricecraft_${snap.docNumber || 'Document'}.pdf`;
     showToast('กำลังสร้างไฟล์ PDF (ฟอนต์ไทยคมชัด)...');
@@ -1332,7 +1364,7 @@
       pdf.addImage(dataUrl, 'PNG', 0, positionY, pageWidthMm, renderedHeightMm, undefined, 'FAST');
       heightLeft -= pageHeightMm;
 
-      while (heightLeft > 2) {
+      while (heightLeft > 5) {
         positionY -= pageHeightMm;
         pdf.addPage();
         pdf.addImage(dataUrl, 'PNG', 0, positionY, pageWidthMm, renderedHeightMm, undefined, 'FAST');

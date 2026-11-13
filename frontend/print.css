@@ -489,7 +489,10 @@
   }
 
   /* Parallel Left-Right Signatures */
-  .signatures-section {
+  .signatures-section,
+  .signature-section,
+  .a4-sheet-signatures,
+  .footer-container {
     margin-top: 24px !important;
     padding-top: 14px !important;
     border-top: 0.75pt dashed #CBD5E1 !important;
@@ -498,6 +501,10 @@
     gap: 32px !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+    break-inside: avoid-page !important;
+    page-break-before: auto !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 
   .signature-block {
