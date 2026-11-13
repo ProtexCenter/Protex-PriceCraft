@@ -283,13 +283,29 @@
     width: 9% !important;
   }
 
+  table,
+  .excel-table,
+  .a4-sheet-table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
   table thead,
+  thead,
   .excel-table thead,
   .a4-sheet-table thead {
     display: table-header-group !important;
   }
 
+  table tbody,
+  tbody,
+  .excel-table tbody,
+  .a4-sheet-table tbody {
+    display: table-row-group !important;
+  }
+
   table tr,
+  tr,
   .excel-table tr,
   .a4-sheet-table tr,
   .excel-table tbody tr,

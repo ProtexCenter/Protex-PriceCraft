@@ -826,17 +826,16 @@
 
     const centralSize = centralParts.reduce((acc, part) => acc + part.byteLength, 0);
 
-    // End of Central Directory Record (22 bytes)
     const eocd = new Uint8Array(22);
     const ev = new DataView(eocd.buffer);
-    ev.setUint32(0, 0x06054b50, true);         // EOCD signature
-    ev.setUint16(4, 0, true);                  // Number of this disk
-    ev.setUint16(6, 0, true);                  // Disk where central directory starts
-    ev.setUint16(8, files.length, true);       // Number of central directory records on this disk
-    ev.setUint16(10, files.length, true);      // Total number of central directory records
-    ev.setUint32(12, centralSize, true);       // Size of central directory
-    ev.setUint32(16, offset, true);            // Offset of start of central directory
-    ev.setUint16(20, 0, true);                 // Comment length
+    ev.setUint32(0, 0x06054b50, true);
+    ev.setUint16(4, 0, true);
+    ev.setUint16(6, 0, true);
+    ev.setUint16(8, files.length, true);
+    ev.setUint16(10, files.length, true);
+    ev.setUint32(12, centralSize, true);
+    ev.setUint32(16, offset, true);
+    ev.setUint16(20, 0, true);
 
     const totalLength = offset + centralSize + eocd.byteLength;
     const output = new Uint8Array(totalLength);
@@ -855,16 +854,13 @@
     return output;
   }
 
-  /**
-   * Builds a 100% genuine OpenXML Word (.docx) binary Uint8Array for the Cost Request Sheet
-   */
   function buildTrueOpenXmlDocxBytes(snap) {
     const wCell = (text, opts) => {
       const o = opts || {};
       const align = o.align || 'left';
       const bold = o.bold ? '<w:b/><w:bCs/>' : '';
       const color = o.color ? `<w:color w:val="${o.color}"/>` : '';
-      const sz = o.sizeHalfPt || 19; // 9.5pt default
+      const sz = o.sizeHalfPt || 19; 
       const fill = o.fill
         ? `<w:shd w:val="clear" w:color="auto" w:fill="${o.fill}"/>`
         : '';
@@ -1100,9 +1096,6 @@
     showToast(`ส่งออกไฟล์ Word มาตรฐาน OpenXML (${snap.docNumber}_รายการขอราคาต้นทุน.docx) สำเร็จ!`);
   }
 
-  /* ==========================================================================
-     6. A4 PRINT PREVIEW ENGINE (EXACT 210mm x 297mm A4 PAPER SIMULATION)
-     ========================================================================== */
   function buildA4PreviewHtml(snap) {
     const rowsHtml = snap.calc.rows
       .map(
@@ -1239,31 +1232,27 @@
 
   async function exportToPdf(tbody) {
     const snap = collectDocumentSnapshot(tbody);
-    const hasHtmlToImage = typeof window.htmlToImage !== 'undefined' && typeof window.htmlToImage.toPng === 'function';
-    const jsPdfCtor = window.jspdf && window.jspdf.jsPDF;
+    const filename = `Pricecraft_${snap.docNumber || 'Document'}.pdf`;
 
-    if (!hasHtmlToImage || !jsPdfCtor) {
-      showToast('กำลังเปิดหน้าต่างบันทึกเป็น PDF...');
+    if (typeof window.html2pdf !== 'function') {
       window.print();
       return;
     }
 
     const host = document.createElement('div');
     host.style.position = 'fixed';
-    host.style.left = '0';
+    host.style.left = '-99999px';
     host.style.top = '0';
     host.style.width = '210mm';
-    host.style.opacity = '0';
-    host.style.pointerEvents = 'none';
-    host.style.zIndex = '-9999';
     host.style.background = '#FFFFFF';
+    host.style.zIndex = '-9999';
 
     const sheet = document.createElement('div');
     sheet.className = 'a4-paper-sheet';
     sheet.style.boxShadow = 'none';
     sheet.style.margin = '0';
-    sheet.style.width = '210mm';
-    sheet.style.minHeight = '290mm';
+    sheet.style.width = '100%';
+    sheet.style.minHeight = 'auto';
     sheet.style.letterSpacing = '0px';
     sheet.style.fontFamily = "'Sarabun', 'Prompt', sans-serif";
     sheet.innerHTML = buildA4PreviewHtml(snap);
@@ -1281,111 +1270,44 @@
     host.appendChild(sheet);
     document.body.appendChild(host);
 
-    // Ensure elements with break-inside: avoid never split across A4 page boundaries (297mm)
-    const pxPerMm = sheet.offsetWidth / 210;
-    const pageHeightPx = 297 * pxPerMm;
-
-    // 1. Table Rows Smart Page-Break Avoidance with Repeated Header
-    const theadThs = sheet.querySelectorAll('.a4-sheet-table thead tr th');
-    let theadRowHtml = '';
-    if (theadThs.length > 0) {
-      theadRowHtml = Array.from(theadThs)
-        .map(
-          (th) =>
-            `<th style="background:#111114;color:#FFFFFF;border:0.75pt solid #111114;border-bottom:2.5pt solid #E11D24;padding:6px 4px;font-size:8.2pt;text-align:center;">${th.innerHTML}</th>`
-        )
-        .join('');
-    }
-
-    const tbodyRows = Array.from(sheet.querySelectorAll('.a4-sheet-table tbody tr'));
-    let currentPage = 1;
-
-    tbodyRows.forEach((tr) => {
-      const pageBoundary = currentPage * pageHeightPx;
-      const elTop = tr.offsetTop;
-      const elBottom = elTop + tr.offsetHeight;
-
-      // If this row crosses the A4 page boundary (splits across pages)
-      if (elTop < pageBoundary && elBottom > pageBoundary) {
-        const spacerTr = document.createElement('tr');
-        spacerTr.className = 'page-break-spacer-row';
-        const neededGap = Math.ceil(pageBoundary - elTop + 14);
-        spacerTr.innerHTML = `<td colspan="9" style="height:${neededGap}px;padding:0!important;margin:0!important;border:none!important;background:transparent!important;"></td>`;
-        tr.parentNode.insertBefore(spacerTr, tr);
-
-        // Repeat table header at the top of the next page so customer can read columns
-        if (theadRowHtml) {
-          const repeatHeaderTr = document.createElement('tr');
-          repeatHeaderTr.className = 'page-break-header-repeat';
-          repeatHeaderTr.innerHTML = theadRowHtml;
-          tr.parentNode.insertBefore(repeatHeaderTr, tr);
-        }
-
-        currentPage += 1;
-      } else if (elTop >= pageBoundary) {
-        currentPage = Math.floor(elTop / pageHeightPx) + 1;
-      }
-    });
-
-    // 2. Bottom Grid & Signatures Page-Break Avoidance
-    const breakAvoidElements = sheet.querySelectorAll(
-      '.a4-sheet-signatures, .a4-sheet-bottom-grid, .signatures-section, .doc-bottom-grid'
-    );
-    breakAvoidElements.forEach((el) => {
-      const elTop = el.offsetTop;
-      const elBottom = elTop + el.offsetHeight;
-      const currentBoundary = Math.floor(elTop / pageHeightPx + 1) * pageHeightPx;
-      if (elTop < currentBoundary && elBottom > currentBoundary) {
-        const pushGap = currentBoundary - elTop + 24;
-        el.style.marginTop = `${pushGap}px`;
-      }
-    });
-
-    const filename = `Pricecraft_${snap.docNumber || 'Document'}.pdf`;
-    showToast('กำลังสร้างไฟล์ PDF (ฟอนต์ไทยคมชัด)...');
+    showToast('กำลังสร้างไฟล์ PDF (ตัดหน้าเรียบเนียน)...');
 
     try {
       if (document.fonts && document.fonts.ready) {
         await document.fonts.ready;
       }
 
-      // ใช้ Browser Native HarfBuzz Engine ผ่าน SVG foreignObject เพื่อไม่ให้สระ/วรรณยุกต์ภาษาไทยเพี้ยน
-      const dataUrl = await window.htmlToImage.toPng(sheet, {
-        pixelRatio: 2.2,
-        backgroundColor: '#FFFFFF',
-        cacheBust: true,
-        style: {
-          transform: 'none',
-          letterSpacing: '0px',
+      const opt = {
+        margin: [12, 10, 14, 10],
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          letterRendering: false,
+          scrollY: 0,
         },
-      });
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait',
+          compress: true,
+        },
+        pagebreak: {
+          mode: ['css', 'legacy'],
+          avoid: [
+            'tr',
+            '.excel-table tbody tr',
+            '.a4-sheet-table tbody tr',
+            '.a4-sheet-bottom-grid',
+            '.a4-sheet-signatures',
+            '.signatures-section',
+            '.doc-bottom-grid',
+          ],
+        },
+      };
 
-      const pdf = new jsPdfCtor({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true,
-      });
-
-      const pageWidthMm = 210;
-      const pageHeightMm = 297;
-      const imgProps = pdf.getImageProperties(dataUrl);
-      const renderedHeightMm = (imgProps.height * pageWidthMm) / imgProps.width;
-
-      let heightLeft = renderedHeightMm;
-      let positionY = 0;
-
-      pdf.addImage(dataUrl, 'PNG', 0, positionY, pageWidthMm, renderedHeightMm, undefined, 'FAST');
-      heightLeft -= pageHeightMm;
-
-      while (heightLeft > 5) {
-        positionY -= pageHeightMm;
-        pdf.addPage();
-        pdf.addImage(dataUrl, 'PNG', 0, positionY, pageWidthMm, renderedHeightMm, undefined, 'FAST');
-        heightLeft -= pageHeightMm;
-      }
-
-      pdf.save(filename);
+      await window.html2pdf().set(opt).from(sheet).save();
       showToast(`ดาวน์โหลด ${filename} เรียบร้อยแล้ว`);
     } catch {
       showToast('กำลังเปิดหน้าต่างสั่งพิมพ์ (เลือก Save as PDF)...');
@@ -1395,9 +1317,6 @@
     }
   }
 
-  /* ==========================================================================
-     7. EXCEL (.XLSX) EXPORT & IMPORT
-     ========================================================================== */
   function exportToExcel(tbody) {
     const snap = collectDocumentSnapshot(tbody);
 
@@ -1587,9 +1506,6 @@
     reader.readAsArrayBuffer(file);
   }
 
-  /* ==========================================================================
-     8. APPWRITE STATE PERSISTENCE BY EMPLOYEE ID (COLLECTION: user_drafts)
-     ========================================================================== */
   const externalConfig =
     (typeof window !== 'undefined' &&
       window.PricecraftAppwrite &&
@@ -1647,7 +1563,6 @@
       if (el && val !== undefined) el.value = val;
     };
 
-    // Case 1: New Employee / No Draft Found -> Clear table to 0 items & reset inputs
     if (!draftData) {
       tbody.innerHTML = '';
       setVal('customerNameInput', '');
@@ -1659,7 +1574,6 @@
       return;
     }
 
-    // Case 2: Returning Employee -> Restore 100% of fields and table rows
     setVal('customerNameInput', draftData.customerName || '');
     setVal('sellerNameInput', draftData.sellerName || '');
     setVal('shippingCostInput', draftData.shippingCost !== undefined ? draftData.shippingCost : '0.00');
@@ -1704,7 +1618,6 @@
           return parsed;
         }
       } catch {
-        // Fallback to local employee draft store when Appwrite cloud endpoint is unreachable/mocked
       }
     }
 

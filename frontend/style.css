@@ -1758,6 +1758,10 @@ input[type="number"],
   display: table-header-group;
 }
 
+.a4-sheet-table tbody {
+  display: table-row-group;
+}
+
 .a4-sheet-table tr,
 .a4-sheet-table tbody tr {
   page-break-inside: avoid !important;
