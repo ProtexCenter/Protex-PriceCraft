@@ -493,8 +493,9 @@
   .signature-section,
   .a4-sheet-signatures,
   .footer-container {
-    margin-top: 24px !important;
-    padding-top: 14px !important;
+    margin-top: 40px !important;
+    padding-top: 32px !important;
+    padding-bottom: 24px !important;
     border-top: 0.75pt dashed #CBD5E1 !important;
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;

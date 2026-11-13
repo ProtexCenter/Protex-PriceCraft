@@ -67,9 +67,6 @@
     return roundScaled2Dp(rescaled);
   }
 
-  /* ==========================================================================
-     2. CONSTANTS & INITIAL SAMPLE ROWS
-     ========================================================================== */
   const CELL_FIELDS_ORDER = [
     'itemName',
     'quantity',
@@ -101,9 +98,6 @@
     },
   ];
 
-  /* ==========================================================================
-     2B. HARDCODED LOCAL CATALOG DATABASE (SMART SEARCH & AUTO-FILL)
-     ========================================================================== */
   const localItemsDB = [
     {
       mainName: 'ถังพรีฮีต 300 ลิตร',
@@ -392,9 +386,6 @@
     return `${datePart} เวลา ${timePart} น.`;
   }
 
-  /* ==========================================================================
-     3. 9-COLUMN EXCEL TABLE BUILDER & REAL-TIME CALCULATION
-     ========================================================================== */
   function buildExcelRowHtml(index, rowData) {
     const data = rowData || {};
     rowCounter += 1;
@@ -676,9 +667,6 @@
     return newRow;
   }
 
-  /* ==========================================================================
-     4. EXCEL KEYBOARD NAVIGATION
-     ========================================================================== */
   function handleExcelGridKeydown(event, tbody) {
     const target = event.target;
     if (!target || !target.dataset || !target.dataset.field) return;
@@ -732,9 +720,6 @@
     }
   }
 
-  /* ==========================================================================
-     5. SNAPSHOT COLLECTOR & TRUE OPENXML (.DOCX) ZIP GENERATOR
-     ========================================================================== */
   function collectDocumentSnapshot(tbody) {
     const calc = recalculateAll(tbody);
     const docNumEl = document.getElementById('docNumberDisplay');
@@ -765,9 +750,6 @@
     };
   }
 
-  /**
-   * Standard CRC-32 Lookup Table & Calculator for Valid ZIP Archive Generation
-   */
   const CRC32_TABLE = (function buildCrc32Table() {
     const table = new Uint32Array(256);
     for (let i = 0; i < 256; i += 1) {
@@ -788,10 +770,6 @@
     return (crc ^ 0xffffffff) >>> 0;
   }
 
-  /**
-   * Packs an array of { name: string, content: string } into a genuine ZIP Uint8Array
-   * compliant with PKWARE ZIP & ECMA-376 OpenXML (.docx) specifications.
-   */
   function createOpenXmlZipBytes(files) {
     const encoder = new TextEncoder();
     const localParts = [];
@@ -804,44 +782,42 @@
       const crc = computeCrc32(dataBytes);
       const size = dataBytes.byteLength;
 
-      // Local File Header (30 bytes + filename)
       const localHeader = new Uint8Array(30 + nameBytes.byteLength);
       const lv = new DataView(localHeader.buffer);
-      lv.setUint32(0, 0x04034b50, true); // Local file header signature
-      lv.setUint16(4, 20, true);         // Version needed to extract (2.0)
-      lv.setUint16(6, 0x0800, true);     // General purpose bit flag (UTF-8)
-      lv.setUint16(8, 0, true);          // Compression method (0 = Stored)
-      lv.setUint16(10, 0x6000, true);    // Last mod file time
-      lv.setUint16(12, 0x596c, true);    // Last mod file date
-      lv.setUint32(14, crc, true);       // CRC-32
-      lv.setUint32(18, size, true);      // Compressed size
-      lv.setUint32(22, size, true);      // Uncompressed size
-      lv.setUint16(26, nameBytes.byteLength, true); // File name length
-      lv.setUint16(28, 0, true);         // Extra field length
+      lv.setUint32(0, 0x04034b50, true);
+      lv.setUint16(4, 20, true);
+      lv.setUint16(6, 0x0800, true);
+      lv.setUint16(8, 0, true);
+      lv.setUint16(10, 0x6000, true);
+      lv.setUint16(12, 0x596c, true);
+      lv.setUint32(14, crc, true);
+      lv.setUint32(18, size, true);
+      lv.setUint32(22, size, true);
+      lv.setUint16(26, nameBytes.byteLength, true);
+      lv.setUint16(28, 0, true);
       localHeader.set(nameBytes, 30);
 
       localParts.push(localHeader, dataBytes);
 
-      // Central Directory File Header (46 bytes + filename)
       const centralHeader = new Uint8Array(46 + nameBytes.byteLength);
       const cv = new DataView(centralHeader.buffer);
-      cv.setUint32(0, 0x02014b50, true); // Central file header signature
-      cv.setUint16(4, 20, true);         // Version made by
-      cv.setUint16(6, 20, true);         // Version needed to extract
-      cv.setUint16(8, 0x0800, true);     // General purpose bit flag (UTF-8)
-      cv.setUint16(10, 0, true);         // Compression method (0 = Stored)
-      cv.setUint16(12, 0x6000, true);    // Last mod file time
-      cv.setUint16(14, 0x596c, true);    // Last mod file date
-      cv.setUint32(16, crc, true);       // CRC-32
-      cv.setUint32(20, size, true);      // Compressed size
-      cv.setUint32(24, size, true);      // Uncompressed size
-      cv.setUint16(28, nameBytes.byteLength, true); // File name length
-      cv.setUint16(30, 0, true);         // Extra field length
-      cv.setUint16(32, 0, true);         // File comment length
-      cv.setUint16(34, 0, true);         // Disk number start
-      cv.setUint16(36, 0, true);         // Internal file attributes
-      cv.setUint32(38, 0, true);         // External file attributes
-      cv.setUint32(42, offset, true);    // Relative offset of local header
+      cv.setUint32(0, 0x02014b50, true);
+      cv.setUint16(4, 20, true);
+      cv.setUint16(6, 20, true);
+      cv.setUint16(8, 0x0800, true);
+      cv.setUint16(10, 0, true);
+      cv.setUint16(12, 0x6000, true);
+      cv.setUint16(14, 0x596c, true);
+      cv.setUint32(16, crc, true);
+      cv.setUint32(20, size, true);
+      cv.setUint32(24, size, true);
+      cv.setUint16(28, nameBytes.byteLength, true);
+      cv.setUint16(30, 0, true);
+      cv.setUint16(32, 0, true);
+      cv.setUint16(34, 0, true);
+      cv.setUint16(36, 0, true);
+      cv.setUint32(38, 0, true);
+      cv.setUint32(42, offset, true);
       centralHeader.set(nameBytes, 46);
 
       centralParts.push(centralHeader);
@@ -1300,11 +1276,6 @@
       });
       const notesBox = sheet.querySelector('.a4-sheet-notes-box');
       if (notesBox) notesBox.style.minHeight = '64px';
-      const sigs = sheet.querySelector('.a4-sheet-signatures');
-      if (sigs) {
-        sigs.style.marginTop = '14px';
-        sigs.style.paddingTop = '10px';
-      }
     }
 
     host.appendChild(sheet);

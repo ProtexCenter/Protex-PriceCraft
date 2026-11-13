@@ -1367,8 +1367,9 @@ input[type="number"],
 }
 
 .signatures-section {
-  margin-top: 38px;
-  padding-top: 20px;
+  margin-top: 44px;
+  padding-top: 36px;
+  padding-bottom: 28px;
   border-top: 1px dashed #CBD5E1;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1832,8 +1833,9 @@ input[type="number"],
 }
 
 .a4-sheet-signatures {
-  margin-top: 18px;
-  padding-top: 12px;
+  margin-top: 36px;
+  padding-top: 32px;
+  padding-bottom: 24px;
   border-top: 1px dashed #94A3B8;
   display: grid;
   grid-template-columns: 1fr 1fr;
