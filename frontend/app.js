@@ -57,6 +57,19 @@
     return `${withCommas}.${decPart}`;
   }
 
+  function formatShippingWithCommas(value) {
+    if (value === null || value === undefined) return '0.00';
+    const raw = String(value).trim().replace(/[^0-9.]/g, '');
+    if (!raw) return '0.00';
+    const num = parseFloat(raw);
+    if (isNaN(num) || num < 0) return '0.00';
+    const hasDecimal = raw.includes('.');
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: hasDecimal ? 2 : 0,
+      maximumFractionDigits: 2,
+    });
+  }
+
   function multiplyAndRound2(a, b) {
     const sa = typeof a === 'bigint' ? a : parseToScaledBigInt(a);
     const sb = typeof b === 'bigint' ? b : parseToScaledBigInt(b);
@@ -1625,7 +1638,10 @@
 
     setVal('customerNameInput', draftData.customerName || '');
     setVal('sellerNameInput', draftData.sellerName || '');
-    setVal('shippingCostInput', draftData.shippingCost !== undefined ? draftData.shippingCost : '0.00');
+    setVal(
+      'shippingCostInput',
+      draftData.shippingCost !== undefined ? formatShippingWithCommas(draftData.shippingCost) : '0.00'
+    );
     if (draftData.notes !== undefined) {
       setVal('docGeneralNotes', draftData.notes);
     }
@@ -1828,16 +1844,21 @@
 
     const shippingInput = document.getElementById('shippingCostInput');
     if (shippingInput) {
+      shippingInput.value = formatShippingWithCommas(shippingInput.value);
+      shippingInput.addEventListener('focus', () => {
+        shippingInput.value = String(shippingInput.value || '').replace(/,/g, '');
+      });
       shippingInput.addEventListener('input', () => {
         recalculateAll(tbody);
         triggerSave();
       });
-      shippingInput.addEventListener('change', () => {
-        const n = Number(shippingInput.value);
-        if (!isNaN(n) && n >= 0) shippingInput.value = n.toFixed(2);
+      const applyShippingFormat = () => {
+        shippingInput.value = formatShippingWithCommas(shippingInput.value);
         recalculateAll(tbody);
         triggerSave();
-      });
+      };
+      shippingInput.addEventListener('blur', applyShippingFormat);
+      shippingInput.addEventListener('change', applyShippingFormat);
     }
 
     // Bind Auto-Save on Header & Footer Inputs (Customer, Seller, Notes, Signatures)
@@ -1859,6 +1880,19 @@
     document.getElementById('btnAddSubItem')?.addEventListener('click', () => {
       appendExcelRow(tbody, { isSubItem: true }, { focusFirstCell: true });
       saveUserDraftByEmployeeId(currentEmpId, tbody);
+    });
+
+    document.getElementById('btnClearCostTable')?.addEventListener('click', () => {
+      if (!tbody || tbody.children.length === 0) {
+        showToast('ตารางว่างเปล่าอยู่แล้ว (0 รายการ)');
+        return;
+      }
+      if (window.confirm('คุณต้องการล้างรายการทั้งหมดในตารางให้กลับเป็น 0 รายการใช่หรือไม่?')) {
+        tbody.innerHTML = '';
+        recalculateAll(tbody);
+        saveUserDraftByEmployeeId(currentEmpId, tbody);
+        showToast('ล้างรายการทั้งหมดเรียบร้อยแล้ว (0 รายการ)');
+      }
     });
 
     document.getElementById('btnAddFiveRows')?.addEventListener('click', () => {
@@ -2338,12 +2372,8 @@
     bindDashCellFormatting(qtyInput);
 
     tr.querySelector('.dash-del-btn')?.addEventListener('click', () => {
-      if (tbody.children.length > 1) {
-        tr.remove();
-        updateDashContractTotals();
-      } else {
-        showToast('สัญญาต้องมีรายการสินค้าอย่างน้อย 1 แถว');
-      }
+      tr.remove();
+      updateDashContractTotals();
     });
 
     priceInput?.focus();
@@ -2358,7 +2388,7 @@
       tbody.querySelectorAll('.dash-del-btn').forEach((btn) => {
         btn.addEventListener('click', (e) => {
           const row = e.target.closest('tr');
-          if (row && tbody.children.length > 1) {
+          if (row) {
             row.remove();
             updateDashContractTotals();
           }
@@ -2443,7 +2473,7 @@
     const tbody = document.getElementById('dashContractTableBody');
     if (tbody) {
       tbody.innerHTML = '';
-      const items = Array.isArray(contract.items) && contract.items.length > 0 ? contract.items : [{}];
+      const items = Array.isArray(contract.items) ? contract.items : [];
       items.forEach((it) => addDashContractRow(it));
     }
 
@@ -2471,12 +2501,11 @@
     const tbody = document.getElementById('dashContractTableBody');
     if (tbody) {
       tbody.innerHTML = '';
-      addDashContractRow({});
     }
     unlockCnyRate();
     fetchCnyRates();
     updateDashContractTotals();
-    showToast('เตรียมฟอร์มสัญญาใหม่เรียบร้อย');
+    showToast('เตรียมฟอร์มสัญญาใหม่เรียบร้อย (0 รายการสินค้า)');
   }
 
   async function refreshDashRecentChips() {
@@ -2507,34 +2536,102 @@
     const input = document.getElementById('dashContractSearchInput');
     const clearBtn = document.getElementById('dashContractSearchClear');
     const dropdown = document.getElementById('dashContractSearchDropdown');
+    const historyPanel = document.getElementById('dashProductHistoryPanel');
     if (!input || !dropdown) return;
 
     let debounceTimer = null;
 
-    const renderOptions = (results) => {
+    const renderProductHistoryPanel = (records, queryText) => {
+      if (!historyPanel) return;
+      if (!queryText) {
+        historyPanel.innerHTML = '';
+        historyPanel.classList.add('is-hidden');
+        return;
+      }
+
+      historyPanel.innerHTML = '';
+      historyPanel.classList.remove('is-hidden');
+
+      if (!records || records.length === 0) {
+        historyPanel.innerHTML = `
+          <div class="dash-history-empty">
+            ไม่พบประวัติลูกค้าที่เคยซื้อสินค้าหรือสัญญาที่ตรงกับ <strong>"${escapeAttr(queryText)}"</strong>
+          </div>
+        `;
+        return;
+      }
+
+      const header = document.createElement('div');
+      header.className = 'dash-history-header';
+      header.innerHTML = `
+        <span>📦 รายชื่อลูกค้าที่เคยซื้อสินค้า / ตรงกับคำค้นหา <strong>"${escapeAttr(queryText)}"</strong> (${records.length} รายการ)</span>
+      `;
+      historyPanel.appendChild(header);
+
+      const listEl = document.createElement('div');
+      listEl.className = 'dash-history-grid';
+
+      records.forEach((rec) => {
+        const card = document.createElement('div');
+        card.className = 'dash-history-item-card';
+        const itemsText = (rec.matchedItems || [])
+          .map((it) => `${escapeAttr(it.item || '-')} (${escapeAttr(it.qty || '1')} • ${escapeAttr(it.price || '-')})`)
+          .join(' | ');
+
+        card.innerHTML = `
+          <div class="dash-history-item-info">
+            <div class="dash-history-cust-line">
+              <span class="dash-history-cust-badge">ลูกค้า</span>
+              <strong class="dash-history-cust-name">${escapeAttr(rec.customerName)}</strong>
+              <span class="dash-history-sc-tag">SC: ${escapeAttr(rec.contractNo)}</span>
+              <span class="dash-history-date-tag">${escapeAttr(rec.date)}</span>
+            </div>
+            <div class="dash-history-prod-line">
+              <span>สินค้าที่ซื้อ:</span> <strong>${itemsText || 'ไม่มีรายการสินค้า'}</strong>
+            </div>
+          </div>
+          <button type="button" class="dash-history-load-btn">โหลดสัญญานี้</button>
+        `;
+        card.querySelector('.dash-history-load-btn')?.addEventListener('click', () => {
+          populateDashContractForm(rec.contract);
+          dropdown.hidden = true;
+        });
+        listEl.appendChild(card);
+      });
+
+      historyPanel.appendChild(listEl);
+    };
+
+    const renderOptions = (records, queryText) => {
       dropdown.innerHTML = '';
-      if (!results || results.length === 0) {
+      if (!records || records.length === 0) {
         const empty = document.createElement('div');
         empty.className = 'dash-search-empty';
-        empty.textContent = 'ไม่พบข้อมูลลูกค้าหรือสัญญาที่ค้นหา';
+        empty.textContent = 'ไม่พบข้อมูลลูกค้าหรือสินค้าที่ค้นหา';
         dropdown.appendChild(empty);
         dropdown.hidden = false;
         return;
       }
 
-      results.forEach((c) => {
+      records.forEach((rec) => {
+        const c = rec.contract || rec;
         const opt = document.createElement('button');
         opt.type = 'button';
         opt.className = 'dash-search-option';
-        const count = Array.isArray(c.items) ? c.items.length : 0;
+        const matchedItems = rec.matchedItems || c.items || [];
+        const prodSummary = matchedItems
+          .slice(0, 2)
+          .map((it) => `${it.item || '-'} (${it.qty || '1'})`)
+          .join(', ');
+
         opt.innerHTML = `
           <div class="dash-opt-main">
-            <strong>${escapeAttr(c.contractNo || 'N/A')}</strong>
-            <span>${escapeAttr(c.buyerName || c.customerName || 'ไม่ระบุชื่อผู้ซื้อ')}</span>
+            <strong>👤 ${escapeAttr(rec.customerName || c.buyerName || c.customerName || 'ไม่ระบุชื่อผู้ซื้อ')}</strong>
+            <span>📄 SC No.: ${escapeAttr(c.contractNo || 'N/A')} ${prodSummary ? `• 📦 สินค้า: ${escapeAttr(prodSummary)}` : ''}</span>
           </div>
           <div class="dash-opt-meta">
             <span>${escapeAttr(c.totalCny || '')}</span>
-            <small>${count} รายการ</small>
+            <small>${escapeAttr(c.date || '')}</small>
           </div>
         `;
         opt.addEventListener('click', () => {
@@ -2544,13 +2641,25 @@
         dropdown.appendChild(opt);
       });
       dropdown.hidden = false;
+      renderProductHistoryPanel(records, queryText);
     };
 
     const runSearch = async () => {
-      if (!window.searchContracts) return;
       const q = input.value.trim();
-      const results = await window.searchContracts(q);
-      renderOptions(results);
+      if (window.searchCustomersByProduct) {
+        const records = await window.searchCustomersByProduct(q);
+        renderOptions(records, q);
+      } else if (window.searchContracts) {
+        const results = await window.searchContracts(q);
+        const mapped = results.map((c) => ({
+          customerName: c.buyerName || c.customerName || 'ไม่ระบุชื่อลูกค้า',
+          contractNo: c.contractNo,
+          date: c.date,
+          matchedItems: c.items || [],
+          contract: c,
+        }));
+        renderOptions(mapped, q);
+      }
     };
 
     input.addEventListener('input', () => {
@@ -2567,6 +2676,7 @@
       input.value = '';
       clearBtn.hidden = true;
       dropdown.hidden = true;
+      renderProductHistoryPanel([], '');
       input.focus();
     });
 

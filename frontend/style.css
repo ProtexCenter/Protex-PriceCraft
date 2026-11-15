@@ -2925,6 +2925,128 @@ input[type="number"],
   border-top: 1.5px dashed #E2E8F0;
 }
 
+.excel-btn.clear-table-btn {
+  background: #FFF1F2;
+  color: #BE123C;
+  border: 1px solid #FECDD3;
+}
+
+.excel-btn.clear-table-btn:hover {
+  background: #FFE4E6;
+  color: #9F1239;
+  border-color: #FDA4AF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(225, 29, 36, 0.12);
+}
+
+/* Task 4: Product-to-Customer Purchase History Panel */
+.dash-product-history-panel {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #E2E8F0;
+}
+
+.dash-history-header {
+  font-size: 0.84rem;
+  color: #334155;
+  margin-bottom: 10px;
+}
+
+.dash-history-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.dash-history-item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.dash-history-item-card:hover {
+  background: #FFFFFF;
+  border-color: #CBD5E1;
+}
+
+.dash-history-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dash-history-cust-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dash-history-cust-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(225, 29, 36, 0.1);
+  color: #DC2626;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.dash-history-cust-name {
+  font-size: 0.88rem;
+  color: #0F172A;
+}
+
+.dash-history-sc-tag,
+.dash-history-date-tag {
+  font-size: 0.75rem;
+  color: #64748B;
+  font-family: var(--font-num);
+  background: #E2E8F0;
+  padding: 1px 7px;
+  border-radius: 6px;
+}
+
+.dash-history-prod-line {
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.dash-history-load-btn {
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  background: #18181B;
+  border: 1px solid #27272A;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.dash-history-load-btn:hover {
+  background: var(--protex-red-bright);
+  border-color: var(--protex-red-bright);
+  transform: translateY(-1px);
+}
+
+.dash-history-empty {
+  font-size: 0.82rem;
+  color: #64748B;
+  padding: 8px 4px;
+}
+
 /* Task 4: Appwrite Customer & Contract Search Bar */
 .dash-search-card {
   padding: 1.25rem 1.5rem !important;

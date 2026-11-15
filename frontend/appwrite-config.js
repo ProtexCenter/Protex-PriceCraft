@@ -220,6 +220,15 @@
   async function saveContract(contract) {
     if (!contract || !contract.contractNo) return null;
     const key = contract.contractNo.trim();
+    const customerName = (contract.buyerName || contract.customerName || '').trim();
+    const normalizedContract = {
+      ...contract,
+      contractNo: key,
+      customerName,
+      buyerName: customerName,
+      items: Array.isArray(contract.items) ? contract.items : [],
+      updated_at: new Date().toISOString(),
+    };
 
     // 1. LocalStorage Offline-first
     let storedList = [];
@@ -232,9 +241,9 @@
 
     const existIdx = storedList.findIndex((c) => c.contractNo === key);
     if (existIdx >= 0) {
-      storedList[existIdx] = { ...storedList[existIdx], ...contract, updated_at: new Date().toISOString() };
+      storedList[existIdx] = { ...storedList[existIdx], ...normalizedContract };
     } else {
-      storedList.unshift({ ...contract, updated_at: new Date().toISOString() });
+      storedList.unshift(normalizedContract);
     }
 
     try {
@@ -249,9 +258,9 @@
         const { Query, ID } = global.Appwrite;
         const payload = {
           contract_no: key,
-          customer_name: contract.customerName || '',
-          contract_json: JSON.stringify(contract),
-          updated_at: new Date().toISOString(),
+          customer_name: customerName,
+          contract_json: JSON.stringify(normalizedContract),
+          updated_at: normalizedContract.updated_at,
         };
 
         const existing = await databases.listDocuments(
@@ -280,18 +289,10 @@
       }
     }
 
-    return contract;
+    return normalizedContract;
   }
 
-  /**
-   * ค้นหาสัญญาซื้อขายและประวัติลูกค้าจาก Appwrite หรือ Local Database
-   * @param {string} query คำค้นหา (ชื่อลูกค้า หรือ ชื่อสินค้า/อุปกรณ์)
-   * @returns {Promise<Array>} รายการสัญญาที่ตรงกับคำค้นหา
-   */
-  async function searchContracts(query) {
-    const q = String(query || '').trim().toLowerCase();
-
-    // รวมข้อมูล LocalStorage + Default Demo Contracts
+  async function fetchAllContractsMerged() {
     let localContracts = [];
     try {
       const raw = localStorage.getItem('pc_appwrite_contracts');
@@ -304,41 +305,94 @@
     DEFAULT_CONTRACTS.forEach((c) => combinedMap.set(c.contractNo, c));
     localContracts.forEach((c) => combinedMap.set(c.contractNo, c));
 
-    // ค้นหาใน Appwrite หากเชื่อมต่อแล้ว
-    if (q && databases && global.Appwrite && APPWRITE_CONFIG.projectId !== 'YOUR_PROJECT_ID') {
+    if (databases && global.Appwrite && APPWRITE_CONFIG.projectId !== 'YOUR_PROJECT_ID') {
       try {
         const { Query } = global.Appwrite;
         const res = await databases.listDocuments(
           APPWRITE_CONFIG.databaseId,
           APPWRITE_CONFIG.contractsCollectionId,
-          [Query.search('customer_name', q), Query.limit(20)]
+          [Query.limit(100)]
         );
         if (res && res.documents) {
           res.documents.forEach((doc) => {
             try {
               const parsed = typeof doc.contract_json === 'string' ? JSON.parse(doc.contract_json) : doc;
-              combinedMap.set(doc.contract_no, parsed);
+              if (doc.contract_no) {
+                combinedMap.set(doc.contract_no, parsed);
+              }
             } catch {
               // Ignore parse error
             }
           });
         }
       } catch {
-        // Fallback to local filtering
+        // Fallback to local
       }
     }
 
-    const all = Array.from(combinedMap.values());
+    return Array.from(combinedMap.values());
+  }
+
+  /**
+   * ค้นหาสัญญาซื้อขายและประวัติลูกค้าจาก Appwrite หรือ Local Database
+   * @param {string} query คำค้นหา (ชื่อลูกค้า หรือ ชื่อสินค้า/อุปกรณ์)
+   * @returns {Promise<Array>} รายการสัญญาที่ตรงกับคำค้นหา
+   */
+  async function searchContracts(query) {
+    const q = String(query || '').trim().toLowerCase();
+    const all = await fetchAllContractsMerged();
     if (!q) return all;
 
     return all.filter((c) => {
-      const cust = (c.customerName || '').toLowerCase();
+      const cust = (c.buyerName || c.customerName || '').toLowerCase();
       const num = (c.contractNo || '').toLowerCase();
       const itemsMatch = (c.items || []).some(
         (it) => (it.item || '').toLowerCase().includes(q) || (it.hsCode || '').toLowerCase().includes(q)
       );
       return cust.includes(q) || num.includes(q) || itemsMatch;
     });
+  }
+
+  /**
+   * สืบค้นรายชื่อลูกค้าทั้งหมดที่เคยซื้อสินค้า/อุปกรณ์ที่ระบุ (Product-to-Customer Search)
+   * @param {string} productQuery ชื่อสินค้า/อุปกรณ์ หรือ HS Code
+   * @returns {Promise<Array>} รายการประวัติลูกค้าที่เคยซื้อสินค้านั้น
+   */
+  async function searchCustomersByProduct(productQuery) {
+    const q = String(productQuery || '').trim().toLowerCase();
+    const all = await fetchAllContractsMerged();
+    const results = [];
+
+    all.forEach((c) => {
+      const items = Array.isArray(c.items) ? c.items : [];
+      const matchedItems = q
+        ? items.filter(
+            (it) =>
+              (it.item || '').toLowerCase().includes(q) ||
+              (it.hsCode || '').toLowerCase().includes(q)
+          )
+        : items;
+
+      const custName = c.buyerName || c.customerName || 'ไม่ระบุชื่อลูกค้า';
+      const custOrNoMatch =
+        q &&
+        (custName.toLowerCase().includes(q) ||
+          (c.contractNo || '').toLowerCase().includes(q));
+
+      if (matchedItems.length > 0 || custOrNoMatch) {
+        results.push({
+          customerName: custName,
+          contractNo: c.contractNo || 'N/A',
+          date: c.date || '-',
+          totalCny: c.totalCny || '',
+          matchedItems: matchedItems.length > 0 ? matchedItems : items,
+          isProductMatch: Boolean(q && matchedItems.length > 0),
+          contract: c,
+        });
+      }
+    });
+
+    return results;
   }
 
   global.PricecraftAppwrite = {
@@ -350,11 +404,13 @@
     verifyEmployee,
     saveContract,
     searchContracts,
+    searchCustomersByProduct,
     DEFAULT_CONTRACTS,
   };
   global.saveData = saveData;
   global.loadData = loadData;
   global.saveContract = saveContract;
   global.searchContracts = searchContracts;
+  global.searchCustomersByProduct = searchCustomersByProduct;
 })(window);
 
