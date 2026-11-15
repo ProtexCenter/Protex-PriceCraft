@@ -1925,6 +1925,11 @@
 
     // A4 Print Preview Modal Controls
     document.getElementById('btnPrintPreview')?.addEventListener('click', () => {
+      if (document.getElementById('viewContract')?.classList.contains('active')) {
+        openDashContractA4Preview();
+        return;
+      }
+      isContractPreviewMode = false;
       updateClock();
       openPrintPreviewModal(tbody);
     });
@@ -1946,6 +1951,10 @@
       exportToPdf(tbody);
     });
     document.getElementById('btnPreviewConfirmPrint')?.addEventListener('click', () => {
+      if (isContractPreviewMode) {
+        printCurrentSalesContract();
+        return;
+      }
       updateClock();
       window.print();
     });
@@ -1958,8 +1967,17 @@
     });
 
     document.getElementById('btnPrintDoc')?.addEventListener('click', () => {
+      if (document.getElementById('viewContract')?.classList.contains('active')) {
+        openDashContractA4Preview();
+        setTimeout(() => printCurrentSalesContract(), 120);
+        return;
+      }
       updateClock();
       window.print();
+    });
+
+    window.addEventListener('afterprint', () => {
+      document.body.classList.remove('printing-contract');
     });
 
     document.getElementById('btnLogout')?.addEventListener('click', () => {
@@ -1989,15 +2007,15 @@
   // ==========================================================================
 
   let currentCnyThbRate = 5.0450;
+  let prevCnyThbRate = 5.0420;
   let isRateLocked = false;
   let lockedRateData = null;
   let cnyChartInstance = null;
+  let isContractPreviewMode = false;
 
   function initSpaNavigation() {
     const btnNavCost = document.getElementById('btnNavCost');
     const btnNavContract = document.getElementById('btnNavContract');
-    const btnMenuCost = document.getElementById('btnMenuCost');
-    const btnMenuContract = document.getElementById('btnMenuContract');
     const viewCost = document.getElementById('viewCost');
     const viewContract = document.getElementById('viewContract');
     const appTitle = document.getElementById('topbarAppTitle');
@@ -2006,26 +2024,21 @@
       if (viewName === 'cost') {
         btnNavCost?.classList.add('active');
         btnNavContract?.classList.remove('active');
-        btnMenuCost?.classList.add('active');
-        btnMenuContract?.classList.remove('active');
         viewCost?.classList.add('active');
         viewContract?.classList.remove('active');
         if (appTitle) appTitle.textContent = 'PRICECRAFT • ใบขอราคาต้นทุน';
       } else if (viewName === 'contract') {
         btnNavContract?.classList.add('active');
         btnNavCost?.classList.remove('active');
-        btnMenuContract?.classList.add('active');
-        btnMenuCost?.classList.remove('active');
         viewContract?.classList.add('active');
         viewCost?.classList.remove('active');
-        if (appTitle) appTitle.textContent = 'PRICECRAFT • สัญญาซื้อขาย (Sales Contract Dashboard)';
+        if (appTitle) appTitle.textContent = 'PRICECRAFT • สัญญาซื้อขาย';
+        updateDashContractTotals();
       }
     }
 
     btnNavCost?.addEventListener('click', () => switchView('cost'));
     btnNavContract?.addEventListener('click', () => switchView('contract'));
-    btnMenuCost?.addEventListener('click', () => switchView('cost'));
-    btnMenuContract?.addEventListener('click', () => switchView('contract'));
 
     try {
       const params = new URLSearchParams(window.location.search);
@@ -2037,21 +2050,51 @@
     }
   }
 
+  function updateCnyWidgetBadges(rate, baseRate = prevCnyThbRate) {
+    const liveRateEl = document.getElementById('cnyLiveRateText');
+    const deltaEl = document.getElementById('cnyDeltaBadge');
+    const lockEl = document.getElementById('cnyLockBadge');
+
+    if (liveRateEl) {
+      liveRateEl.textContent = `1 CNY = ${rate.toFixed(4)} ฿`;
+      liveRateEl.classList.toggle('locked-rate', isRateLocked);
+    }
+
+    if (deltaEl && baseRate > 0) {
+      const diff = rate - baseRate;
+      const pct = (diff / baseRate) * 100;
+      const sign = diff >= 0 ? '+' : '';
+      deltaEl.textContent = `${sign}${diff.toFixed(4)} (${sign}${pct.toFixed(2)}%)`;
+      deltaEl.classList.remove('is-up', 'is-down');
+      deltaEl.classList.add(diff >= 0 ? 'is-up' : 'is-down');
+    }
+
+    if (lockEl) {
+      lockEl.textContent = isRateLocked ? 'LOCKED' : 'LIVE';
+      lockEl.classList.toggle('is-locked', isRateLocked);
+    }
+  }
+
   async function fetchCnyRates(dateStr = null) {
     if (isRateLocked && lockedRateData) {
+      updateCnyWidgetBadges(lockedRateData.rate);
       return lockedRateData.rate;
     }
 
-    const liveRateEl = document.getElementById('cnyLiveRateText');
     const dateLabelEl = document.getElementById('cnyRateDateLabel');
+    const todayStr = new Date().toISOString().slice(0, 10);
 
     try {
       let url = 'https://api.frankfurter.app/latest?from=CNY&to=THB';
       let label = 'วันนี้ (Live)';
 
       if (dateStr) {
-        url = `https://api.frankfurter.app/${dateStr}?from=CNY&to=THB`;
-        label = `ณ วันที่ ${dateStr}`;
+        if (dateStr > todayStr) {
+          label = `Live (${dateStr} ล่วงหน้า)`;
+        } else {
+          url = `https://api.frankfurter.app/${dateStr}?from=CNY&to=THB`;
+          label = `ณ วันที่ ${dateStr}`;
+        }
       }
 
       const res = await fetch(url);
@@ -2059,12 +2102,10 @@
         const data = await res.json();
         if (data && data.rates && data.rates.THB) {
           currentCnyThbRate = parseFloat(data.rates.THB);
-          if (liveRateEl) {
-            liveRateEl.textContent = `1 CNY = ${currentCnyThbRate.toFixed(4)} ฿`;
-          }
           if (dateLabelEl) {
             dateLabelEl.textContent = label;
           }
+          updateCnyWidgetBadges(currentCnyThbRate);
           updateDashContractTotals();
           return currentCnyThbRate;
         }
@@ -2073,9 +2114,7 @@
       console.warn('[CNY API fallback]:', err);
     }
 
-    if (liveRateEl && !liveRateEl.textContent.includes('CNY')) {
-      liveRateEl.textContent = `1 CNY = ${currentCnyThbRate.toFixed(4)} ฿`;
-    }
+    updateCnyWidgetBadges(currentCnyThbRate);
     updateDashContractTotals();
     return currentCnyThbRate;
   }
@@ -2103,6 +2142,7 @@
             labels = dates.map((d) => d.slice(5));
             dataPoints = dates.map((d) => timeData.rates[d].THB);
             currentCnyThbRate = dataPoints[dataPoints.length - 1];
+            prevCnyThbRate = dataPoints[dataPoints.length - 2];
           }
         }
       }
@@ -2111,9 +2151,13 @@
     }
 
     const ctx = canvas.getContext('2d');
-    const grad = ctx.createLinearGradient(0, 0, 0, 32);
-    grad.addColorStop(0, 'rgba(225, 29, 36, 0.38)');
+    const grad = ctx.createLinearGradient(0, 0, 0, 44);
+    grad.addColorStop(0, 'rgba(225, 29, 36, 0.32)');
     grad.addColorStop(1, 'rgba(225, 29, 36, 0.0)');
+
+    if (cnyChartInstance) {
+      cnyChartInstance.destroy();
+    }
 
     cnyChartInstance = new window.Chart(ctx, {
       type: 'line',
@@ -2123,12 +2167,12 @@
           {
             data: dataPoints,
             borderColor: '#E11D24',
-            borderWidth: 1.8,
+            borderWidth: 2,
             fill: true,
             backgroundColor: grad,
-            tension: 0.45,
+            tension: 0.42,
             pointRadius: 0,
-            pointHoverRadius: 3,
+            pointHoverRadius: 3.5,
             pointHoverBackgroundColor: '#FFFFFF',
             pointHoverBorderColor: '#E11D24',
             pointHoverBorderWidth: 2,
@@ -2139,7 +2183,7 @@
         responsive: true,
         maintainAspectRatio: false,
         animation: {
-          duration: 800,
+          duration: 700,
           easing: 'easeOutQuart',
         },
         plugins: {
@@ -2150,8 +2194,8 @@
             padding: 6,
             cornerRadius: 6,
             callbacks: {
-              title: () => '',
-              label: (c) => `1 CNY = ${parseFloat(c.raw).toFixed(4)} THB`,
+              title: (items) => (items && items[0] ? items[0].label : ''),
+              label: (c) => `1 CNY = ${parseFloat(c.raw).toFixed(4)} ฿`,
             },
           },
         },
@@ -2172,10 +2216,22 @@
       },
     });
 
-    const liveRateEl = document.getElementById('cnyLiveRateText');
-    if (liveRateEl) {
-      liveRateEl.textContent = `1 CNY = ${currentCnyThbRate.toFixed(4)} ฿`;
-    }
+    updateCnyWidgetBadges(currentCnyThbRate);
+    updateDashContractTotals();
+
+    // Auto-refresh live rate every 60s when unlocked
+    setInterval(() => {
+      if (!isRateLocked) {
+        const selectedDate = document.getElementById('dashContractDate')?.value;
+        fetchCnyRates(selectedDate || null);
+      }
+    }, 60000);
+  }
+
+  function unlockCnyRate() {
+    isRateLocked = false;
+    lockedRateData = null;
+    updateCnyWidgetBadges(currentCnyThbRate);
   }
 
   function lockCnyRateForExport() {
@@ -2186,11 +2242,7 @@
       date: dateVal,
       timestamp: new Date().toLocaleTimeString('th-TH'),
     };
-    const liveRateEl = document.getElementById('cnyLiveRateText');
-    if (liveRateEl) {
-      liveRateEl.classList.add('locked-rate');
-      liveRateEl.textContent = `[LOCKED] 1 CNY = ${lockedRateData.rate.toFixed(4)} ฿`;
-    }
+    updateCnyWidgetBadges(lockedRateData.rate);
     return lockedRateData;
   }
 
@@ -2321,6 +2373,7 @@
     if (dateInput) {
       dateInput.addEventListener('change', () => {
         if (dateInput.value) {
+          unlockCnyRate();
           showToast(`กำลังดึงเรทเงิน CNY ณ วันที่ ${dateInput.value}...`);
           fetchCnyRates(dateInput.value);
         }
@@ -2330,10 +2383,15 @@
     // Save to Appwrite
     document.getElementById('btnDashSaveContract')?.addEventListener('click', async () => {
       const snap = collectDashContractSnapshot();
+      if (!snap.buyerName && !snap.contractNo) {
+        showToast('กรุณาระบุชื่อผู้ซื้อหรือเลขที่สัญญา');
+        return;
+      }
       showToast('กำลังบันทึกสัญญาลง Appwrite...');
       if (window.saveContract) {
         await window.saveContract(snap);
         showToast(`บันทึกสัญญา ${snap.contractNo || ''} สำเร็จ!`);
+        await refreshDashRecentChips();
       } else {
         showToast('บันทึกสัญญาเรียบร้อยแล้ว');
       }
@@ -2343,6 +2401,188 @@
     document.getElementById('btnDashPreviewContract')?.addEventListener('click', () => {
       openDashContractA4Preview();
     });
+
+    // New contract reset
+    document.getElementById('btnDashNewContract')?.addEventListener('click', () => {
+      resetDashContractForm();
+    });
+
+    // Initialize customer/contract search & quick chips
+    initDashContractSearch();
+    updateDashContractTotals();
+  }
+
+  function populateDashContractForm(contract) {
+    if (!contract) return;
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && val !== undefined && val !== null) el.value = val;
+    };
+
+    setVal('dashContractNo', contract.contractNo || '');
+    setVal('dashContractDate', contract.date || new Date().toISOString().slice(0, 10));
+    setVal('dashHeaderCompany', contract.headerCompany || '');
+    setVal('dashHeaderAdd', contract.headerAdd || '');
+    setVal('dashHeaderTel', contract.headerTel || '');
+    setVal('dashBuyerName', contract.buyerName || contract.customerName || '');
+    setVal('dashBuyerAdd', contract.buyerAdd || '');
+    setVal('dashBuyerTel', contract.buyerTel || '');
+    setVal('dashSellerName', contract.sellerName || '');
+    setVal('dashSellerAdd', contract.sellerAdd || '');
+    setVal('dashSellerTel', contract.sellerTel || '');
+    setVal('dashSellerMob', contract.sellerMob || '');
+    setVal('dashNote', contract.note || '');
+    setVal('dashBankInfo', contract.bankInfo || '');
+    setVal('dashPayment', contract.payment || '');
+    setVal('dashManufacturing', contract.manufacturing || '');
+    setVal('dashWarranty', contract.warranty || '');
+    setVal('dashTraining', contract.training || '');
+    setVal('dashBuyerSign', contract.buyerSign || '');
+    setVal('dashSellerSign', contract.sellerSign || '');
+
+    const tbody = document.getElementById('dashContractTableBody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      const items = Array.isArray(contract.items) && contract.items.length > 0 ? contract.items : [{}];
+      items.forEach((it) => addDashContractRow(it));
+    }
+
+    unlockCnyRate();
+    if (contract.date) {
+      fetchCnyRates(contract.date);
+    }
+    updateDashContractTotals();
+    showToast(`โหลดสัญญา ${contract.contractNo || contract.buyerName || ''} แล้ว`);
+  }
+
+  function resetDashContractForm() {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const clearIds = [
+      'dashContractNo', 'dashBuyerName', 'dashBuyerAdd', 'dashBuyerTel',
+      'dashNote', 'dashPayment', 'dashBuyerSign',
+    ];
+    clearIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const dateEl = document.getElementById('dashContractDate');
+    if (dateEl) dateEl.value = todayStr;
+
+    const tbody = document.getElementById('dashContractTableBody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      addDashContractRow({});
+    }
+    unlockCnyRate();
+    fetchCnyRates();
+    updateDashContractTotals();
+    showToast('เตรียมฟอร์มสัญญาใหม่เรียบร้อย');
+  }
+
+  async function refreshDashRecentChips() {
+    const chipsContainer = document.getElementById('dashRecentContractsChips');
+    if (!chipsContainer || !window.searchContracts) return;
+
+    try {
+      const list = await window.searchContracts('');
+      chipsContainer.innerHTML = '';
+      list.slice(0, 5).forEach((c) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'dash-chip-btn';
+        const label = c.contractNo
+          ? `${c.contractNo} • ${(c.buyerName || c.customerName || 'ไม่ระบุ').slice(0, 22)}`
+          : (c.buyerName || c.customerName || 'สัญญา');
+        btn.textContent = label;
+        btn.addEventListener('click', () => populateDashContractForm(c));
+        chipsContainer.appendChild(btn);
+      });
+    } catch (err) {
+      console.warn('[Quick chips]:', err);
+    }
+  }
+
+  function initDashContractSearch() {
+    const wrap = document.getElementById('dashContractSearchWrap');
+    const input = document.getElementById('dashContractSearchInput');
+    const clearBtn = document.getElementById('dashContractSearchClear');
+    const dropdown = document.getElementById('dashContractSearchDropdown');
+    if (!input || !dropdown) return;
+
+    let debounceTimer = null;
+
+    const renderOptions = (results) => {
+      dropdown.innerHTML = '';
+      if (!results || results.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'dash-search-empty';
+        empty.textContent = 'ไม่พบข้อมูลลูกค้าหรือสัญญาที่ค้นหา';
+        dropdown.appendChild(empty);
+        dropdown.hidden = false;
+        return;
+      }
+
+      results.forEach((c) => {
+        const opt = document.createElement('button');
+        opt.type = 'button';
+        opt.className = 'dash-search-option';
+        const count = Array.isArray(c.items) ? c.items.length : 0;
+        opt.innerHTML = `
+          <div class="dash-opt-main">
+            <strong>${escapeAttr(c.contractNo || 'N/A')}</strong>
+            <span>${escapeAttr(c.buyerName || c.customerName || 'ไม่ระบุชื่อผู้ซื้อ')}</span>
+          </div>
+          <div class="dash-opt-meta">
+            <span>${escapeAttr(c.totalCny || '')}</span>
+            <small>${count} รายการ</small>
+          </div>
+        `;
+        opt.addEventListener('click', () => {
+          populateDashContractForm(c);
+          dropdown.hidden = true;
+        });
+        dropdown.appendChild(opt);
+      });
+      dropdown.hidden = false;
+    };
+
+    const runSearch = async () => {
+      if (!window.searchContracts) return;
+      const q = input.value.trim();
+      const results = await window.searchContracts(q);
+      renderOptions(results);
+    };
+
+    input.addEventListener('input', () => {
+      if (clearBtn) clearBtn.hidden = !input.value;
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(runSearch, 180);
+    });
+
+    input.addEventListener('focus', () => {
+      runSearch();
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      input.value = '';
+      clearBtn.hidden = true;
+      dropdown.hidden = true;
+      input.focus();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (wrap && !wrap.contains(e.target)) {
+        dropdown.hidden = true;
+      }
+    });
+
+    refreshDashRecentChips();
+  }
+
+  function printCurrentSalesContract() {
+    openDashContractA4Preview();
+    document.body.classList.add('printing-contract');
+    window.print();
   }
 
   function collectDashContractSnapshot() {
@@ -2360,13 +2600,15 @@
       });
     }
 
+    const buyerName = document.getElementById('dashBuyerName')?.value.trim() || '';
     return {
       contractNo: document.getElementById('dashContractNo')?.value.trim() || 'AM251202',
       date: document.getElementById('dashContractDate')?.value || new Date().toISOString().slice(0, 10),
       headerCompany: document.getElementById('dashHeaderCompany')?.value.trim() || 'AMMA CONSTRUCTION MACHINERY CO., LTD.',
       headerAdd: document.getElementById('dashHeaderAdd')?.value.trim() || '',
       headerTel: document.getElementById('dashHeaderTel')?.value.trim() || '',
-      buyerName: document.getElementById('dashBuyerName')?.value.trim() || '',
+      buyerName,
+      customerName: buyerName,
       buyerAdd: document.getElementById('dashBuyerAdd')?.value.trim() || '',
       buyerTel: document.getElementById('dashBuyerTel')?.value.trim() || '',
       sellerName: document.getElementById('dashSellerName')?.value.trim() || '',
@@ -2392,6 +2634,9 @@
     const modal = document.getElementById('a4PrintPreviewModal');
     const sheet = document.getElementById('a4PaperSheetContent');
     if (!modal || !sheet) return;
+
+    lockCnyRateForExport();
+    isContractPreviewMode = true;
 
     const snap = collectDashContractSnapshot();
     const rowsHtml = snap.items.length > 0
@@ -2422,7 +2667,7 @@
 
         <div style="display: flex; justify-content: space-between; border-top: 1.5pt solid #000; border-bottom: 1.5pt solid #000; padding: 4px 8px; font-weight: 700; font-size: 9pt;">
           <div>SC No.: ${escapeAttr(snap.contractNo)}</div>
-          <div>DATE: ${escapeAttr(snap.date)} (อัตราแลกเปลี่ยนล็อก: 1 CNY = ${snap.lockedRate.rate.toFixed(4)} ฿)</div>
+          <div>DATE: ${escapeAttr(snap.date)} (LOCKED: 1 CNY = ${snap.lockedRate.rate.toFixed(4)} ฿)</div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; border: 1.5pt solid #000; border-top: none; font-size: 8.5pt; margin-bottom: 0;">
@@ -2465,7 +2710,7 @@
           <strong>NOTE:</strong><br>${escapeAttr(snap.note || '-')}
         </div>
 
-        <div style="border: 1.5pt solid #000; border-top: none; padding: 6px; font-size: 8pt;">
+        <div style="border: 1.5pt solid #000; border-top: none; padding: 6px; font-size: 8pt; white-space: pre-wrap;">
           <strong>BANK INFO for CNY:</strong><br>${escapeAttr(snap.bankInfo || '-')}
         </div>
 
@@ -2473,6 +2718,10 @@
           <strong>Payment Items:</strong> ${escapeAttr(snap.payment || '-')}<br>
           <strong>Manufacturing Time:</strong> ${escapeAttr(snap.manufacturing || '-')}<br>
           <strong>Warranty:</strong> ${escapeAttr(snap.warranty || '-')}
+        </div>
+
+        <div style="border: 1.5pt solid #000; border-top: none; padding: 6px; font-size: 8pt; white-space: pre-wrap;">
+          <strong>ERECTION / COMMISSIONING / TRAINING:</strong><br>${escapeAttr(snap.training || '-')}
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; padding: 24px 20px 8px 20px; font-size: 9pt; font-weight: 700;">

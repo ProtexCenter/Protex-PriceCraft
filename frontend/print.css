@@ -553,14 +553,46 @@
 
   /* Sales Contract Print Adjustments */
   .spa-sidebar,
+  .cny-subheader-bar,
   .cny-rate-widget,
   .dashboard-form-container,
+  .dash-search-card,
   .contract-search-container,
   .contract-table-actions,
-  .contract-row-del-btn,
-  .circular-menu-wrapper,
-  .topbar-center-menu {
+  .contract-row-del-btn {
     display: none !important;
+  }
+
+  body.printing-contract .spa-layout {
+    display: none !important;
+  }
+
+  body.printing-contract #a4PrintPreviewModal {
+    display: block !important;
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  body.printing-contract .a4-preview-topbar {
+    display: none !important;
+  }
+
+  body.printing-contract .a4-preview-stage {
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+
+  body.printing-contract .a4-paper-sheet {
+    width: 100% !important;
+    min-height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
   }
 
   .contract-paper-sheet {
