@@ -1655,6 +1655,14 @@ input[type="number"],
   width: 52px;
 }
 
+.col-w-64 {
+  width: 58px;
+}
+
+.col-w-72 {
+  width: 66px;
+}
+
 .col-w-82 {
   width: 82px;
 }
@@ -1663,8 +1671,20 @@ input[type="number"],
   width: 88px;
 }
 
+.col-w-90 {
+  width: 84px;
+}
+
+.col-w-110 {
+  width: 112px;
+}
+
 .col-w-118 {
   width: 118px;
+}
+
+.col-w-120 {
+  width: 116px;
 }
 
 .col-w-130 {
@@ -1685,6 +1705,23 @@ input[type="number"],
 
 .col-w-270 {
   width: 270px;
+}
+
+.col-item-name {
+  width: 38%;
+  min-width: 340px;
+}
+
+.a4-paper-sheet input,
+.a4-paper-sheet select,
+.a4-paper-sheet textarea,
+.a4-paper-sheet button,
+.a4-paper-sheet .form-control,
+.a4-paper-sheet *:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
 .summary-wht-label {

@@ -51,6 +51,29 @@
     color: transparent !important;
   }
 
+  input,
+  select,
+  textarea,
+  button,
+  .form-control,
+  .doc-meta-input-inline,
+  .vendor-input,
+  .shipping-input-inline,
+  .cell-input,
+  input:focus,
+  select:focus,
+  textarea:focus,
+  button:focus,
+  .cell-input:focus,
+  *:focus,
+  *:focus-visible,
+  *:focus-within {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
   .workspace-stage {
     max-width: 100% !important;
     width: 100% !important;
@@ -240,47 +263,49 @@
 
   .excel-table th:nth-child(1),
   .excel-table td:nth-child(1) {
-    width: 5.5% !important;
+    width: 4.5% !important;
   }
 
   .excel-table th:nth-child(2),
   .excel-table td:nth-child(2) {
-    width: 28.5% !important;
+    width: 37% !important;
+    word-break: break-word !important;
+    white-space: normal !important;
   }
 
   .excel-table th:nth-child(3),
   .excel-table td:nth-child(3) {
-    width: 7.5% !important;
+    width: 6% !important;
   }
 
   .excel-table th:nth-child(4),
   .excel-table td:nth-child(4) {
-    width: 6.5% !important;
+    width: 5.5% !important;
   }
 
   .excel-table th:nth-child(5),
   .excel-table td:nth-child(5) {
-    width: 12.5% !important;
+    width: 11% !important;
   }
 
   .excel-table th:nth-child(6),
   .excel-table td:nth-child(6) {
-    width: 12.5% !important;
+    width: 11% !important;
   }
 
   .excel-table th:nth-child(7),
   .excel-table td:nth-child(7) {
-    width: 9% !important;
+    width: 8.5% !important;
   }
 
   .excel-table th:nth-child(8),
   .excel-table td:nth-child(8) {
-    width: 9% !important;
+    width: 8.25% !important;
   }
 
   .excel-table th:nth-child(9),
   .excel-table td:nth-child(9) {
-    width: 9% !important;
+    width: 8.25% !important;
   }
 
   table,

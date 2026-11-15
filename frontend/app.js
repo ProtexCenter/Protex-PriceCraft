@@ -1115,14 +1115,14 @@
         (r) => `
         <tr>
           <td class="tabular-nums" style="text-align: center;">${r.seq}</td>
-          <td>${escapeAttr(r.itemName || '-')}</td>
+          <td style="word-break: break-word; white-space: normal;">${escapeAttr(r.itemName || '-')}</td>
           <td class="tabular-nums" style="text-align: right;">${escapeAttr(r.quantity || '0')}</td>
           <td style="text-align: center;">${escapeAttr(r.unit || '-')}</td>
           <td class="tabular-nums" style="text-align: right;">${r.unitCostFormatted}</td>
           <td class="tabular-nums" style="text-align: right; font-weight: 700;">${r.lineTotalFormatted}</td>
           <td class="tabular-nums" style="text-align: right;">${r.wht3Formatted}</td>
-          <td>${escapeAttr(r.delivery || '-')}</td>
-          <td>${escapeAttr(r.remark || '-')}</td>
+          <td style="word-break: break-word; white-space: normal;">${escapeAttr(r.delivery || '-')}</td>
+          <td style="word-break: break-word; white-space: normal;">${escapeAttr(r.remark || '-')}</td>
         </tr>`
       )
       .join('');
@@ -1151,15 +1151,15 @@
         <table class="a4-sheet-table">
           <thead>
             <tr>
-              <th style="width: 6%;">ลำดับ</th>
-              <th style="width: 26%;">รายการ</th>
-              <th style="width: 8%;">จำนวน</th>
-              <th style="width: 7%;">หน่วย</th>
-              <th style="width: 13%;">ราคาต้นทุน(ก่อนVAT)</th>
-              <th style="width: 13%;">ราคารวม (ก่อนVAT)</th>
-              <th style="width: 9%;">หักภาษี3%</th>
-              <th style="width: 9%;">การส่งมอบ</th>
-              <th style="width: 9%;">หมายเหตุ</th>
+              <th style="width: 4.5%;">ลำดับ</th>
+              <th style="width: 37%;">รายการ</th>
+              <th style="width: 6%;">จำนวน</th>
+              <th style="width: 5.5%;">หน่วย</th>
+              <th style="width: 11%;">ราคาต้นทุน(ก่อนVAT)</th>
+              <th style="width: 11%;">ราคารวม (ก่อนVAT)</th>
+              <th style="width: 8.5%;">หักภาษี3%</th>
+              <th style="width: 8.25%;">การส่งมอบ</th>
+              <th style="width: 8.25%;">หมายเหตุ</th>
             </tr>
           </thead>
           <tbody>
@@ -1985,11 +1985,19 @@
       exportToPdf(tbody);
     });
     document.getElementById('btnPreviewConfirmPrint')?.addEventListener('click', () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
       if (isContractPreviewMode) {
         printCurrentSalesContract();
         return;
       }
       updateClock();
+      const sheet = document.getElementById('a4PaperSheetContent');
+      if (sheet) {
+        sheet.innerHTML = buildA4PreviewHtml(collectDocumentSnapshot(tbody));
+      }
+      document.body.classList.add('printing-contract');
       window.print();
     });
 
@@ -2001,12 +2009,20 @@
     });
 
     document.getElementById('btnPrintDoc')?.addEventListener('click', () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
       if (document.getElementById('viewContract')?.classList.contains('active')) {
         openDashContractA4Preview();
         setTimeout(() => printCurrentSalesContract(), 120);
         return;
       }
       updateClock();
+      const sheet = document.getElementById('a4PaperSheetContent');
+      if (sheet) {
+        sheet.innerHTML = buildA4PreviewHtml(collectDocumentSnapshot(tbody));
+      }
+      document.body.classList.add('printing-contract');
       window.print();
     });
 
