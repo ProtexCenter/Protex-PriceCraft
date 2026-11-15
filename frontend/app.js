@@ -2196,6 +2196,7 @@
     if (lockEl) {
       lockEl.textContent = isRateLocked ? 'LOCKED' : 'LIVE';
       lockEl.classList.toggle('is-locked', isRateLocked);
+      lockEl.classList.toggle('is-hidden', !isRateLocked);
     }
   }
 
