@@ -515,21 +515,28 @@ input[type="number"],
 .topbar-actions-toolbar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
   flex-shrink: 0;
 }
 
+@media (max-width: 1280px) {
+  .workspace-topbar {
+    flex-wrap: wrap;
+  }
+}
+
 .cmd-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 15px;
+  gap: 6px;
+  padding: 7px 12px;
   border-radius: 10px;
   font-family: inherit;
-  font-size: 0.84rem;
+  font-size: 0.81rem;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   border: 1px solid transparent;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
@@ -755,21 +762,51 @@ input[type="number"],
   flex: 1;
   min-width: 240px;
   max-width: 440px;
-  padding: 5px 10px;
+  padding: 6px 12px;
   font-family: inherit;
-  font-size: 0.96rem;
+  font-size: 0.94rem;
   font-weight: 600;
   color: var(--navy-900);
-  background: transparent;
-  border: none;
-  border-bottom: 1.5px solid #52525B;
-  transition: border-color var(--transition), background-color var(--transition);
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 9px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.vendor-input:hover {
+  border-color: #CBD5E1;
+  background: #FFFFFF;
 }
 
 .vendor-input:focus {
   outline: none;
-  background: #FAFAFB;
-  border-bottom: 2px solid var(--protex-red);
+  background: #FFFFFF;
+  border-color: var(--protex-red-bright);
+  box-shadow: 0 0 0 3px rgba(225, 29, 36, 0.12);
+}
+
+.doc-meta-input-inline {
+  padding: 5px 11px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--navy-900);
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 8px;
+  min-width: 175px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.doc-meta-input-inline:hover {
+  border-color: #CBD5E1;
+  background: #FFFFFF;
+}
+
+.doc-meta-input-inline:focus {
+  outline: none;
+  background: #FFFFFF;
+  border-color: var(--protex-red-bright);
+  box-shadow: 0 0 0 3px rgba(225, 29, 36, 0.12);
 }
 
 /* Task 2: Seamless Right-Side Document Title Area (No Border, No Background Box) */
@@ -864,23 +901,33 @@ input[type="number"],
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
 
-.excel-toolbar-left {
-  display: flex;
+.excel-toolbar-left,
+.toolbar-btn-group {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 /* Smart Search & Auto-Fill Box */
+.smart-search-wrapper {
+  position: relative;
+  flex: 1 1 300px;
+  max-width: 440px;
+  min-width: 240px;
+}
+
 .smart-search-box {
   position: relative;
-  flex: 1 1 320px;
-  max-width: 460px;
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .smart-search-icon {
@@ -892,19 +939,25 @@ input[type="number"],
   height: 16px;
   color: #64748B;
   pointer-events: none;
+  z-index: 2;
 }
 
 .smart-search-input {
   width: 100%;
-  padding: 8px 14px 8px 36px;
+  padding: 8px 34px 8px 36px;
   font-family: inherit;
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--navy-900);
   background: #F8FAFC;
-  border: 1px solid #CBD5E1;
-  border-radius: 9px;
-  transition: border-color var(--transition), box-shadow var(--transition), background-color var(--transition);
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.smart-search-input:hover {
+  border-color: #CBD5E1;
+  background: #FFFFFF;
 }
 
 .smart-search-input:focus {
@@ -912,6 +965,57 @@ input[type="number"],
   background: #FFFFFF;
   border-color: var(--protex-red-bright);
   box-shadow: 0 0 0 3px rgba(225, 29, 36, 0.12);
+}
+
+.smart-search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #E2E8F0;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.smart-search-clear:hover {
+  background: #CBD5E1;
+  color: #0F172A;
+}
+
+.keyboard-hints-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.76rem;
+  color: #64748B;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.keyboard-hints-pill kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-family: var(--font-num);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #334155;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 5px;
+  box-shadow: 0 1px 0 #CBD5E1;
 }
 
 .smart-search-dropdown {
@@ -1020,18 +1124,26 @@ input[type="number"],
 .excel-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 7px;
+  padding: 8px 15px;
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   font-weight: 600;
-  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-radius: 10px;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid #E2E8F0;
   background: #F8FAFC;
   color: var(--navy-900);
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
   transition: all var(--transition);
+}
+
+.excel-btn svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
 }
 
 .excel-btn:hover {
@@ -1041,7 +1153,8 @@ input[type="number"],
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.07);
 }
 
-.excel-btn.primary {
+.excel-btn.primary,
+.excel-btn.excel-btn-primary {
   background: linear-gradient(180deg, #18181B 0%, #09090B 100%);
   border: none;
   border-bottom: 3px solid var(--protex-red-bright);
@@ -1049,7 +1162,8 @@ input[type="number"],
   box-shadow: 0 8px 20px -4px rgba(9, 9, 11, 0.38);
 }
 
-.excel-btn.primary:hover {
+.excel-btn.primary:hover,
+.excel-btn.excel-btn-primary:hover {
   background: linear-gradient(180deg, #27272A 0%, #111114 100%);
   border-bottom: 3px solid var(--protex-red-bright);
   color: #FFFFFF;
@@ -2624,31 +2738,33 @@ input[type="number"],
   display: flex;
   flex-direction: column;
   min-width: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
   background: #F8FAFC;
 }
 
 /* ==========================================================================
-   Task 5: Prominent CNY Exchange Rate Widget (Top-Right Below Header)
+   Task 2: Compact & Left-Aligned CNY Exchange Rate Widget Below Header
    ========================================================================== */
 .cny-subheader-bar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
   max-width: 1380px;
   width: 100%;
   margin: 0 auto;
-  padding: 1rem 2rem 0 2rem;
+  padding: 0.85rem 2rem 0 2rem;
 }
 
 .cny-rate-widget {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 1.25rem;
-  background: rgba(255, 255, 255, 0.94);
+  gap: 0.9rem;
+  width: fit-content;
+  max-width: 100%;
+  background: rgba(255, 255, 255, 0.96);
   border: 1px solid rgba(226, 232, 240, 0.95);
-  border-radius: 16px;
-  padding: 0.7rem 1.25rem;
+  border-radius: 14px;
+  padding: 0.5rem 0.95rem;
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   box-shadow: var(--shadow-card);
@@ -2752,7 +2868,7 @@ input[type="number"],
 }
 
 .cny-current-rate {
-  font-size: 1.15rem;
+  font-size: 1.02rem;
   font-weight: 800;
   color: #0F172A;
   font-family: var(--font-num);
@@ -2764,11 +2880,36 @@ input[type="number"],
 }
 
 .cny-chart-box {
-  width: 170px;
-  height: 44px;
+  width: 120px;
+  height: 36px;
   position: relative;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+}
+
+/* Sales Contract Dashboard Section Badges & Paper-Aligned Meta Strip */
+.dash-step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #18181B 0%, #27272A 100%);
+  color: #FFFFFF;
+  font-family: var(--font-num);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.16);
+}
+
+.dash-contract-meta-strip {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1.5px dashed #E2E8F0;
 }
 
 /* Task 4: Appwrite Customer & Contract Search Bar */
