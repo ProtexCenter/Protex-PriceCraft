@@ -578,6 +578,22 @@ input[type="number"],
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
+.cmd-btn-new-contract {
+  background: linear-gradient(180deg, #27272A 0%, #09090B 100%);
+  color: #FFFFFF;
+  border-color: #3F3F46;
+  border-bottom: 2.5px solid var(--protex-red-bright);
+  box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.cmd-btn-new-contract:hover {
+  background: linear-gradient(180deg, #3F3F46 0%, #18181B 100%);
+  border-color: #52525B;
+  border-bottom: 2.5px solid var(--protex-red-bright);
+  color: #FFFFFF;
+  box-shadow: 0 6px 18px -2px rgba(225, 29, 36, 0.25);
+}
+
 .cmd-btn-excel {
   background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   color: #FFFFFF;
