@@ -7,7 +7,9 @@
   <title>ใบรายการขอราคาต้นทุนและสัญญาซื้อขาย | Pricecraft</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="print.css">
   <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.1" defer></script>
@@ -30,7 +32,8 @@
       <nav class="sidebar-nav">
         <button type="button" class="sidebar-icon-btn active" id="btnNavCost" data-view="cost"
           data-tooltip="ใบขอราคาต้นทุน (Cost Estimation)" aria-label="ใบขอราคาต้นทุน">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="22" height="22" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="22" height="22"
+            aria-hidden="true">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
             <line x1="8" y1="13" x2="16" y2="13"></line>
@@ -39,7 +42,8 @@
         </button>
         <button type="button" class="sidebar-icon-btn" id="btnNavContract" data-view="contract"
           data-tooltip="สัญญาซื้อขาย (Sales Contract Dashboard)" aria-label="สัญญาซื้อขาย">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="22" height="22" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="22" height="22"
+            aria-hidden="true">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -54,8 +58,8 @@
       <header class="workspace-topbar no-print" aria-label="แถบเครื่องมือหลัก">
         <div class="topbar-brand-group">
           <div class="topbar-logo-badge">
-            <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="PROTEX GROUP Logo" class="topbar-brand-logo" width="112"
-              height="38">
+            <img src="ChatGPT Image 9 พ.ย. 2569 21_02_33.png" alt="PROTEX GROUP Logo" class="topbar-brand-logo"
+              width="112" height="38">
           </div>
           <div class="topbar-brand-text">
             <span class="topbar-app-name" id="topbarAppTitle">PRICECRAFT • Protex Center</span>
@@ -99,8 +103,7 @@
             <span>ส่งออก Word</span>
           </button>
 
-          <button type="button" class="cmd-btn cmd-btn-pdf" id="btnExportPdf"
-            title="ดาวน์โหลดเป็นไฟล์ PDF ขนาด A4">
+          <button type="button" class="cmd-btn cmd-btn-pdf" id="btnExportPdf" title="ดาวน์โหลดเป็นไฟล์ PDF ขนาด A4">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
@@ -134,7 +137,8 @@
         </div>
 
         <!-- Task 1: Compact & Sleek CNY Live Exchange Rate Widget (Far Right of Top Header) -->
-        <div class="cny-rate-widget" id="cnyRateWidget" title="เรทเงินหยวน (CNY / THB) อัปเดตแบบเรียลไทม์และดึงตามวันที่สัญญา">
+        <div class="cny-rate-widget" id="cnyRateWidget"
+          title="เรทเงินหยวน (CNY / THB) อัปเดตแบบเรียลไทม์และดึงตามวันที่สัญญา">
           <div class="cny-rate-info">
             <div class="cny-rate-header">
               <span class="cny-badge"><span class="cny-live-dot" aria-hidden="true"></span>CNY/THB</span>
@@ -201,7 +205,8 @@
             <!-- Excel-like Spreadsheet Toolbar & Smart Search -->
             <div class="excel-toolbar no-print">
               <div class="toolbar-btn-group">
-                <button type="button" class="excel-btn excel-btn-primary" id="btnAddRow" title="เพิ่มแถวใหม่ (Enter ที่ช่องสุดท้าย)">
+                <button type="button" class="excel-btn excel-btn-primary" id="btnAddRow"
+                  title="เพิ่มแถวใหม่ (Enter ที่ช่องสุดท้าย)">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -231,16 +236,16 @@
               <!-- Smart Search & Auto-Fill Dropdown -->
               <div class="smart-search-wrapper" id="smartSearchWrapper">
                 <div class="smart-search-box" id="smartSearchBox">
-                  <svg class="smart-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                    aria-hidden="true">
+                  <svg class="smart-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.2" aria-hidden="true">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                   </svg>
                   <input type="text" id="smartSearchInput" class="smart-search-input"
                     placeholder="ค้นหา &amp; เติมอัตโนมัติ (เช่น ถังพรีฮีต 300 ลิตร, เหล็กแผ่น, ตู้ไฟ)..."
                     aria-label="ค้นหารายการสินค้าในแคตตาล็อก" autocomplete="off">
-                  <button type="button" id="smartSearchClearBtn" class="smart-search-clear"
-                    title="ล้างคำค้นหา" aria-label="ล้างคำค้นหา">✕</button>
+                  <button type="button" id="smartSearchClearBtn" class="smart-search-clear" title="ล้างคำค้นหา"
+                    aria-label="ล้างคำค้นหา">✕</button>
                 </div>
                 <div class="smart-search-dropdown" id="smartSearchDropdown"></div>
               </div>
@@ -303,7 +308,8 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16"
                           height="16" aria-hidden="true">
                           <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                          </path>
                         </svg>
                       </button>
                     </td>
@@ -346,8 +352,8 @@
                   </div>
                   <div class="shipping-input-box">
                     <span class="currency-prefix-sign">฿</span>
-                    <input type="text" inputmode="decimal" id="shippingCostInput" class="shipping-input-inline tabular-nums"
-                      value="500.00" title="ค่าขนส่ง (ไม่มี VAT)">
+                    <input type="text" inputmode="decimal" id="shippingCostInput"
+                      class="shipping-input-inline tabular-nums" value="500.00" title="ค่าขนส่ง (ไม่มี VAT)">
                   </div>
                 </div>
 
@@ -383,8 +389,8 @@
                   <label for="preparerSignName">ผู้จัดทำ (<span
                       class="signature-dots">................................................</span>)</label>
                 </div>
-                <input type="text" id="preparerSignName" class="signature-name-input" placeholder="(ลงชื่อ / ตำแหน่งผู้จัดทำ)"
-                  title="ชื่อผู้จัดทำ" value="">
+                <input type="text" id="preparerSignName" class="signature-name-input"
+                  placeholder="(ลงชื่อ / ตำแหน่งผู้จัดทำ)" title="ชื่อผู้จัดทำ" value="">
               </div>
             </footer>
           </article>
@@ -402,21 +408,25 @@
               <p>กรอกข้อมูล ค้นหารายชื่อลูกค้าจาก Appwrite Database และสั่งพิมพ์สัญญา A4 ได้ในหน้าเดียว</p>
             </div>
             <div class="toolbar-btn-group">
-              <button type="button" class="cmd-btn cmd-btn-new-contract" id="btnDashNewContract" title="ล้างฟอร์มเพื่อสร้างสัญญาใหม่">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" width="16" height="16" aria-hidden="true">
+              <button type="button" class="cmd-btn cmd-btn-new-contract" id="btnDashNewContract"
+                title="ล้างฟอร์มเพื่อสร้างสัญญาใหม่">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" width="16" height="16"
+                  aria-hidden="true">
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
                 <span>สัญญาใหม่</span>
               </button>
-              <button type="button" class="cmd-btn cmd-btn-excel" id="btnDashSaveContract" title="บันทึกสัญญาลง Appwrite Database">
+              <button type="button" class="cmd-btn cmd-btn-excel" id="btnDashSaveContract"
+                title="บันทึกสัญญาลง Appwrite Database">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16">
                   <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                   <polyline points="17 21 17 13 7 13 7 21"></polyline>
                 </svg>
                 <span>บันทึกสัญญา</span>
               </button>
-              <button type="button" class="cmd-btn cmd-btn-preview" id="btnDashPreviewContract" title="ดูตัวอย่างสัญญาบนกระดาษ A4 จริง">
+              <button type="button" class="cmd-btn cmd-btn-preview" id="btnDashPreviewContract"
+                title="ดูตัวอย่างสัญญาบนกระดาษ A4 จริง">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
@@ -430,15 +440,18 @@
           <div class="dashboard-card dash-search-card">
             <div class="dash-search-row">
               <div class="dash-search-input-wrap" id="dashContractSearchWrap">
-                <svg class="dash-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="18" height="18" aria-hidden="true">
+                <svg class="dash-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  width="18" height="18" aria-hidden="true">
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
                 <input type="text" id="dashContractSearchInput" class="dash-search-input"
                   placeholder="พิมพ์ชื่อสินค้า/อุปกรณ์ (เช่น PT2010RAP, Crusher, ถังพรีฮีต) เพื่อดูรายชื่อลูกค้าที่เคยซื้อ หรือค้นหาชื่อลูกค้า/เลขสัญญา..."
                   aria-label="ค้นหารายชื่อลูกค้าและประวัติการซื้อสินค้า" autocomplete="off">
-                <button type="button" id="dashContractSearchClear" class="dash-search-clear is-hidden" title="ล้างคำค้นหา" aria-label="ล้างคำค้นหา">✕</button>
-                <div class="dash-search-dropdown" id="dashContractSearchDropdown" role="listbox" aria-label="ผลการค้นหาลูกค้าและสัญญา"></div>
+                <button type="button" id="dashContractSearchClear" class="dash-search-clear is-hidden"
+                  title="ล้างคำค้นหา" aria-label="ล้างคำค้นหา">✕</button>
+                <div class="dash-search-dropdown" id="dashContractSearchDropdown" role="listbox"
+                  aria-label="ผลการค้นหาลูกค้าและสัญญา"></div>
               </div>
               <div class="dash-quick-chips" id="dashRecentContractsChips"></div>
             </div>
@@ -454,11 +467,13 @@
             <div class="dashboard-grid-3">
               <div class="form-group">
                 <label class="form-label" for="dashHeaderCompany">ชื่อบริษัทหัวเอกสาร (Header Company)</label>
-                <input type="text" id="dashHeaderCompany" class="form-input" placeholder="เช่น AMMA CONSTRUCTION MACHINERY CO., LTD." value="">
+                <input type="text" id="dashHeaderCompany" class="form-input"
+                  placeholder="เช่น AMMA CONSTRUCTION MACHINERY CO., LTD." value="">
               </div>
               <div class="form-group">
                 <label class="form-label" for="dashHeaderAdd">ที่อยู่บริษัท (ADD)</label>
-                <input type="text" id="dashHeaderAdd" class="form-input" placeholder="ที่อยู่บริษัท (เช่น No.51, 14th floor, Unit 1...)" value="">
+                <input type="text" id="dashHeaderAdd" class="form-input"
+                  placeholder="ที่อยู่บริษัท (เช่น No.51, 14th floor, Unit 1...)" value="">
               </div>
               <div class="form-group">
                 <label class="form-label" for="dashHeaderTel">เบอร์โทรศัพท์บริษัท (TEL / ห้ามมีคอมม่า)</label>
@@ -468,7 +483,8 @@
             <div class="dashboard-grid-2 dash-contract-meta-strip">
               <div class="form-group">
                 <label class="form-label" for="dashContractNo">เลขที่สัญญา (SC No.)</label>
-                <input type="text" id="dashContractNo" class="form-input" placeholder="เช่น AM251202 หรือ PC-2026-01" value="">
+                <input type="text" id="dashContractNo" class="form-input" placeholder="เช่น AM251202 หรือ PC-2026-01"
+                  value="">
               </div>
               <div class="form-group">
                 <label class="form-label" for="dashContractDate">
@@ -492,7 +508,8 @@
                 <h4 class="dash-party-title">TO: ฝ่ายผู้ซื้อ (The Buyer)</h4>
                 <div class="form-group dash-mb-10">
                   <label class="form-label" for="dashBuyerName">ชื่อบริษัทผู้ซื้อ (Buyer Name)</label>
-                  <input type="text" id="dashBuyerName" class="form-input" placeholder="เช่น PROTEX ACCESSORY INDUSTRIAL LTD.,PART." value="">
+                  <input type="text" id="dashBuyerName" class="form-input"
+                    placeholder="เช่น PROTEX ACCESSORY INDUSTRIAL LTD.,PART." value="">
                 </div>
                 <div class="form-group dash-mb-10">
                   <label class="form-label" for="dashBuyerAdd">ที่อยู่ผู้ซื้อ (ADD)</label>
@@ -509,7 +526,8 @@
                 <h4 class="dash-party-title">FROM: ฝ่ายผู้ขาย (The Seller)</h4>
                 <div class="form-group dash-mb-10">
                   <label class="form-label" for="dashSellerName">ชื่อบริษัทผู้ขาย (Seller Name)</label>
-                  <input type="text" id="dashSellerName" class="form-input" placeholder="เช่น AMMA CONSTRUCTION MACHINERY CO., LTD." value="">
+                  <input type="text" id="dashSellerName" class="form-input"
+                    placeholder="เช่น AMMA CONSTRUCTION MACHINERY CO., LTD." value="">
                 </div>
                 <div class="form-group dash-mb-10">
                   <label class="form-label" for="dashSellerAdd">ที่อยู่ผู้ขาย (ADD)</label>
@@ -580,7 +598,8 @@
               </div>
               <div class="form-group">
                 <label class="form-label" for="dashBankInfo">ข้อมูลบัญชีธนาคาร (BANK INFO for CNY)</label>
-                <textarea id="dashBankInfo" class="form-textarea" placeholder="Beneficiary, Account No., SWIFT CODE, Bank Address..."></textarea>
+                <textarea id="dashBankInfo" class="form-textarea"
+                  placeholder="Beneficiary, Account No., SWIFT CODE, Bank Address..."></textarea>
               </div>
             </div>
           </div>
@@ -595,21 +614,26 @@
             <div class="dashboard-grid-3">
               <div class="form-group">
                 <label class="form-label" for="dashPayment">เงื่อนไขการชำระเงิน (Payment Items)</label>
-                <input type="text" id="dashPayment" class="form-input" placeholder="เช่น CNY 1,151,400 as down payment..." value="">
+                <input type="text" id="dashPayment" class="form-input"
+                  placeholder="เช่น CNY 1,151,400 as down payment..." value="">
               </div>
               <div class="form-group">
                 <label class="form-label" for="dashManufacturing">ระยะเวลาการผลิต (Manufacturing Time)</label>
-                <input type="text" id="dashManufacturing" class="form-input" placeholder="เช่น 55 days after down payment..." value="">
+                <input type="text" id="dashManufacturing" class="form-input"
+                  placeholder="เช่น 55 days after down payment..." value="">
               </div>
               <div class="form-group">
                 <label class="form-label" for="dashWarranty">การรับประกัน (Warranty)</label>
-                <input type="text" id="dashWarranty" class="form-input" placeholder="เช่น 15 months after erecting..." value="">
+                <input type="text" id="dashWarranty" class="form-input" placeholder="เช่น 15 months after erecting..."
+                  value="">
               </div>
             </div>
 
             <div class="form-group dash-mt-16">
-              <label class="form-label" for="dashTraining">การติดตั้งและการฝึกอบรม (ERECTION / COMMISSIONING / TRAINING)</label>
-              <textarea id="dashTraining" class="form-textarea" placeholder="รายละเอียดการส่งวิศวกรเข้าติดตั้งและอบรม..."></textarea>
+              <label class="form-label" for="dashTraining">การติดตั้งและการฝึกอบรม (ERECTION / COMMISSIONING /
+                TRAINING)</label>
+              <textarea id="dashTraining" class="form-textarea"
+                placeholder="รายละเอียดการส่งวิศวกรเข้าติดตั้งและอบรม..."></textarea>
             </div>
           </div>
 
@@ -623,11 +647,13 @@
             <div class="dashboard-grid-2">
               <div class="form-group">
                 <label class="form-label" for="dashBuyerSign">ผู้ลงนามฝ่ายผู้ซื้อ (The Buyer)</label>
-                <input type="text" id="dashBuyerSign" class="form-input" placeholder="(ลงชื่อ / ตำแหน่งผู้มีอำนาจลงนาม)" value="">
+                <input type="text" id="dashBuyerSign" class="form-input" placeholder="(ลงชื่อ / ตำแหน่งผู้มีอำนาจลงนาม)"
+                  value="">
               </div>
               <div class="form-group">
                 <label class="form-label" for="dashSellerSign">ผู้ลงนามฝ่ายผู้ขาย (The Seller)</label>
-                <input type="text" id="dashSellerSign" class="form-input" placeholder="เช่น Manuel Chan (AMMA CONSTRUCTION)" value="">
+                <input type="text" id="dashSellerSign" class="form-input"
+                  placeholder="เช่น Manuel Chan (AMMA CONSTRUCTION)" value="">
               </div>
             </div>
           </div>
