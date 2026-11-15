@@ -1323,6 +1323,22 @@ input[type="number"],
   text-align: center;
 }
 
+.cell-textarea-auto {
+  resize: none;
+  overflow: hidden;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  display: block;
+}
+
+.main-item-name-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
 .cell-calculated {
   padding: 6px 10px;
   text-align: right;

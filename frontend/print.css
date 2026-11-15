@@ -392,6 +392,16 @@
     color: #0F172A !important;
   }
 
+  .cell-textarea-auto {
+    resize: none !important;
+    overflow: visible !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    height: auto !important;
+    line-height: 1.38 !important;
+  }
+
   .cell-calculated {
     background: rgba(241, 245, 249, 0.7) !important;
     font-size: 9pt !important;

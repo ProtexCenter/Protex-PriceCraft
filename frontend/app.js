@@ -70,6 +70,29 @@
     });
   }
 
+  function formatShippingLiveInput(rawVal) {
+    if (rawVal === null || rawVal === undefined) return '';
+    const cleaned = String(rawVal).replace(/[^0-9.]/g, '');
+    if (!cleaned) return '';
+    const parts = cleaned.split('.');
+    const intRaw = parts[0].replace(/^0+(?=\d)/, '');
+    const intPart = intRaw || (parts[0].length > 0 ? '0' : '');
+    const withCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (parts.length > 1) {
+      return `${withCommas}.${parts[1].slice(0, 2)}`;
+    }
+    return withCommas;
+  }
+
+  function autoResizeRowTextareas(scopeEl) {
+    if (!scopeEl) return;
+    const textareas = scopeEl.querySelectorAll('textarea.cell-textarea-auto');
+    textareas.forEach((ta) => {
+      ta.style.height = 'auto';
+      ta.style.height = `${Math.max(36, ta.scrollHeight)}px`;
+    });
+  }
+
   function multiplyAndRound2(a, b) {
     const sa = typeof a === 'bigint' ? a : parseToScaledBigInt(a);
     const sb = typeof b === 'bigint' ? b : parseToScaledBigInt(b);
@@ -336,8 +359,16 @@
 
     searchInput.addEventListener('focus', () => renderOptions(searchInput.value));
     searchInput.addEventListener('input', () => renderOptions(searchInput.value));
+    const clearBtn = document.getElementById('smartSearchClearBtn');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        dropdown.classList.remove('is-open');
+        searchInput.focus();
+      });
+    }
     document.addEventListener('click', (e) => {
-      if (!box.contains(e.target)) {
+      if (!box.contains(e.target) && !dropdown.contains(e.target)) {
         dropdown.classList.remove('is-open');
       }
     });
@@ -415,17 +446,16 @@
     return `
       <tr class="excel-row${isSubItem ? ' is-sub-item' : ''}" data-row-id="r-${rowCounter}" data-sub-item="${isSubItem ? 'true' : 'false'}">
         <td class="excel-col-index tabular-nums" data-role="seq">${seqDisplay}</td>
-        <td>
-          <div class="${isSubItem ? 'sub-item-name-wrap' : ''}">
+        <td class="col-item-name cell-item-name">
+          <div class="${isSubItem ? 'sub-item-name-wrap' : 'main-item-name-wrap'}">
             ${isSubItem ? '<span class="sub-item-branch-icon" aria-hidden="true">↳</span>' : ''}
-            <input
-              type="text"
-              class="cell-input"
+            <textarea
+              rows="1"
+              class="cell-input cell-textarea-auto"
               data-field="itemName"
               placeholder="${isSubItem ? 'ระบุรายละเอียดรายการย่อย...' : 'ระบุชื่อรายการสินค้า / ขนาดสเปก...'}"
-              value="${itemName}"
               aria-label="รายการ แถวที่ ${seqDisplay}"
-            >
+            >${itemName}</textarea>
           </div>
         </td>
         <td>
@@ -672,6 +702,7 @@
 
     renumberRows(tbody);
     recalculateAll(tbody);
+    autoResizeRowTextareas(newRow);
 
     if (opts.focusFirstCell) {
       const firstInput = newRow.querySelector('[data-field="itemName"]');
@@ -739,7 +770,8 @@
     const issuedEl = document.getElementById('issuedDateTimeDisplay');
     const customerEl = document.getElementById('customerNameInput');
     const sellerEl = document.getElementById('sellerNameInput');
-    const notesEl = document.getElementById('docGeneralNotes');
+    const notesEl =
+      document.getElementById('documentNotesInput') || document.getElementById('docGeneralNotes');
     const approverEl = document.getElementById('approverSignName');
     const preparerEl = document.getElementById('preparerSignName');
     const logoImgEl = document.getElementById('companyLogoImg');
@@ -1604,13 +1636,15 @@
   function serializeWorkspaceDraft(employeeId, tbody) {
     const trList = Array.from(tbody.querySelectorAll('tr.excel-row'));
     const rows = trList.map((tr) => readRowFromDom(tr));
+    const notesEl =
+      document.getElementById('documentNotesInput') || document.getElementById('docGeneralNotes');
 
     return {
       employee_id: String(employeeId),
       customerName: document.getElementById('customerNameInput')?.value || '',
       sellerName: document.getElementById('sellerNameInput')?.value || '',
       shippingCost: document.getElementById('shippingCostInput')?.value || '0.00',
-      notes: document.getElementById('docGeneralNotes')?.value || '',
+      notes: notesEl?.value || '',
       approverName: document.getElementById('approverSignName')?.value || '',
       preparerName: document.getElementById('preparerSignName')?.value || '',
       docNumber: document.getElementById('docNumberDisplay')?.textContent?.trim() || 'PC-202611-0001',
@@ -1644,6 +1678,7 @@
     );
     if (draftData.notes !== undefined) {
       setVal('docGeneralNotes', draftData.notes);
+      setVal('documentNotesInput', draftData.notes);
     }
     setVal('approverSignName', draftData.approverName || '');
     setVal('preparerSignName', draftData.preparerName || '');
@@ -1657,6 +1692,7 @@
     const savedRows = Array.isArray(draftData.rows) ? draftData.rows : [];
     savedRows.forEach((row) => appendExcelRow(tbody, row));
     recalculateAll(tbody);
+    autoResizeRowTextareas(tbody);
   }
 
   async function loadUserDraftByEmployeeId(employeeId, tbody) {
@@ -1797,7 +1833,11 @@
 
     const triggerSave = () => scheduleAutoSave(currentEmpId, tbody);
 
-    tbody.addEventListener('input', () => {
+    tbody.addEventListener('input', (e) => {
+      if (e.target && e.target.classList && e.target.classList.contains('cell-textarea-auto')) {
+        e.target.style.height = 'auto';
+        e.target.style.height = `${Math.max(36, e.target.scrollHeight)}px`;
+      }
       recalculateAll(tbody);
       triggerSave();
     });
@@ -1846,9 +1886,31 @@
     if (shippingInput) {
       shippingInput.value = formatShippingWithCommas(shippingInput.value);
       shippingInput.addEventListener('focus', () => {
-        shippingInput.value = String(shippingInput.value || '').replace(/,/g, '');
+        if (shippingInput.value === '0.00' || shippingInput.value === '0') {
+          shippingInput.select();
+        }
       });
       shippingInput.addEventListener('input', () => {
+        const prevVal = shippingInput.value;
+        const selStart = shippingInput.selectionStart || prevVal.length;
+        const digitsBeforeCursor = prevVal.slice(0, selStart).replace(/[^0-9.]/g, '').length;
+        const formatted = formatShippingLiveInput(prevVal);
+        if (formatted !== prevVal) {
+          shippingInput.value = formatted;
+          let newPos = 0;
+          let count = 0;
+          while (newPos < formatted.length && count < digitsBeforeCursor) {
+            if (/[0-9.]/.test(formatted[newPos])) {
+              count += 1;
+            }
+            newPos += 1;
+          }
+          try {
+            shippingInput.setSelectionRange(newPos, newPos);
+          } catch {
+            // Ignore selection errors
+          }
+        }
         recalculateAll(tbody);
         triggerSave();
       });
@@ -1950,15 +2012,23 @@
       });
     }
 
-    document.getElementById('btnExportExcel')?.addEventListener('click', () => exportToExcel(tbody));
-    document.getElementById('btnExportWord')?.addEventListener('click', () => exportToWord(tbody));
+    document.getElementById('btnExportExcel')?.addEventListener('click', () => {
+      lockCnyRateForExport();
+      exportToExcel(tbody);
+    });
+    document.getElementById('btnExportWord')?.addEventListener('click', () => {
+      lockCnyRateForExport();
+      exportToWord(tbody);
+    });
     document.getElementById('btnExportPdf')?.addEventListener('click', () => {
+      lockCnyRateForExport();
       updateClock();
       exportToPdf(tbody);
     });
 
     // A4 Print Preview Modal Controls
     document.getElementById('btnPrintPreview')?.addEventListener('click', () => {
+      lockCnyRateForExport();
       if (document.getElementById('viewContract')?.classList.contains('active')) {
         openDashContractA4Preview();
         return;
@@ -1978,13 +2048,16 @@
       applyPreviewZoom(100);
     });
     document.getElementById('btnPreviewExportWord')?.addEventListener('click', () => {
+      lockCnyRateForExport();
       exportToWord(tbody);
     });
     document.getElementById('btnPreviewExportPdf')?.addEventListener('click', () => {
+      lockCnyRateForExport();
       updateClock();
       exportToPdf(tbody);
     });
     document.getElementById('btnPreviewConfirmPrint')?.addEventListener('click', () => {
+      lockCnyRateForExport();
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
       }
@@ -2009,6 +2082,7 @@
     });
 
     document.getElementById('btnPrintDoc')?.addEventListener('click', () => {
+      lockCnyRateForExport();
       if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
       }
