@@ -1,19 +1,13 @@
-/**
- * ============================================================================
- * PRICECRAFT — APPWRITE WEB SDK CONFIGURATION & REAL-TIME CRUD ENGINE
- * ============================================================================
- */
 (function initAppwriteConfig(global) {
   'use strict';
 
-  // 1. ตั้งค่า Environment / Project Config (รองรับ window.__ENV__ บน Production หรือใส่ค่าตรงนี้)
   const env = global.__ENV__ || {};
   const APPWRITE_CONFIG = {
     endpoint: env.VITE_APPWRITE_ENDPOINT || 'https://sgp.cloud.appwrite.io/v1',
     projectId: env.VITE_APPWRITE_PROJECT_ID || '6af2e5a000218106d920',
-    databaseId: env.VITE_APPWRITE_DATABASE_ID || 'YOUR_DATABASE_ID',    // <-- ใส่ Database ID ของ ProtexNewsDB
-    collectionId: env.VITE_APPWRITE_COLLECTION_ID || 'user_drafts',     // <-- ชื่อ Collection สำหรับเก็บ Draft
-    employeesCollectionId: env.VITE_APPWRITE_EMPLOYEES_COLLECTION_ID || '6af2e9c6003dafa5b692', // <-- ตาราง Employees
+    databaseId: env.VITE_APPWRITE_DATABASE_ID || 'YOUR_DATABASE_ID',
+    collectionId: env.VITE_APPWRITE_COLLECTION_ID || 'user_drafts',
+    employeesCollectionId: env.VITE_APPWRITE_EMPLOYEES_COLLECTION_ID || '6af2e9c6003dafa5b692',
     contractsCollectionId: env.VITE_APPWRITE_CONTRACTS_COLLECTION_ID || 'contracts',
   };
 
@@ -73,20 +67,13 @@
     databases = new global.Appwrite.Databases(client);
   }
 
-  /**
-   * บันทึกข้อมูลตารางและฟอร์มของพนักงานลง Appwrite Collection (Upsert: มีแล้วอัปเดต / ยังไม่มีสร้างใหม่)
-   * @param {string} employeeId รหัสพนักงาน (เช่น "1234")
-   * @param {Object} data ข้อมูลตารางและฟอร์มทั้งหมด
-   */
   async function saveData(employeeId, data) {
     const empKey = String(employeeId || '').trim();
     if (!empKey) return null;
 
-    // สำรองข้อมูลลง LocalStorage ทันที (Offline-first resilience)
     try {
       localStorage.setItem(`pc_appwrite_draft_${empKey}`, JSON.stringify(data));
     } catch {
-      // Ignore storage quota errors
     }
 
     if (!databases || !global.Appwrite || APPWRITE_CONFIG.projectId === 'YOUR_PROJECT_ID') {
@@ -138,11 +125,6 @@
     }
   }
 
-  /**
-   * ดึงข้อมูล Draft เดิมของพนักงานจาก Appwrite Collection ตาม employee_id
-   * @param {string} employeeId รหัสพนักงาน
-   * @returns {Promise<Object|null>} ข้อมูล Draft หรือ null หากเป็นพนักงานใหม่
-   */
   async function loadData(employeeId) {
     const empKey = String(employeeId || '').trim();
     if (!empKey) return null;
@@ -177,11 +159,6 @@
     }
   }
 
-  /**
-   * ตรวจสอบรหัสพนักงานจากตาราง Employees บน Appwrite (Table ID: 6af2e9c6003dafa5b692)
-   * @param {string} employeeId รหัสพนักงาน เช่น HR0000000
-   * @returns {Promise<{id: string, name: string, role: string}|null>}
-   */
   async function verifyEmployee(employeeId) {
     const rawKey = String(employeeId || '').trim();
     if (!rawKey || !databases || !global.Appwrite || APPWRITE_CONFIG.databaseId === 'YOUR_DATABASE_ID') {
@@ -207,16 +184,11 @@
           };
         }
       } catch {
-        // Fallback to local registered map if databaseId/permissions are not yet configured
       }
     }
     return null;
   }
 
-  /**
-   * บันทึกข้อมูลสัญญาซื้อขาย (Sales Contract) ลง Appwrite + LocalStorage
-   * @param {Object} contract ข้อมูลสัญญา
-   */
   async function saveContract(contract) {
     if (!contract || !contract.contractNo) return null;
     const key = contract.contractNo.trim();
@@ -230,7 +202,6 @@
       updated_at: new Date().toISOString(),
     };
 
-    // 1. LocalStorage Offline-first
     let storedList = [];
     try {
       const raw = localStorage.getItem('pc_appwrite_contracts');
@@ -252,7 +223,6 @@
       console.warn('LocalStorage quota warning:', e);
     }
 
-    // 2. Appwrite Cloud
     if (databases && global.Appwrite && APPWRITE_CONFIG.projectId !== 'YOUR_PROJECT_ID') {
       try {
         const { Query, ID } = global.Appwrite;
@@ -333,11 +303,6 @@
     return Array.from(combinedMap.values());
   }
 
-  /**
-   * ค้นหาสัญญาซื้อขายและประวัติลูกค้าจาก Appwrite หรือ Local Database
-   * @param {string} query คำค้นหา (ชื่อลูกค้า หรือ ชื่อสินค้า/อุปกรณ์)
-   * @returns {Promise<Array>} รายการสัญญาที่ตรงกับคำค้นหา
-   */
   async function searchContracts(query) {
     const q = String(query || '').trim().toLowerCase();
     const all = await fetchAllContractsMerged();
@@ -353,11 +318,6 @@
     });
   }
 
-  /**
-   * สืบค้นรายชื่อลูกค้าทั้งหมดที่เคยซื้อสินค้า/อุปกรณ์ที่ระบุ (Product-to-Customer Search)
-   * @param {string} productQuery ชื่อสินค้า/อุปกรณ์ หรือ HS Code
-   * @returns {Promise<Array>} รายการประวัติลูกค้าที่เคยซื้อสินค้านั้น
-   */
   async function searchCustomersByProduct(productQuery) {
     const q = String(productQuery || '').trim().toLowerCase();
     const all = await fetchAllContractsMerged();
@@ -367,10 +327,10 @@
       const items = Array.isArray(c.items) ? c.items : [];
       const matchedItems = q
         ? items.filter(
-            (it) =>
-              (it.item || '').toLowerCase().includes(q) ||
-              (it.hsCode || '').toLowerCase().includes(q)
-          )
+          (it) =>
+            (it.item || '').toLowerCase().includes(q) ||
+            (it.hsCode || '').toLowerCase().includes(q)
+        )
         : items;
 
       const custName = c.buyerName || c.customerName || 'ไม่ระบุชื่อลูกค้า';
