@@ -764,10 +764,21 @@
     }
   }
 
+  function getLiveDocNumber() {
+    const el =
+      document.getElementById('docNumberInput') ||
+      document.getElementById('docNoInput') ||
+      document.getElementById('docNumberDisplay');
+    if (!el) return 'PC-202611-0001';
+    const raw = typeof el.value === 'string' ? el.value : el.textContent;
+    const trimmed = String(raw !== undefined && raw !== null ? raw : '').trim();
+    return trimmed || 'PC-202611-0001';
+  }
+
   function collectDocumentSnapshot(tbody) {
     const calc = recalculateAll(tbody);
-    const docNumEl = document.getElementById('docNumberDisplay');
-    const issuedEl = document.getElementById('issuedDateTimeDisplay');
+    const issuedEl =
+      document.getElementById('issueDateTime') || document.getElementById('issuedDateTimeDisplay');
     const customerEl = document.getElementById('customerNameInput');
     const sellerEl = document.getElementById('sellerNameInput');
     const notesEl =
@@ -781,7 +792,7 @@
       companyAddress:
         '56/360 ม.1 ซ.วัดไตรสามัคคี3 ถ.สุขุมวิท ต.บางเมืองใหม่ อ.เมืองสมุทรปราการ จ.สมุทรปราการ 10270',
       docTitle: 'รายการขอราคาต้นทุน',
-      docNumber: docNumEl && docNumEl.textContent ? docNumEl.textContent.trim() : 'PC-202611-0001',
+      docNumber: getLiveDocNumber(),
       issuedAt:
         issuedEl && issuedEl.textContent ? issuedEl.textContent.trim() : formatCurrentDateTimeTh(),
       customerName: customerEl && customerEl.value ? customerEl.value.trim() : '-',
@@ -1174,7 +1185,7 @@
           </div>
           <div class="a4-sheet-meta-box">
             <div class="a4-sheet-doc-title">${escapeAttr(snap.docTitle)}</div>
-            <div class="a4-sheet-meta-row">เลขที่เอกสาร : <strong class="tabular-nums">${escapeAttr(snap.docNumber)}</strong></div>
+            <div class="a4-sheet-meta-row">เลขที่เอกสาร : <strong class="tabular-nums" id="a4PreviewDocNumberVal">${escapeAttr(snap.docNumber)}</strong></div>
             <div class="a4-sheet-meta-row">วันที่และเวลาที่ออก : <strong class="tabular-nums">${escapeAttr(snap.issuedAt)}</strong></div>
             <div class="a4-sheet-meta-row">ชื่อผู้ขาย : <strong>${escapeAttr(snap.sellerName)}</strong></div>
           </div>
@@ -1647,7 +1658,7 @@
       notes: notesEl?.value || '',
       approverName: document.getElementById('approverSignName')?.value || '',
       preparerName: document.getElementById('preparerSignName')?.value || '',
-      docNumber: document.getElementById('docNumberDisplay')?.textContent?.trim() || 'PC-202611-0001',
+      docNumber: getLiveDocNumber(),
       rows,
       updated_at: new Date().toISOString(),
     };
@@ -1683,9 +1694,17 @@
     setVal('approverSignName', draftData.approverName || '');
     setVal('preparerSignName', draftData.preparerName || '');
 
-    const docNumEl = document.getElementById('docNumberDisplay');
-    if (docNumEl && draftData.docNumber) {
-      docNumEl.textContent = draftData.docNumber;
+    if (draftData.docNumber) {
+      setVal('docNumberInput', draftData.docNumber);
+      setVal('docNoInput', draftData.docNumber);
+      const docNumDisplayEl = document.getElementById('docNumberDisplay');
+      if (docNumDisplayEl) {
+        if ('value' in docNumDisplayEl) {
+          docNumDisplayEl.value = draftData.docNumber;
+        } else {
+          docNumDisplayEl.textContent = draftData.docNumber;
+        }
+      }
     }
 
     tbody.innerHTML = '';
@@ -1923,13 +1942,20 @@
       shippingInput.addEventListener('change', applyShippingFormat);
     }
 
-    // Bind Auto-Save on Header & Footer Inputs (Customer, Seller, Notes, Signatures)
-    ['customerNameInput', 'sellerNameInput', 'docGeneralNotes', 'documentNotesInput', 'approverSignName', 'preparerSignName'].forEach(
+    // Bind Auto-Save & Real-time 1:1 Mirroring on Header & Footer Inputs (Doc Number, Customer, Seller, Notes, Signatures)
+    ['docNumberInput', 'docNoInput', 'customerNameInput', 'sellerNameInput', 'docGeneralNotes', 'documentNotesInput', 'approverSignName', 'preparerSignName'].forEach(
       (inputId) => {
         const el = document.getElementById(inputId);
         if (el) {
-          el.addEventListener('input', triggerSave);
-          el.addEventListener('change', triggerSave);
+          const handleMetaSync = () => {
+            triggerSave();
+            const liveDocNoEl = document.getElementById('a4PreviewDocNumberVal');
+            if (liveDocNoEl && (inputId === 'docNumberInput' || inputId === 'docNoInput')) {
+              liveDocNoEl.textContent = getLiveDocNumber();
+            }
+          };
+          el.addEventListener('input', handleMetaSync);
+          el.addEventListener('change', handleMetaSync);
         }
       }
     );
