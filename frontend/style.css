@@ -543,9 +543,9 @@ input[type="number"],
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 2px 6px rgba(0, 0, 0, 0.18);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 0.2s ease,
-              border-color 0.2s ease;
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .cmd-btn-logout {
@@ -652,9 +652,6 @@ input[type="number"],
   box-shadow: 0 4px 14px -2px rgba(239, 68, 68, 0.35);
 }
 
-/* ==========================================================================
-   TASK 3: LUXURY CORPORATE DOCUMENT PAPER & BORDERLESS SOFT-SHADOW UI
-   ========================================================================== */
 .workspace-stage {
   max-width: 1380px;
   width: 100%;
@@ -697,7 +694,6 @@ input[type="number"],
   print-color-adjust: exact;
 }
 
-/* Official Document Header (Executive Corporate Letterhead — Prominent Top Logo + Balanced 2-Column Info) */
 .official-doc-header,
 .header-section {
   display: flex;
@@ -714,7 +710,6 @@ input[type="number"],
   justify-content: flex-start;
 }
 
-/* Task 1: Pure Brand Logo (No Dashed Box, No Border, No Upload Text) */
 .company-brand-logo {
   display: block;
   width: 192px;
@@ -831,7 +826,6 @@ input[type="number"],
   box-shadow: 0 0 0 3px rgba(225, 29, 36, 0.12);
 }
 
-/* Task 2: Seamless Right-Side Document Title Area (No Border, No Background Box) */
 .doc-title-meta-box {
   background: transparent;
   border: none;
@@ -1460,7 +1454,9 @@ input[type="number"],
   color: #334155;
 }
 
-.col-w-68 { width: 68px; }
+.col-w-68 {
+  width: 68px;
+}
 
 /* Bottom Summary & Signatures (Luxury Soft-Shadow Cards) */
 .doc-bottom-grid {
@@ -2276,7 +2272,7 @@ input[type="number"],
   z-index: 0;
 }
 
-.contract-paper-sheet > * {
+.contract-paper-sheet>* {
   position: relative;
   z-index: 1;
 }
@@ -2737,10 +2733,10 @@ input[type="number"],
   position: relative;
   outline: none;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              color 0.2s ease;
+    background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.2s ease;
 }
 
 /* Hover: Scale Up + Layered Protex Red Ambient Glow */
@@ -2750,8 +2746,8 @@ input[type="number"],
   background: rgba(225, 29, 36, 0.22);
   border-color: rgba(225, 29, 36, 0.6);
   box-shadow: 0 8px 24px -4px rgba(225, 29, 36, 0.45),
-              0 2px 6px rgba(225, 29, 36, 0.2),
-              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    0 2px 6px rgba(225, 29, 36, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 /* Active State: Rich Red Gradient + Left Luminous Bar Indicator */
@@ -2760,8 +2756,8 @@ input[type="number"],
   color: #FFFFFF;
   border-color: rgba(254, 202, 202, 0.35);
   box-shadow: 0 8px 28px -4px rgba(220, 38, 38, 0.55),
-              0 2px 8px rgba(220, 38, 38, 0.3),
-              inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    0 2px 8px rgba(220, 38, 38, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .sidebar-icon-btn.active::before {
@@ -2798,7 +2794,7 @@ input[type="number"],
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: var(--shadow-layered-md);
   transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 200;
 }
 
@@ -2833,8 +2829,8 @@ input[type="number"],
   -webkit-backdrop-filter: blur(14px);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.26);
   transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cny-rate-widget:hover {
@@ -2882,8 +2878,17 @@ input[type="number"],
 }
 
 @keyframes cny-dot-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
 }
 
 .cny-delta-badge {
@@ -2946,13 +2951,27 @@ input[type="number"],
 }
 
 @keyframes rateFlashUp {
-  0% { color: #34D399; text-shadow: 0 0 8px rgba(52, 211, 153, 0.45); }
-  100% { color: #FFFFFF; text-shadow: none; }
+  0% {
+    color: #34D399;
+    text-shadow: 0 0 8px rgba(52, 211, 153, 0.45);
+  }
+
+  100% {
+    color: #FFFFFF;
+    text-shadow: none;
+  }
 }
 
 @keyframes rateFlashDown {
-  0% { color: #F87171; text-shadow: 0 0 8px rgba(248, 113, 113, 0.45); }
-  100% { color: #FFFFFF; text-shadow: none; }
+  0% {
+    color: #F87171;
+    text-shadow: 0 0 8px rgba(248, 113, 113, 0.45);
+  }
+
+  100% {
+    color: #FFFFFF;
+    text-shadow: none;
+  }
 }
 
 .cny-current-rate.rate-tick-up {
@@ -3158,8 +3177,8 @@ input[type="number"],
   outline: none;
   caret-color: #DC2626;
   transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dash-search-input:hover {
@@ -3293,7 +3312,7 @@ input[type="number"],
   display: none;
   opacity: 0;
   transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1),
-              transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
   transform: translateY(8px);
   width: 100%;
 }
@@ -3346,8 +3365,8 @@ input[type="number"],
   border: 1px solid rgba(226, 232, 240, 0.85);
   box-shadow: var(--shadow-card);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.25s ease;
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s ease;
 }
 
 .dashboard-card:hover {
@@ -3391,6 +3410,7 @@ input[type="number"],
 }
 
 @media (max-width: 900px) {
+
   .dashboard-grid-2,
   .dashboard-grid-3,
   .dashboard-grid-4 {
@@ -3434,9 +3454,9 @@ input[type="number"],
   color: #0F172A;
   background: rgba(248, 250, 252, 0.85);
   transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              color 0.2s ease;
+    background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.2s ease;
   box-sizing: border-box;
   outline: none;
   caret-color: #DC2626;
@@ -3580,9 +3600,9 @@ input[type="number"],
   cursor: pointer;
   box-shadow: var(--shadow-layered-xs);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.2s ease,
-              color 0.2s ease;
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .contract-add-row-btn:hover {
@@ -3627,15 +3647,25 @@ input[type="number"],
 }
 
 /* Helper Utilities (Zero Inline Styles) */
-.dash-mt-14 { margin-top: 14px; }
-.dash-mt-16 { margin-top: 16px; }
-.dash-mb-10 { margin-bottom: 10px; }
+.dash-mt-14 {
+  margin-top: 14px;
+}
+
+.dash-mt-16 {
+  margin-top: 16px;
+}
+
+.dash-mb-10 {
+  margin-bottom: 10px;
+}
+
 .dash-party-card {
   margin: 0 !important;
   background: #F8FAFC !important;
   border: 1px solid #E2E8F0 !important;
   border-radius: 14px !important;
 }
+
 .dash-party-title {
   font-size: 0.96rem;
   font-weight: 700;
@@ -3643,12 +3673,32 @@ input[type="number"],
   margin-bottom: 1rem;
   letter-spacing: -0.01em;
 }
-.th-hs { width: 20%; }
-.th-item { width: 44%; }
-.th-qty { width: 14%; }
-.th-price { width: 22%; }
-.th-action { width: 44px; text-align: center; }
-.td-center { text-align: center; }
+
+.th-hs {
+  width: 20%;
+}
+
+.th-item {
+  width: 44%;
+}
+
+.th-qty {
+  width: 14%;
+}
+
+.th-price {
+  width: 22%;
+}
+
+.th-action {
+  width: 44px;
+  text-align: center;
+}
+
+.td-center {
+  text-align: center;
+}
+
 .dash-table-bottom-bar {
   display: flex;
   justify-content: space-between;
@@ -3657,13 +3707,14 @@ input[type="number"],
   gap: 12px;
   margin-top: 12px;
 }
+
 .dash-total-bar-compact {
   margin: 0 !important;
   padding: 0.75rem 1.4rem !important;
 }
+
 .dash-total-title {
   font-weight: 700;
   color: #475569;
   font-size: 0.88rem;
 }
-

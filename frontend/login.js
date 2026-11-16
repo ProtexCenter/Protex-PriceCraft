@@ -105,7 +105,6 @@
       return;
     }
 
-    // Store authenticated employee info for workspace header
     try {
       sessionStorage.setItem('pc_emp_id', matchedEmployee.id);
       sessionStorage.setItem('pc_emp_name', matchedEmployee.name);

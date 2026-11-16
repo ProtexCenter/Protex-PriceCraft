@@ -1,12 +1,3 @@
-/**
- * ============================================================================
- * PRICECRAFT — CUSTOMER SALES CONTRACT & SMART DATABASE ENGINE
- * (customer-contract.js)
- * High-performance A4 Sales Contract with Real-Time Comma Formatting,
- * Appwrite Cloud Storage & Flawless Thai Font PDF/Word/Print Export.
- * ============================================================================
- */
-
 (function initCustomerContractApp() {
   'use strict';
 
@@ -35,27 +26,18 @@
   // ==========================================================================
   // 1. NUMBER FORMATTING ENGINE (Task 3)
   // ==========================================================================
-
-  /**
-   * ลบเครื่องหมาย Comma ออกทั้งหมด เพื่อให้แก้ไขตัวเลขได้ง่าย
-   */
   function stripCommas(val) {
     return String(val || '').replace(/,/g, '').trim();
   }
 
-  /**
-   * ใส่ลูกน้ำ (Comma) ให้กับตัวเลขอย่างชาญฉลาด โดยไม่กระทบเบอร์โทรศัพท์
-   */
   function formatWithCommas(val, keepCurrency = true) {
     if (!val) return '';
     const str = String(val).trim();
 
-    // ข้อยกเว้น: เบอร์โทรศัพท์ ห้ามใส่ลูกน้ำเด็ดขาด
     if (/^(\+?\d{1,4}[-\s]?)?(\(?\d{2,4}\)?[-\s]?)?[\d\s-]{6,15}$/.test(str) && (str.includes('-') || str.startsWith('+'))) {
       return str;
     }
 
-    // ตรวจจับ Prefix สกุลเงิน (เช่น CNY, THB, USD)
     const matchCurrency = str.match(/^([A-Za-z]{2,4}\$?)?\s*([\d,.]+)\s*(.*)$/);
     if (matchCurrency) {
       const prefix = matchCurrency[1] || '';
@@ -76,9 +58,6 @@
     return str;
   }
 
-  /**
-   * คำนวณราคารวม TOTAL PRICE ทั้งหมดในตาราง
-   */
   function calculateContractTotal() {
     const tbody = document.getElementById('contractTableBody');
     const totalCell = document.getElementById('contractTotalPriceCell');
@@ -110,14 +89,10 @@
     totalCell.textContent = `${currencyPrefix}${formattedTotal}`;
   }
 
-  /**
-   * ผูก Event ฟอร์แมตตัวเลข (Focus ถอดลูกน้ำ / Blur ใส่ลูกน้ำ)
-   */
   function bindCellFormatting(input) {
     if (!input) return;
 
     input.addEventListener('focus', () => {
-      // เมื่อกดคลิกแก้ไข ให้ถอดลูกน้ำออกชั่วคราว
       const raw = input.value;
       const currencyMatch = raw.match(/^([A-Za-z]{2,4})/);
       const prefix = currencyMatch ? currencyMatch[1] : '';
@@ -363,7 +338,6 @@
         await document.fonts.ready;
       }
 
-      // Hide no-print buttons temporarily for high-res capture
       const canvas = await window.htmlToImage.toCanvas(sheet, {
         pixelRatio: 2,
         backgroundColor: '#FFFFFF',
@@ -383,12 +357,10 @@
       const pxToMm = 210 / sheetWidthPx;
       const totalHeightMm = sheetRect.height * pxToMm;
 
-      // Single Page Document (standard A4 contract)
       if (totalHeightMm <= 297) {
         const imgData = canvas.toDataURL('image/jpeg', 0.98);
         pdf.addImage(imgData, 'JPEG', 0, 0, 210, totalHeightMm, undefined, 'FAST');
       } else {
-        // Multi-page slicing at safe row boundaries
         const imgData = canvas.toDataURL('image/jpeg', 0.98);
         let heightLeft = totalHeightMm;
         let positionY = 0;
@@ -413,9 +385,6 @@
     }
   }
 
-  /**
-   * Export to Microsoft Word (.docx)
-   */
   async function exportContractToWord() {
     if (!window.docx) {
       showToast('กำลังโหลดไลบรารี Word...');
