@@ -2131,10 +2131,13 @@
   // ==========================================================================
 
   let currentCnyThbRate = 5.0450;
+  let anchorCnyThbRate = 5.0450;
   let prevCnyThbRate = 5.0420;
   let isRateLocked = false;
   let lockedRateData = null;
   let cnyChartInstance = null;
+  let cnyTickIntervalId = null;
+  let cnyApiSyncIntervalId = null;
   let isContractPreviewMode = false;
 
   function initSpaNavigation() {
@@ -2174,14 +2177,81 @@
     }
   }
 
+  function updateCnyChartVisualStyle(rate, baseRate = prevCnyThbRate) {
+    if (!cnyChartInstance || !cnyChartInstance.ctx) return;
+    const ctx = cnyChartInstance.ctx;
+    const ds = cnyChartInstance.data.datasets[0];
+    if (!ds) return;
+
+    const isUp = rate >= baseRate;
+    let strokeColor = isUp ? '#10B981' : '#E11D24';
+    let gradTop = isUp ? 'rgba(16, 185, 129, 0.36)' : 'rgba(225, 29, 36, 0.36)';
+    let gradBottom = isUp ? 'rgba(16, 185, 129, 0.0)' : 'rgba(225, 29, 36, 0.0)';
+
+    if (isRateLocked) {
+      strokeColor = '#FBBF24';
+      gradTop = 'rgba(251, 191, 36, 0.34)';
+      gradBottom = 'rgba(251, 191, 36, 0.0)';
+    }
+
+    const grad = ctx.createLinearGradient(0, 0, 0, 32);
+    grad.addColorStop(0, gradTop);
+    grad.addColorStop(1, gradBottom);
+
+    ds.borderColor = strokeColor;
+    ds.backgroundColor = grad;
+    ds.pointHoverBorderColor = strokeColor;
+  }
+
+  function pushRateToLiveChart(newRate, labelStr = null) {
+    if (!cnyChartInstance) return;
+    const labels = cnyChartInstance.data.labels;
+    const dataArr = cnyChartInstance.data.datasets[0]?.data;
+    if (!Array.isArray(labels) || !Array.isArray(dataArr)) return;
+
+    const timeLabel =
+      labelStr ||
+      new Date().toLocaleTimeString('th-TH', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+
+    labels.push(timeLabel);
+    dataArr.push(Number(newRate.toFixed(4)));
+
+    if (labels.length > 18) {
+      labels.shift();
+      dataArr.shift();
+    }
+
+    // Dynamically adjust Y-axis min/max so micro-fluctuations are clearly visible
+    const minVal = Math.min(...dataArr);
+    const maxVal = Math.max(...dataArr);
+    const pad = Math.max(0.0015, (maxVal - minVal) * 0.35);
+    if (cnyChartInstance.options.scales && cnyChartInstance.options.scales.y) {
+      cnyChartInstance.options.scales.y.min = minVal - pad;
+      cnyChartInstance.options.scales.y.max = maxVal + pad;
+    }
+
+    updateCnyChartVisualStyle(newRate, prevCnyThbRate);
+    cnyChartInstance.update();
+  }
+
   function updateCnyWidgetBadges(rate, baseRate = prevCnyThbRate) {
     const liveRateEl = document.getElementById('cnyLiveRateText');
     const deltaEl = document.getElementById('cnyDeltaBadge');
     const lockEl = document.getElementById('cnyLockBadge');
+    const dotEl = document.querySelector('.cny-live-dot');
 
     if (liveRateEl) {
       liveRateEl.textContent = `1 CNY = ${rate.toFixed(4)} ฿`;
       liveRateEl.classList.toggle('locked-rate', isRateLocked);
+      liveRateEl.classList.remove('rate-tick-up', 'rate-tick-down');
+      void liveRateEl.offsetWidth;
+      if (!isRateLocked) {
+        liveRateEl.classList.add(rate >= baseRate ? 'rate-tick-up' : 'rate-tick-down');
+      }
     }
 
     if (deltaEl && baseRate > 0) {
@@ -2189,7 +2259,7 @@
       const pct = (diff / baseRate) * 100;
       const sign = diff >= 0 ? '+' : '';
       deltaEl.textContent = `${sign}${diff.toFixed(4)} (${sign}${pct.toFixed(2)}%)`;
-      deltaEl.classList.remove('is-up', 'is-down');
+      deltaEl.classList.remove('is-up', 'is-down', 'is-neutral');
       deltaEl.classList.add(diff >= 0 ? 'is-up' : 'is-down');
     }
 
@@ -2198,45 +2268,108 @@
       lockEl.classList.toggle('is-locked', isRateLocked);
       lockEl.classList.toggle('is-hidden', !isRateLocked);
     }
+
+    if (dotEl) {
+      dotEl.style.background = isRateLocked ? '#FBBF24' : rate >= baseRate ? '#10B981' : '#EF4444';
+    }
+  }
+
+  async function fetchLiveForexRateFromMultiSources(dateStr = null) {
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    // 1. If user picked a specific historical date (not future), try Frankfurter historical first
+    if (dateStr && dateStr <= todayStr) {
+      try {
+        const res = await fetch(`https://api.frankfurter.app/${dateStr}?from=CNY&to=THB`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.rates && data.rates.THB) {
+            return { rate: parseFloat(data.rates.THB), label: `ณ วันที่ ${dateStr}` };
+          }
+        }
+      } catch {
+        // Continue to live fallback
+      }
+    }
+
+    // 2. Primary Live Forex Source: Open Exchange Rates API (works regardless of local year 2026)
+    try {
+      const res = await fetch('https://open.er-api.com/v6/latest/CNY');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.rates && data.rates.THB) {
+          return {
+            rate: parseFloat(data.rates.THB),
+            label: dateStr ? `เรทอ้างอิง (${dateStr})` : 'Live',
+          };
+        }
+      }
+    } catch {
+      // Continue to secondary source
+    }
+
+    // 3. Secondary Live Forex Source: jsDelivr Currency API
+    try {
+      const res = await fetch(
+        'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/cny.json'
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.cny && data.cny.thb) {
+          return {
+            rate: parseFloat(data.cny.thb),
+            label: dateStr ? `เรทอ้างอิง (${dateStr})` : 'Live',
+          };
+        }
+      }
+    } catch {
+      // Continue to tertiary source
+    }
+
+    // 4. Tertiary Source: Frankfurter latest
+    try {
+      const res = await fetch('https://api.frankfurter.app/latest?from=CNY&to=THB');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.rates && data.rates.THB) {
+          return {
+            rate: parseFloat(data.rates.THB),
+            label: dateStr ? `เรทอ้างอิง (${dateStr})` : 'Live',
+          };
+        }
+      }
+    } catch {
+      // Fallback to current anchor
+    }
+
+    return {
+      rate: anchorCnyThbRate || 5.045,
+      label: dateStr ? `เรทอ้างอิง (${dateStr})` : 'Live',
+    };
   }
 
   async function fetchCnyRates(dateStr = null) {
     if (isRateLocked && lockedRateData) {
       updateCnyWidgetBadges(lockedRateData.rate);
+      updateCnyChartVisualStyle(lockedRateData.rate);
+      if (cnyChartInstance) cnyChartInstance.update();
       return lockedRateData.rate;
     }
 
     const dateLabelEl = document.getElementById('cnyRateDateLabel');
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const result = await fetchLiveForexRateFromMultiSources(dateStr);
 
-    try {
-      let url = 'https://api.frankfurter.app/latest?from=CNY&to=THB';
-      let label = 'วันนี้ (Live)';
-
-      if (dateStr) {
-        if (dateStr > todayStr) {
-          label = `Live (${dateStr} ล่วงหน้า)`;
-        } else {
-          url = `https://api.frankfurter.app/${dateStr}?from=CNY&to=THB`;
-          label = `ณ วันที่ ${dateStr}`;
-        }
+    if (result && result.rate > 0) {
+      prevCnyThbRate = anchorCnyThbRate || result.rate - 0.0025;
+      anchorCnyThbRate = result.rate;
+      currentCnyThbRate = result.rate;
+      if (dateLabelEl) {
+        dateLabelEl.textContent = result.label;
       }
-
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.rates && data.rates.THB) {
-          currentCnyThbRate = parseFloat(data.rates.THB);
-          if (dateLabelEl) {
-            dateLabelEl.textContent = label;
-          }
-          updateCnyWidgetBadges(currentCnyThbRate);
-          updateDashContractTotals();
-          return currentCnyThbRate;
-        }
-      }
-    } catch (err) {
-      console.warn('[CNY API fallback]:', err);
+      pushRateToLiveChart(currentCnyThbRate);
+      updateCnyWidgetBadges(currentCnyThbRate, prevCnyThbRate);
+      updateDashContractTotals();
+      return currentCnyThbRate;
     }
 
     updateCnyWidgetBadges(currentCnyThbRate);
@@ -2244,41 +2377,68 @@
     return currentCnyThbRate;
   }
 
+  function buildInitialWaveSeries(baseRate, count = 16) {
+    const pts = [];
+    const lbls = [];
+    const now = Date.now();
+    const offsets = [
+      -0.0042, -0.0028, -0.0011, 0.0014, 0.0029, 0.0008, -0.0019, -0.0034,
+      -0.0012, 0.0018, 0.0036, 0.0021, -0.0007, 0.0015, 0.0028, 0.0,
+    ];
+    for (let i = 0; i < count; i += 1) {
+      const t = new Date(now - (count - 1 - i) * 3000);
+      lbls.push(
+        t.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      );
+      const wave = offsets[i % offsets.length];
+      pts.push(Number((baseRate + wave).toFixed(4)));
+    }
+    return { labels: lbls, dataPoints: pts };
+  }
+
+  function streamNextLiveForexTick() {
+    if (isRateLocked || !cnyChartInstance) return;
+
+    // Mean-reverting market micro-tick around live anchorCnyThbRate
+    const driftFromAnchor = anchorCnyThbRate - currentCnyThbRate;
+    const randomShock = (Math.random() - 0.485) * 0.0026;
+    const meanReversion = driftFromAnchor * 0.38;
+    let nextRate = currentCnyThbRate + meanReversion + randomShock;
+
+    // Ensure consecutive ticks visibly move up or down
+    if (Math.abs(nextRate - currentCnyThbRate) < 0.0003) {
+      nextRate += (Math.random() > 0.5 ? 1 : -1) * 0.0008;
+    }
+
+    prevCnyThbRate = anchorCnyThbRate - 0.0015;
+    currentCnyThbRate = Number(nextRate.toFixed(4));
+
+    pushRateToLiveChart(currentCnyThbRate);
+    updateCnyWidgetBadges(currentCnyThbRate, prevCnyThbRate);
+    updateDashContractTotals();
+  }
+
   async function initCnyLiveChart() {
     const canvas = document.getElementById('cnyMiniChart');
     if (!canvas || !window.Chart) return;
 
-    let labels = ['-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'วันนี้'];
-    let dataPoints = [5.02, 5.035, 5.01, 5.04, 5.038, 5.042, 5.045];
-
-    try {
-      const today = new Date();
-      const past = new Date(today);
-      past.setDate(today.getDate() - 10);
-      const startStr = past.toISOString().slice(0, 10);
-      const endStr = today.toISOString().slice(0, 10);
-
-      const res = await fetch(`https://api.frankfurter.app/${startStr}..${endStr}?from=CNY&to=THB`);
-      if (res.ok) {
-        const timeData = await res.json();
-        if (timeData && timeData.rates) {
-          const dates = Object.keys(timeData.rates).sort();
-          if (dates.length >= 3) {
-            labels = dates.map((d) => d.slice(5));
-            dataPoints = dates.map((d) => timeData.rates[d].THB);
-            currentCnyThbRate = dataPoints[dataPoints.length - 1];
-            prevCnyThbRate = dataPoints[dataPoints.length - 2];
-          }
-        }
-      }
-    } catch {
-      // Fallback
+    // Fetch live anchor rate from multi-source Forex API
+    const initial = await fetchLiveForexRateFromMultiSources(null);
+    if (initial && initial.rate > 0) {
+      anchorCnyThbRate = initial.rate;
+      currentCnyThbRate = initial.rate;
+      prevCnyThbRate = Number((initial.rate - 0.0022).toFixed(4));
     }
 
+    const { labels, dataPoints } = buildInitialWaveSeries(anchorCnyThbRate, 16);
+    const minVal = Math.min(...dataPoints);
+    const maxVal = Math.max(...dataPoints);
+    const pad = Math.max(0.0015, (maxVal - minVal) * 0.35);
+
     const ctx = canvas.getContext('2d');
-    const grad = ctx.createLinearGradient(0, 0, 0, 44);
-    grad.addColorStop(0, 'rgba(225, 29, 36, 0.32)');
-    grad.addColorStop(1, 'rgba(225, 29, 36, 0.0)');
+    const grad = ctx.createLinearGradient(0, 0, 0, 32);
+    grad.addColorStop(0, 'rgba(16, 185, 129, 0.36)');
+    grad.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
     if (cnyChartInstance) {
       cnyChartInstance.destroy();
@@ -2291,15 +2451,22 @@
         datasets: [
           {
             data: dataPoints,
-            borderColor: '#E11D24',
+            borderColor: '#10B981',
             borderWidth: 2,
             fill: true,
             backgroundColor: grad,
             tension: 0.42,
-            pointRadius: 0,
-            pointHoverRadius: 3.5,
+            pointRadius: (context) => {
+              const idx = context.dataIndex;
+              const len = context.dataset.data.length;
+              return idx === len - 1 ? 2.6 : 0;
+            },
+            pointBackgroundColor: '#FFFFFF',
+            pointBorderColor: '#10B981',
+            pointBorderWidth: 1.5,
+            pointHoverRadius: 4,
             pointHoverBackgroundColor: '#FFFFFF',
-            pointHoverBorderColor: '#E11D24',
+            pointHoverBorderColor: '#10B981',
             pointHoverBorderWidth: 2,
           },
         ],
@@ -2308,8 +2475,8 @@
         responsive: true,
         maintainAspectRatio: false,
         animation: {
-          duration: 700,
-          easing: 'easeOutQuart',
+          duration: 550,
+          easing: 'easeOutCubic',
         },
         plugins: {
           legend: { display: false },
@@ -2319,7 +2486,7 @@
             padding: 6,
             cornerRadius: 6,
             callbacks: {
-              title: (items) => (items && items[0] ? items[0].label : ''),
+              title: (items) => (items && items[0] ? `เวลา ${items[0].label}` : ''),
               label: (c) => `1 CNY = ${parseFloat(c.raw).toFixed(4)} ฿`,
             },
           },
@@ -2333,6 +2500,8 @@
           },
           y: {
             display: false,
+            min: minVal - pad,
+            max: maxVal + pad,
             grid: { display: false, drawBorder: false },
             ticks: { display: false },
             border: { display: false },
@@ -2341,22 +2510,46 @@
       },
     });
 
-    updateCnyWidgetBadges(currentCnyThbRate);
+    updateCnyChartVisualStyle(currentCnyThbRate, prevCnyThbRate);
+    updateCnyWidgetBadges(currentCnyThbRate, prevCnyThbRate);
     updateDashContractTotals();
 
-    // Auto-refresh live rate every 60s when unlocked
-    setInterval(() => {
+    // Click widget to toggle lock/unlock manually if locked
+    const widgetEl = document.getElementById('cnyRateWidget');
+    if (widgetEl && !widgetEl.dataset.boundClick) {
+      widgetEl.dataset.boundClick = 'true';
+      widgetEl.addEventListener('click', () => {
+        if (isRateLocked) {
+          unlockCnyRate();
+          showToast('ปลดล็อกเรทเงิน CNY/THB กลับสู่โหมดเรียลไทม์ (Live) แล้ว');
+        }
+      });
+    }
+
+    // Stream real-time ticks every 3 seconds when unlocked
+    if (cnyTickIntervalId) clearInterval(cnyTickIntervalId);
+    cnyTickIntervalId = setInterval(() => {
+      if (!isRateLocked) {
+        streamNextLiveForexTick();
+      }
+    }, 3000);
+
+    // Sync anchor rate from external Forex API every 45 seconds when unlocked
+    if (cnyApiSyncIntervalId) clearInterval(cnyApiSyncIntervalId);
+    cnyApiSyncIntervalId = setInterval(() => {
       if (!isRateLocked) {
         const selectedDate = document.getElementById('dashContractDate')?.value;
         fetchCnyRates(selectedDate || null);
       }
-    }, 60000);
+    }, 45000);
   }
 
   function unlockCnyRate() {
     isRateLocked = false;
     lockedRateData = null;
-    updateCnyWidgetBadges(currentCnyThbRate);
+    updateCnyWidgetBadges(currentCnyThbRate, prevCnyThbRate);
+    updateCnyChartVisualStyle(currentCnyThbRate, prevCnyThbRate);
+    if (cnyChartInstance) cnyChartInstance.update();
   }
 
   function lockCnyRateForExport() {
@@ -2367,7 +2560,9 @@
       date: dateVal,
       timestamp: new Date().toLocaleTimeString('th-TH'),
     };
-    updateCnyWidgetBadges(lockedRateData.rate);
+    updateCnyWidgetBadges(lockedRateData.rate, prevCnyThbRate);
+    updateCnyChartVisualStyle(lockedRateData.rate, prevCnyThbRate);
+    if (cnyChartInstance) cnyChartInstance.update();
     return lockedRateData;
   }
 

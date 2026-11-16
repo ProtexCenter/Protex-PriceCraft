@@ -2945,9 +2945,27 @@ input[type="number"],
   color: #FBBF24;
 }
 
+@keyframes rateFlashUp {
+  0% { color: #34D399; text-shadow: 0 0 8px rgba(52, 211, 153, 0.45); }
+  100% { color: #FFFFFF; text-shadow: none; }
+}
+
+@keyframes rateFlashDown {
+  0% { color: #F87171; text-shadow: 0 0 8px rgba(248, 113, 113, 0.45); }
+  100% { color: #FFFFFF; text-shadow: none; }
+}
+
+.cny-current-rate.rate-tick-up {
+  animation: rateFlashUp 900ms ease-out;
+}
+
+.cny-current-rate.rate-tick-down {
+  animation: rateFlashDown 900ms ease-out;
+}
+
 .cny-chart-box {
-  width: 78px;
-  height: 28px;
+  width: 88px;
+  height: 30px;
   position: relative;
   display: flex;
   align-items: center;
