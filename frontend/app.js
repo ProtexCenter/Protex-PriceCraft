@@ -1620,7 +1620,7 @@
   const APPWRITE_CONFIG = {
     endpoint: externalConfig.endpoint || 'https://sgp.cloud.appwrite.io/v1',
     projectId: externalConfig.projectId || '6af2e5a000218106d920',
-    databaseId: externalConfig.databaseId || 'YOUR_DATABASE_ID',
+    databaseId: externalConfig.databaseId || 'ProtexNewsDB',
     collectionId: externalConfig.collectionId || 'user_drafts',
     localFallbackPrefix: 'pc_appwrite_draft_',
   };

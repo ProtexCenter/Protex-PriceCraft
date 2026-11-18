@@ -5,7 +5,7 @@
   const APPWRITE_CONFIG = {
     endpoint: env.VITE_APPWRITE_ENDPOINT || 'https://sgp.cloud.appwrite.io/v1',
     projectId: env.VITE_APPWRITE_PROJECT_ID || '6af2e5a000218106d920',
-    databaseId: env.VITE_APPWRITE_DATABASE_ID || 'YOUR_DATABASE_ID',
+    databaseId: env.VITE_APPWRITE_DATABASE_ID || 'ProtexNewsDB',
     collectionId: env.VITE_APPWRITE_COLLECTION_ID || 'user_drafts',
     employeesCollectionId: env.VITE_APPWRITE_EMPLOYEES_COLLECTION_ID || '6af2e9c6003dafa5b692',
     contractsCollectionId: env.VITE_APPWRITE_CONTRACTS_COLLECTION_ID || 'contracts',
@@ -161,31 +161,82 @@
 
   async function verifyEmployee(employeeId) {
     const rawKey = String(employeeId || '').trim();
-    if (!rawKey || !databases || !global.Appwrite || APPWRITE_CONFIG.databaseId === 'YOUR_DATABASE_ID') {
-      return null;
-    }
+    if (!rawKey) return null;
+    const lowerKey = rawKey.toLowerCase();
 
-    const { Query } = global.Appwrite;
-    const candidates = Array.from(new Set([rawKey, rawKey.toUpperCase(), rawKey.toLowerCase()]));
+    // 1. Check Appwrite Cloud Database (ProtexNewsDB -> Employees 6af2e9c6003dafa5b692)
+    if (databases && global.Appwrite && APPWRITE_CONFIG.databaseId && APPWRITE_CONFIG.databaseId !== 'YOUR_DATABASE_ID') {
+      const { Query } = global.Appwrite;
+      const candidates = Array.from(new Set([rawKey, rawKey.toUpperCase(), rawKey.toLowerCase()]));
 
-    for (const candidate of candidates) {
+      for (const candidate of candidates) {
+        try {
+          const res = await databases.listDocuments(
+            APPWRITE_CONFIG.databaseId,
+            APPWRITE_CONFIG.employeesCollectionId,
+            [Query.equal('id', candidate), Query.limit(1)]
+          );
+          if (res && res.documents && res.documents.length > 0) {
+            const emp = res.documents[0];
+            return {
+              id: emp.id || emp.emp_id || candidate,
+              name: emp.fullname || emp.full_name || emp.name || candidate,
+              role: emp.role || emp.category || emp.department || 'พนักงานโพรเทคส์',
+            };
+          }
+        } catch {
+          // If 'id' attribute is not indexed, fallback to full list scan below
+          break;
+        }
+      }
+
+      // Fallback: Fetch employee list without filter (works even when 'id' index is not created in Appwrite)
       try {
-        const res = await databases.listDocuments(
+        const listRes = await databases.listDocuments(
           APPWRITE_CONFIG.databaseId,
           APPWRITE_CONFIG.employeesCollectionId,
-          [Query.equal('id', candidate), Query.limit(1)]
+          Query ? [Query.limit(100)] : []
         );
-        if (res && res.documents && res.documents.length > 0) {
-          const emp = res.documents[0];
-          return {
-            id: emp.id || candidate,
-            name: emp.fullname || emp.name || candidate,
-            role: emp.role || emp.department || 'พนักงานโพรเทคส์',
-          };
+        if (listRes && Array.isArray(listRes.documents)) {
+          const matchedDoc = listRes.documents.find((doc) => {
+            const docCode = String(doc.id || doc.emp_id || doc.$id || '').trim().toLowerCase();
+            return docCode === lowerKey;
+          });
+          if (matchedDoc) {
+            return {
+              id: matchedDoc.id || matchedDoc.emp_id || rawKey.toUpperCase(),
+              name: matchedDoc.fullname || matchedDoc.full_name || matchedDoc.name || rawKey.toUpperCase(),
+              role: matchedDoc.role || matchedDoc.category || matchedDoc.department || 'พนักงานโพรเทคส์',
+            };
+          }
         }
       } catch {
+        // Fallback to local cache if offline or CORS restricted
       }
     }
+
+    // 2. Check LocalStorage Employee Cache (if synced on same browser)
+    try {
+      const cachedRaw = localStorage.getItem('protex_appwrite_employees_v2');
+      if (cachedRaw) {
+        const cachedList = JSON.parse(cachedRaw);
+        if (Array.isArray(cachedList)) {
+          const foundLocal = cachedList.find(
+            (e) => String(e.id || e.emp_id || '').trim().toLowerCase() === lowerKey
+          );
+          if (foundLocal) {
+            return {
+              id: foundLocal.id || foundLocal.emp_id || rawKey.toUpperCase(),
+              name: foundLocal.fullname || foundLocal.full_name || foundLocal.name || rawKey.toUpperCase(),
+              role: foundLocal.role || foundLocal.category || 'พนักงานโพรเทคส์',
+            };
+          }
+        }
+      }
+    } catch {
+      // Ignore storage errors
+    }
+
     return null;
   }
 

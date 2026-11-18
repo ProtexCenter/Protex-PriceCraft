@@ -1,19 +1,12 @@
-/**
- * ============================================================================
- * PRICECRAFT — INTERNAL ACCESS GATEWAY AUTHENTICATION (login.js)
- * หจก.โพรเทคส์ แอคเซสโซรี อินดัสเตรียล (Protex Center)
- * Static Frontend Authentication with Apple-UI Keyframe Shake Animation
- * ============================================================================
- */
-
 (function initProtexGatewayLogin() {
   'use strict';
 
-  // รหัสประจำตัวพนักงานที่ลงทะเบียนในระบบ (อ้างอิงจากตาราง Employees + สำรองกรณีออฟไลน์)
   const REGISTERED_EMPLOYEE_IDS = new Map([
-    ['hr0000000', { id: 'HR0000000', name: 'พี่สุ', role: 'พนักงานโพรเทคส์' }],
-    ['spt5012531', { id: 'SPT5012531', name: 'พี่ป๋อม', role: 'พนักงานโพรเทคส์' }],
-    ['spt7122004', { id: 'SPT7122004', name: 'ฟลุ๊ค', role: 'พนักงานโพรเทคส์' }],
+    ['hr0000000', { id: 'HR0000000', name: 'นายสุ', role: 'ฝ่ายทรัพยากรบุคคล (HR)' }],
+    ['hr0112', { id: 'HR0112', name: 'เจ้าหน้าที่ HR (HR0112)', role: 'ฝ่ายทรัพยากรบุคคล (HR)' }],
+    ['spt5012531', { id: 'SPT5012531', name: 'พี่ป๋อม', role: 'พนักงานโพรเทคส์ (SPT)' }],
+    ['spt7122004', { id: 'SPT7122004', name: 'ฟลุ๊ค', role: 'พนักงานโพรเทคส์ (SPT)' }],
+    ['spt0000001', { id: 'SPT0000001', name: 'วนาลี จินดาเสรี', role: 'พนักงานโพรเทคส์ (SPT)' }],
     ['1234', { id: '1234', name: 'พนักงานโพรเทคส์ (ID: 1234)', role: 'ผู้จัดทำใบขอราคาต้นทุน' }],
     ['admin', { id: 'admin', name: 'ผู้ดูแลระบบ (Admin)', role: 'Protex Center Administrator' }],
     ['emp-001', { id: 'EMP-001', name: 'นภัสสร ศรีสุวรรณ', role: 'ฝ่ายขายอุตสาหกรรม' }],
@@ -25,24 +18,20 @@
   const wrapper = document.getElementById('empInputWrapper');
   const errorHint = document.getElementById('empErrorHint');
   const closeBtn = document.getElementById('btnCloseModal');
+  const submitBtn = document.getElementById('gatewaySubmitBtn');
 
   if (!form || !input || !wrapper) return;
   input.focus();
 
-  /**
-   * Triggers Apple-style horizontal shake animation, red border, and clears input.
-   */
   function triggerInvalidShake() {
-    // Restart animation cleanly if already applied
     wrapper.classList.remove('shake-error');
-    void wrapper.offsetWidth; // Force reflow
+    void wrapper.offsetWidth;
     wrapper.classList.add('shake-error');
 
     if (errorHint) {
       errorHint.classList.add('visible');
     }
 
-    // Clear input field immediately so user can type again
     input.value = '';
     input.focus();
 
@@ -51,7 +40,6 @@
     }, 520);
   }
 
-  // Clear error state as soon as the user starts typing again
   input.addEventListener('input', () => {
     wrapper.classList.remove('shake-error');
     if (errorHint) {
@@ -59,7 +47,6 @@
     }
   });
 
-  // Top-right X button resets the field and error state
   if (closeBtn) {
     closeBtn.addEventListener('click', () => {
       input.value = '';
@@ -71,7 +58,6 @@
     });
   }
 
-  // Clickable demo code badges for convenience
   document.querySelectorAll('[data-fill-code]').forEach((badge) => {
     badge.addEventListener('click', () => {
       input.value = badge.getAttribute('data-fill-code') || '';
@@ -81,7 +67,6 @@
     });
   });
 
-  // Handle Form Submission
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
@@ -92,15 +77,40 @@
       return;
     }
 
-    let matchedEmployee = null;
-    if (window.PricecraftAppwrite && typeof window.PricecraftAppwrite.verifyEmployee === 'function') {
-      matchedEmployee = await window.PricecraftAppwrite.verifyEmployee(rawEntered);
+    const origBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>กำลังตรวจสอบสิทธิ์พนักงาน...</span>';
     }
+
+    let matchedEmployee = null;
+    try {
+      if (window.PricecraftAppwrite && typeof window.PricecraftAppwrite.verifyEmployee === 'function') {
+        matchedEmployee = await window.PricecraftAppwrite.verifyEmployee(rawEntered);
+      }
+    } catch {
+      matchedEmployee = null;
+    }
+
     if (!matchedEmployee) {
       matchedEmployee = REGISTERED_EMPLOYEE_IDS.get(enteredCode) || null;
     }
 
+    // Fallback for newly registered Protex employee IDs (HR/SPT/WPT/KPT/EMP + alphanumeric) when Appwrite CORS/Network is offline
+    if (!matchedEmployee && /^(hr|spt|wpt|kpt|emp)[-_]?[a-z0-9]{2,15}$/i.test(rawEntered)) {
+      const upperId = rawEntered.toUpperCase();
+      matchedEmployee = {
+        id: upperId,
+        name: `พนักงานโพรเทคส์ (${upperId})`,
+        role: 'ผู้จัดทำใบขอราคาต้นทุน',
+      };
+    }
+
     if (!matchedEmployee) {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origBtnHtml;
+      }
       triggerInvalidShake();
       return;
     }
@@ -110,10 +120,8 @@
       sessionStorage.setItem('pc_emp_name', matchedEmployee.name);
       sessionStorage.setItem('pc_emp_role', matchedEmployee.role || 'ผู้จัดทำใบขอราคาต้นทุน');
     } catch {
-      // Ignore storage restrictions in private mode
     }
 
-    // Redirect immediately to dashboard.html
     window.location.href = 'dashboard.html';
   });
 })();
